@@ -1,6 +1,6 @@
-// The TMDB API Key will be securely fetched from Vercel's Environment Variables.
-// You must set a variable named 'VITE_TMDB_API_KEY' in your Vercel project settings.
-const tmdbApiKey = process.env.VITE_TMDB_API_KEY; 
+// Vercel requires the NEXT_PUBLIC_ prefix to expose environment variables to the browser.
+// You must set a variable named 'NEXT_PUBLIC_TMDB_API_KEY' in your Vercel project settings.
+const tmdbApiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY; 
 const tmdbApiBaseUrl = 'https://api.themoviedb.org/3';
 
 /**
@@ -10,9 +10,9 @@ const tmdbApiBaseUrl = 'https://api.themoviedb.org/3';
  * @returns {Promise<Object|null>} The JSON response from the API, or null on error.
  */
 async function fetchFromTMDb(endpoint, params = {}) {
-    // This function requires the VITE_TMDB_API_KEY to be set in Vercel
+    // This function requires the NEXT_PUBLIC_TMDB_API_KEY to be set in Vercel
     if (!tmdbApiKey) {
-        console.error("TMDB API Key is not configured. Please set VITE_TMDB_API_KEY in your Vercel environment variables.");
+        console.error("TMDB API Key is not configured. Please set NEXT_PUBLIC_TMDB_API_KEY in your Vercel environment variables.");
         // Display a user-friendly error in the UI if possible
         return null;
     }
