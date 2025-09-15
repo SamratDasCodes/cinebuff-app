@@ -1,36 +1,29 @@
-// Vercel requires the NEXT_PUBLIC_ prefix to expose environment variables to the browser.
-// You must set a variable named 'NEXT_PUBLIC_TMDB_API_KEY' in your Vercel project settings.
-const tmdbApiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY; 
-const tmdbApiBaseUrl = 'https://api.themoviedb.org/3';
+// This file no longer contains any API keys. It now securely calls your own backend endpoints.
 
 /**
- * Fetches data from The Movie Database (TMDB) API.
- * @param {string} endpoint - The API endpoint to call (e.g., 'trending/movie/week').
+ * Securely fetches data from The Movie Database (TMDB) via our own backend proxy.
+ * @param {string} endpoint - The TMDB API endpoint to call (e.g., 'trending/movie/week').
  * @param {Object} [params={}] - An object of query parameters to add to the request.
  * @returns {Promise<Object|null>} The JSON response from the API, or null on error.
  */
 async function fetchFromTMDb(endpoint, params = {}) {
-    // This function requires the NEXT_PUBLIC_TMDB_API_KEY to be set in Vercel
-    if (!tmdbApiKey) {
-        console.error("TMDB API Key is not configured. Please set NEXT_PUBLIC_TMDB_API_KEY in your Vercel environment variables.");
-        // Display a user-friendly error in the UI if possible
-        return null;
-    }
-    const urlParams = new URLSearchParams({
-        api_key: tmdbApiKey,
-        ...params,
-    });
-    const url = `${tmdbApiBaseUrl}/${endpoint}?${urlParams}`;
-
     try {
-        const response = await fetch(url);
+        // All TMDB requests are now proxied through our own serverless function
+        // to keep the API key secure.
+        const response = await fetch('/api/tmdb', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint, params })
+        });
+
         if (!response.ok) {
-            console.error(`API Error: ${response.status} ${response.statusText}`);
+            const errorBody = await response.json();
+            console.error(`TMDB Proxy Error: ${response.status}`, errorBody.error);
             return null;
         }
         return response.json();
     } catch (error) {
-        console.error('Failed to fetch from TMDB:', error);
+        console.error('Failed to fetch from TMDB proxy:', error);
         return null;
     }
 }
