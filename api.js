@@ -1,15 +1,13 @@
-// This file no longer contains any API keys. It now securely calls your own backend endpoints.
-
 /**
- * Securely fetches data from The Movie Database (TMDB) via our own backend proxy.
+ * Fetches data from our secure TMDB proxy function.
  * @param {string} endpoint - The TMDB API endpoint to call (e.g., 'trending/movie/week').
  * @param {Object} [params={}] - An object of query parameters to add to the request.
  * @returns {Promise<Object|null>} The JSON response from the API, or null on error.
  */
 async function fetchFromTMDb(endpoint, params = {}) {
     try {
-        // All TMDB requests are now proxied through our own serverless function
-        // to keep the API key secure.
+        // This makes a POST request to our own backend function (/api/tmdb)
+        // which then securely calls the real TMDB API.
         const response = await fetch('/api/tmdb', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -18,12 +16,14 @@ async function fetchFromTMDb(endpoint, params = {}) {
 
         if (!response.ok) {
             const errorBody = await response.json();
-            console.error(`TMDB Proxy Error: ${response.status}`, errorBody.error);
+            console.error(`Proxy API Error: ${response.status} ${response.statusText}`, errorBody.error);
             return null;
         }
+        
         return response.json();
+
     } catch (error) {
-        console.error('Failed to fetch from TMDB proxy:', error);
+        console.error('Failed to fetch from our TMDB proxy:', error);
         return null;
     }
 }
@@ -59,4 +59,3 @@ async function callGemini(prompt) {
         return "Sorry, there was an error connecting to the AI.";
     }
 }
-
