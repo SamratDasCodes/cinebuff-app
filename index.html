@@ -195,730 +195,263 @@
             background-color: #ef4444;
             color: white;
         }
-
-        /* --- ENHANCED MOBILE UI STYLES --- */
-
-        /* Mobile Navigation */
-        #mobile-nav {
-            background: linear-gradient(180deg, rgba(17, 24, 39, 0.95) 0%, rgba(17, 24, 39, 0.98) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(75, 85, 99, 0.3);
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        #mobile-nav button {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        #mobile-nav button.active {
-            color: #818cf8;
-            transform: translateY(-2px);
-        }
-
-        #mobile-nav button.active::after {
-            content: '';
-            position: absolute;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 24px;
-            height: 3px;
-            background: linear-gradient(90deg, #818cf8, #a78bfa);
-            border-radius: 2px;
-        }
-
-        /* Mobile Cards */
-        .mobile-card {
-            background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(75, 85, 99, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .mobile-card:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-            border-color: rgba(129, 140, 248, 0.3);
-        }
-
-        .mobile-card img {
-            transition: transform 0.3s ease;
-        }
-
-        .mobile-card:hover img {
-            transform: scale(1.05);
-        }
-
-        /* Mobile Typography */
-        .mobile-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            line-height: 1.4;
-            color: #f9fafb;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        .mobile-subtitle {
-            font-size: 0.875rem;
-            font-weight: 400;
-            color: #d1d5db;
-            opacity: 0.9;
-        }
-
-        /* Mobile Header */
-        .mobile-header {
-            background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(75, 85, 99, 0.3);
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        /* Mobile Tabs */
-        .mobile-tab {
-            position: relative;
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .mobile-tab.active {
-            background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
-        }
-
-        .mobile-tab:not(.active) {
-            color: #9ca3af;
-        }
-
-        /* Mobile Search */
-        .mobile-search {
-            background: rgba(55, 65, 81, 0.8);
-            border: 1px solid rgba(75, 85, 99, 0.3);
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            color: #f9fafb;
-            backdrop-filter: blur(10px);
-        }
-
-        .mobile-search:focus {
-            outline: none;
-            border-color: #818cf8;
-            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
-        }
-
-        /* Mobile Filter Modal */
-        #mobile-filter-modal {
-            background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            margin: 1rem;
-            max-height: calc(100vh - 2rem);
-            overflow-y: auto;
-        }
-
-        /* Mobile Buttons */
-        .mobile-btn-primary {
-            background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
-            border: none;
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
-        }
-
-        .mobile-btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(129, 140, 248, 0.4);
-        }
-
-        /* Mobile Grid */
-        .mobile-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            padding: 1rem;
-        }
-
-        /* Swipe Indicators */
-        .swipe-indicator {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 0.5rem;
-            z-index: 5;
-        }
-
-        .swipe-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .swipe-dot.active {
-            background: #818cf8;
-            transform: scale(1.2);
-        }
-
-        /* Pull to Refresh */
-        .pull-refresh {
-            position: absolute;
-            top: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #9ca3af;
-            font-size: 0.875rem;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .pull-refresh.visible {
-            opacity: 1;
-        }
-
-        /* Enhanced Loading States */
-        .mobile-skeleton {
-            background: linear-gradient(90deg, rgba(55, 65, 81, 0.8) 25%, rgba(75, 85, 99, 0.8) 50%, rgba(55, 65, 81, 0.8) 75%);
-            background-size: 200% 100%;
-            animation: mobile-shimmer 1.5s infinite;
-            border-radius: 8px;
-        }
-
-        @keyframes mobile-shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        /* Mobile Modal Enhancements */
-        .mobile-modal {
-            background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            margin: 1rem;
-            max-height: calc(100vh - 2rem);
-            overflow-y: auto;
-        }
-
-        /* Mobile Scrollbar */
-        .mobile-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .mobile-scroll::-webkit-scrollbar-track {
-            background: rgba(55, 65, 81, 0.3);
-            border-radius: 2px;
-        }
-
-        .mobile-scroll::-webkit-scrollbar-thumb {
-            background: rgba(129, 140, 248, 0.5);
-            border-radius: 2px;
-        }
-
-        .mobile-scroll::-webkit-scrollbar-thumb:hover {
-            background: rgba(129, 140, 248, 0.7);
-        }
     </style>
 </head>
 <body>
-    <div id="app" class="p-0 sm:p-4 md:p-6 lg:p-8">
+    <div id="app" class="container mx-auto p-4 md:p-6 lg:p-8">
 
-        <!-- =================================== -->
-        <!-- =========== DESKTOP UI ============ -->
-        <!-- =================================== -->
-        <div id="desktop-ui" class="container mx-auto">
-            <div id="home-page">
-                 <header class="mb-10 relative flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div class="w-full md:w-1/3">
-                        <!-- User ID section has been moved to the My Lists page -->
-                    </div>
-                    <div class="w-full md:w-1/3 text-center">
-                        <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">CineBuff</h1>
-                        <p class="text-lg text-gray-400">Your cinematic universe, beautifully organized.</p>
-                    </div>
-                    <div class="w-full md:w-1/3 flex justify-center md:justify-end gap-2">
-                         <button id="myListsBtn" class="btn-secondary p-3 rounded-lg" title="My Lists">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7zm0 3v1h4v-1H7z"></path></svg>
-                        </button>
-                        <button id="discoverLinkBtn" class="btn-secondary p-3 rounded-lg" title="Go to Discover & Search">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        </button>
-                    </div>
-                </header>
-        
-                <section id="featured-section" class="mb-12 bg-gray-900/50 p-6 rounded-xl">
-                    <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-                        <h2 id="featured-title" class="text-3xl font-bold text-indigo-300 mb-4 md:mb-0">Trending Today</h2>
-                        <div class="flex flex-wrap justify-center md:flex-nowrap items-center gap-2">
-                             <button id="trendingBtn" class="btn-primary text-sm font-semibold py-2 px-4 rounded-md">Trending Today</button>
-                             <button id="recentBtn" class="btn-secondary text-sm font-semibold py-2 px-4 rounded-md">Recent Releases</button>
-                             <button id="upcomingBtn" class="btn-secondary text-sm font-semibold py-2 px-4 rounded-md">Upcoming Movies</button>
-                             <button id="surpriseBtn" class="btn-secondary text-sm font-semibold py-2 px-4 rounded-md flex items-center">Surprise Me</button>
-                        </div>
-                    </div>
-                    <div id="featured-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
-                </section>
-                
-                <section id="recent-section" class="mb-12">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-2xl font-semibold text-indigo-400">Recently Released</h3>
-                        <div id="recent-lang-filters" class="flex space-x-2">
-                            <button data-lang="en" class="lang-filter-btn btn-primary text-sm py-1 px-3 rounded-md">English</button>
-                            <button data-lang="hi" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Hindi</button>
-                            <button data-lang="bn" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Bengali</button>
-                        </div>
-                    </div>
-                    <div id="recent-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4"></div>
-                </section>
+        <div id="home-page">
+             <header class="mb-10 relative flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="w-full md:w-1/3">
+                    <!-- User ID section has been moved to the My Lists page -->
+                </div>
+                <div class="w-full md:w-1/3 text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">CineBuff</h1>
+                    <p class="text-lg text-gray-400">Your cinematic universe, beautifully organized.</p>
+                </div>
+                <div class="w-full md:w-1/3 flex justify-center md:justify-end gap-2">
+                     <button id="myListsBtn" class="btn-secondary p-3 rounded-lg" title="My Lists">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7zm0 3v1h4v-1H7z"></path></svg>
+                    </button>
+                    <button id="discoverLinkBtn" class="btn-secondary p-3 rounded-lg" title="Go to Discover & Search">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </div>
+            </header>
     
-                <section id="upcoming-section" class="mb-12">
-                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-2xl font-semibold text-indigo-400">Upcoming Movies</h3>
-                        <div id="upcoming-lang-filters" class="flex space-x-2">
-                            <button data-lang="en" class="lang-filter-btn btn-primary text-sm py-1 px-3 rounded-md">English</button>
-                            <button data-lang="hi" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Hindi</button>
-                            <button data-lang="bn" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Bengali</button>
+            <section id="featured-section" class="mb-12 bg-gray-900/50 p-6 rounded-xl">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <h2 id="featured-title" class="text-3xl font-bold text-indigo-300 mb-4 md:mb-0">Trending Today</h2>
+                    <div class="flex flex-wrap justify-center md:flex-nowrap items-center gap-2">
+                         <button id="trendingBtn" class="btn-primary text-sm font-semibold py-2 px-4 rounded-md">Trending Today</button>
+                         <button id="recentBtn" class="btn-secondary text-sm font-semibold py-2 px-4 rounded-md">Recent Releases</button>
+                         <button id="upcomingBtn" class="btn-secondary text-sm font-semibold py-2 px-4 rounded-md">Upcoming Movies</button>
+                         <button id="surpriseBtn" class="btn-secondary text-sm font-semibold py-2 px-4 rounded-md flex items-center">Surprise Me</button>
+                    </div>
+                </div>
+                <div id="featured-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
+            </section>
+            
+            <section id="recent-section" class="mb-12">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-2xl font-semibold text-indigo-400">Recently Released</h3>
+                    <div id="recent-lang-filters" class="flex space-x-2">
+                        <button data-lang="en" class="lang-filter-btn btn-primary text-sm py-1 px-3 rounded-md">English</button>
+                        <button data-lang="hi" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Hindi</button>
+                        <button data-lang="bn" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Bengali</button>
+                    </div>
+                </div>
+                <div id="recent-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4"></div>
+            </section>
+
+            <section id="upcoming-section" class="mb-12">
+                 <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-2xl font-semibold text-indigo-400">Upcoming Movies</h3>
+                    <div id="upcoming-lang-filters" class="flex space-x-2">
+                        <button data-lang="en" class="lang-filter-btn btn-primary text-sm py-1 px-3 rounded-md">English</button>
+                        <button data-lang="hi" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Hindi</button>
+                        <button data-lang="bn" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Bengali</button>
+                    </div>
+                </div>
+                <div id="upcoming-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4"></div>
+            </section>
+        </div>
+
+        <div id="discover-page" class="hidden">
+            <header class="relative text-center mb-4">
+                <h2 class="text-4xl md:text-5xl font-bold text-white">Discover & Search</h2>
+                 <button id="homeBtn" class="absolute top-0 right-0 btn-secondary p-3 rounded-lg" title="Go to Home">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                </button>
+            </header>
+            <div id="filter-section" class="bg-gray-900/50 p-6 rounded-xl mt-8 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="searchInput" placeholder="Search by..." class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <select id="searchTypeDropdown" class="w-40 p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none text-center">
+                            <option value="title" selected>Title</option>
+                            <option value="keyword">Keyword</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="directorSearch" class="sr-only">Search by Director or Creator</label>
+                        <input type="text" id="directorSearch" placeholder="Director/Creator Name..." class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+            
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-center">
+                    <div id="genreFilterContainer" class="relative lg:col-span-2">
+                        <label for="genreFilterDisplay" class="sr-only">Genre</label>
+                        <div id="genreFilterDisplay" class="w-full p-3 h-[50px] rounded-md bg-gray-800 text-white border border-gray-700 flex items-center cursor-pointer overflow-hidden">
+                            <span id="genreFilterPlaceholder" class="text-gray-400">Filter by Genre</span>
+                            <div id="selectedGenresContainer" class="flex flex-nowrap gap-1"></div>
+                        </div>
+                        <div id="genreFilterDropdown" class="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg hidden max-h-60 overflow-y-auto"></div>
+                    </div>
+                    <div>
+                        <label for="yearFilter" class="sr-only">Year</label>
+                        <input type="number" id="yearFilter" placeholder="Year" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                    </div>
+                    <div class="w-full relative">
+                        <label for="certCountryFilter" class="sr-only">Certification Country</label>
+                        <select id="certCountryFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                            <option value="">Rating Region</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                         </div>
                     </div>
-                    <div id="upcoming-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4"></div>
-                </section>
+                     <div class="w-full relative">
+                        <label for="certificationFilter" class="sr-only">Certification</label>
+                        <select id="certificationFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none" disabled>
+                            <option value="">Select Rating</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
+                    <div class="w-full relative">
+                        <label for="languageFilter" class="sr-only">Language</label>
+                        <select id="languageFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                            <option value="">All Languages</option>
+                            <option value="en">English</option>
+                            <option value="hi">Hindi</option>
+                            <option value="bn">Bengali</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="ja">Japanese</option>
+                            <option value="ko">Korean</option>
+                            <option value="zh">Chinese</option>
+                            <option value="ru">Russian</option>
+                            <option value="it">Italian</option>
+                            <option value="pt">Portuguese</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 pt-2 items-center">
+                    <div class="w-full md:col-span-2">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="minRatingFilter" class="text-sm text-gray-300 mb-1 block">Min. Rating: <span id="minRatingValue">0.0</span></label>
+                                <input type="range" id="minRatingFilter" min="0" max="10" step="0.5" value="0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label for="maxRatingFilter" class="text-sm text-gray-300 mb-1 block">Max. Rating: <span id="maxRatingValue">10.0</span></label>
+                                <input type="range" id="maxRatingFilter" min="0" max="10" step="0.5" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full relative pt-5">
+                        <label for="contentTypeFilter" class="sr-only">Content Type</label>
+                        <select id="contentTypeFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                            <option value="both" selected>Movies & Series</option>
+                            <option value="movie">Movies Only</option>
+                            <option value="tv">Series Only</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pt-5 px-2 text-gray-400">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-start md:justify-end items-center pt-5">
+                        <button id="applyFiltersBtn" class="btn-primary font-bold py-2 px-6 rounded-md w-full sm:w-auto">Search</button>
+                        <button id="resetFiltersBtn" class="btn-secondary font-bold py-2 px-6 rounded-md w-full sm:w-auto">Reset</button>
+                        <button id="exportCsvBtn" class="btn-secondary font-bold py-2 px-6 rounded-md w-full sm:w-auto hidden">Export</button>
+                    </div>
+                </div>
             </div>
-    
-            <div id="discover-page" class="hidden">
-                <header class="relative text-center mb-4">
-                    <h2 class="text-4xl md:text-5xl font-bold text-white">Discover & Search</h2>
-                     <button id="homeBtn" class="absolute top-0 right-0 btn-secondary p-3 rounded-lg" title="Go to Home">
+
+            <section>
+               <h2 id="grid-title" class="text-2xl font-semibold mb-4 text-indigo-400">Top Rated Movies & Series</h2>
+               <div id="loader" class="flex justify-center items-center py-16"><div class="loader"></div></div>
+               <div id="no-results" class="hidden text-center py-16">
+                   <h3 class="text-xl font-semibold text-gray-400">No Results Found</h3><p class="text-gray-500 mt-2">Try adjusting your search or filters.</p>
+               </div>
+               <div id="movie-list-container" class="hidden overflow-x-auto rounded-lg border border-gray-800">
+                    <table id="movie-list" class="min-w-full zebra-table">
+                        <thead class="bg-gray-800">
+                            <tr>
+                                <th scope="col" class="w-20 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Poster</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Title</th>
+                                <th scope="col" class="w-48 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Genre</th>
+                                <th scope="col" class="w-48 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Keywords</th>
+                                <th scope="col" class="w-24 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Year</th>
+                                <th scope="col" class="w-20 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Language</th>
+                                <th scope="col" class="w-28 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Rating</th>
+                                <th scope="col" class="w-28 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">PG RATING</th>
+                                <th scope="col" class="w-20 px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">Trailer</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800"></tbody>
+                    </table>
+               </div>
+               <div id="loader-more" class="hidden justify-center items-center py-8"><div class="loader"></div></div>
+           </section>
+        </div>
+
+        <div id="my-lists-page" class="hidden">
+             <header class="relative flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+                <div class="w-full md:w-1/3 text-center md:text-left">
+                     <div class="bg-gray-800/50 p-2 rounded-lg inline-block">
+                        <label for="userIdInput" class="text-xs text-gray-400">Your User ID (for syncing):</label>
+                        <div class="flex items-center gap-2 mt-1">
+                            <input type="text" id="userIdInput" class="bg-gray-900 text-gray-300 text-sm rounded px-2 py-1 w-40 sm:w-48">
+                            <button id="copyUserIdBtn" title="Copy ID" class="btn-secondary p-1.5 rounded">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM5 11a1 1 0 100 2h4a1 1 0 100-2H5z"></path></svg>
+                            </button>
+                             <button id="loadUserIdBtn" title="Load Bookmarks for this ID" class="btn-primary p-1.5 rounded">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M4 12a8 8 0 108 8V12H4z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 text-center">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white">My Lists</h2>
+                </div>
+                <div class="w-full md:w-1/3 flex justify-center md:justify-end">
+                     <button id="homeFromListsBtn" class="btn-secondary p-3 rounded-lg" title="Go to Home">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                     </button>
-                </header>
-                <div id="filter-section" class="bg-gray-900/50 p-6 rounded-xl mt-8 space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="flex items-center space-x-2">
-                            <input type="text" id="searchInput" placeholder="Search by..." class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <select id="searchTypeDropdown" class="w-40 p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none text-center">
-                                <option value="title" selected>Title</option>
-                                <option value="keyword">Keyword</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="directorSearch" class="sr-only">Search by Director or Creator</label>
-                            <input type="text" id="directorSearch" placeholder="Director/Creator Name..." class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        </div>
-                    </div>
-                
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-center">
-                        <div id="genreFilterContainer" class="relative lg:col-span-2">
-                            <label for="genreFilterDisplay" class="sr-only">Genre</label>
-                            <div id="genreFilterDisplay" class="w-full p-3 h-[50px] rounded-md bg-gray-800 text-white border border-gray-700 flex items-center cursor-pointer overflow-hidden">
-                                <span id="genreFilterPlaceholder" class="text-gray-400">Filter by Genre</span>
-                                <div id="selectedGenresContainer" class="flex flex-nowrap gap-1"></div>
-                            </div>
-                            <div id="genreFilterDropdown" class="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg hidden max-h-60 overflow-y-auto"></div>
-                        </div>
-                        <div>
-                            <label for="yearFilter" class="sr-only">Year</label>
-                            <input type="number" id="yearFilter" placeholder="Year" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                        </div>
-                        <div class="w-full relative">
-                            <label for="certCountryFilter" class="sr-only">Certification Country</label>
-                            <select id="certCountryFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="">Rating Region</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
-                        </div>
-                         <div class="w-full relative">
-                            <label for="certificationFilter" class="sr-only">Certification</label>
-                            <select id="certificationFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none" disabled>
-                                <option value="">Select Rating</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
-                        </div>
-                        <div class="w-full relative">
-                            <label for="languageFilter" class="sr-only">Language</label>
-                            <select id="languageFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="">All Languages</option>
-                                <option value="en">English</option>
-                                <option value="hi">Hindi</option>
-                                <option value="bn">Bengali</option>
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                                <option value="ja">Japanese</option>
-                                <option value="ko">Korean</option>
-                                <option value="zh">Chinese</option>
-                                <option value="ru">Russian</option>
-                                <option value="it">Italian</option>
-                                <option value="pt">Portuguese</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 pt-2 items-center">
-                        <div class="w-full md:col-span-2">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="minRatingFilter" class="text-sm text-gray-300 mb-1 block">Min. Rating: <span id="minRatingValue">0.0</span></label>
-                                    <input type="range" id="minRatingFilter" min="0" max="10" step="0.5" value="0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
-                                </div>
-                                <div>
-                                    <label for="maxRatingFilter" class="text-sm text-gray-300 mb-1 block">Max. Rating: <span id="maxRatingValue">10.0</span></label>
-                                    <input type="range" id="maxRatingFilter" min="0" max="10" step="0.5" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="w-full relative pt-5">
-                            <label for="contentTypeFilter" class="sr-only">Content Type</label>
-                            <select id="contentTypeFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="both" selected>Movies & Series</option>
-                                <option value="movie">Movies Only</option>
-                                <option value="tv">Series Only</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pt-5 px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
-                        </div>
-                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-start md:justify-end items-center pt-5">
-                            <button id="applyFiltersBtn" class="btn-primary font-bold py-2 px-6 rounded-md w-full sm:w-auto">Search</button>
-                            <button id="resetFiltersBtn" class="btn-secondary font-bold py-2 px-6 rounded-md w-full sm:w-auto">Reset</button>
-                            <button id="exportCsvBtn" class="btn-secondary font-bold py-2 px-6 rounded-md w-full sm:w-auto hidden">Export</button>
-                        </div>
-                    </div>
                 </div>
-    
-                <section>
-                   <h2 id="grid-title" class="text-2xl font-semibold mb-4 text-indigo-400">Top Rated Movies & Series</h2>
-                   <div id="loader" class="flex justify-center items-center py-16"><div class="loader"></div></div>
-                   <div id="no-results" class="hidden text-center py-16">
-                       <h3 class="text-xl font-semibold text-gray-400">No Results Found</h3><p class="text-gray-500 mt-2">Try adjusting your search or filters.</p>
-                   </div>
-                   <div id="movie-list-container" class="hidden overflow-x-auto rounded-lg border border-gray-800">
-                        <table id="movie-list" class="min-w-full zebra-table">
-                            <thead class="bg-gray-800">
-                                <tr>
-                                    <th scope="col" class="w-20 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Poster</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Title</th>
-                                    <th scope="col" class="w-48 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Genre</th>
-                                    <th scope="col" class="w-48 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Keywords</th>
-                                    <th scope="col" class="w-24 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Year</th>
-                                    <th scope="col" class="w-20 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Language</th>
-                                    <th scope="col" class="w-28 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Rating</th>
-                                    <th scope="col" class="w-28 px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">PG RATING</th>
-                                    <th scope="col" class="w-20 px-4 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">Trailer</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-800"></tbody>
-                        </table>
-                   </div>
-                   <div id="loader-more" class="hidden justify-center items-center py-8"><div class="loader"></div></div>
-               </section>
-            </div>
-    
-            <div id="my-lists-page" class="hidden">
-                 <header class="relative flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
-                    <div class="w-full md:w-1/3 text-center md:text-left">
-                         <div class="bg-gray-800/50 p-2 rounded-lg inline-block">
-                            <label for="userIdInput" class="text-xs text-gray-400">Your User ID (for syncing):</label>
-                            <div class="flex items-center gap-2 mt-1">
-                                <input type="text" id="userIdInput" class="bg-gray-900 text-gray-300 text-sm rounded px-2 py-1 w-40 sm:w-48">
-                                <button id="copyUserIdBtn" title="Copy ID" class="btn-secondary p-1.5 rounded">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM5 11a1 1 0 100 2h4a1 1 0 100-2H5z"></path></svg>
-                                </button>
-                                 <button id="loadUserIdBtn" title="Load Bookmarks for this ID" class="btn-primary p-1.5 rounded">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M4 12a8 8 0 108 8V12H4z"></path></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-full md:w-1/3 text-center">
-                        <h2 class="text-4xl md:text-5xl font-bold text-white">My Lists</h2>
-                    </div>
-                    <div class="w-full md:w-1/3 flex justify-center md:justify-end">
-                         <button id="homeFromListsBtn" class="btn-secondary p-3 rounded-lg" title="Go to Home">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            </header>
+            <div class="mt-8">
+                <div class="border-b border-gray-700">
+                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <button data-list-type="watchlist" class="list-tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-indigo-400 border-indigo-500">
+                            Watchlist
                         </button>
-                    </div>
-                </header>
-                <div class="mt-8">
-                    <div class="border-b border-gray-700">
-                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                            <button data-list-type="watchlist" class="list-tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-indigo-400 border-indigo-500">
-                                Watchlist
-                            </button>
-                            <button data-list-type="watched" class="list-tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 hover:text-gray-200 hover:border-gray-500">
-                                Watched
-                            </button>
-                            <button data-list-type="favourite" class="list-tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 hover:text-gray-200 hover:border-gray-500">
-                                Favourites
-                            </button>
-                        </nav>
-                    </div>
-                    <div id="lists-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-                        <!-- Bookmarked movies will be rendered here -->
-                    </div>
+                        <button data-list-type="watched" class="list-tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 hover:text-gray-200 hover:border-gray-500">
+                            Watched
+                        </button>
+                        <button data-list-type="favourite" class="list-tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 hover:text-gray-200 hover:border-gray-500">
+                            Favourites
+                        </button>
+                    </nav>
+                </div>
+                <div id="lists-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+                    <!-- Bookmarked movies will be rendered here -->
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- =================================== -->
-        <!-- ============= MOBILE UI =========== -->
-        <!-- =================================== -->
-        <div id="mobile-ui" class="hidden">
-            <main id="mobile-main-content" class="pb-20 mobile-scroll">
-                <!-- Mobile Home Page -->
-                <div id="mobile-home-page">
-                    <header class="mobile-header sticky top-0">
-                        <h1 class="text-2xl font-bold text-white text-center">CineBuff</h1>
-                        <p class="text-sm text-gray-400 text-center mt-1">Your cinematic universe</p>
-                    </header>
+    <button id="scrollTopBtn" class="hidden fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 z-50" title="Go to top">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
 
-                    <!-- Hero Section -->
-                    <div class="px-4 mb-6">
-                        <div class="mobile-card p-6 text-center" style="background: linear-gradient(135deg, rgba(129, 140, 248, 0.1) 0%, rgba(168, 184, 250, 0.1) 100%);">
-                            <h2 class="text-xl font-bold text-white mb-2">Discover Amazing Movies</h2>
-                            <p class="text-gray-300 text-sm">Explore trending films and series</p>
-                            <!-- Test button for mobile interaction -->
-                            <button id="mobile-test-btn" class="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                                Test Mobile Click
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Tab Navigation -->
-                    <div class="px-4 mb-6">
-                        <nav class="flex bg-gray-800/50 rounded-xl p-1 backdrop-blur-sm">
-                            <button data-section="trending" class="mobile-tab flex-1 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-300 active">
-                                🔥 Trending
-                            </button>
-                            <button data-section="recent" class="mobile-tab flex-1 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-300">
-                                🆕 Recent
-                            </button>
-                            <button data-section="upcoming" class="mobile-tab flex-1 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-300">
-                                🎬 Upcoming
-                            </button>
-                        </nav>
-                    </div>
-
-                    <!-- Content Grid -->
-                    <div id="mobile-home-container" class="mobile-grid">
-                        <!-- Movies will be rendered here -->
-                    </div>
-                </div>
-
-                <!-- Mobile Discover Page -->
-                <div id="mobile-discover-page" class="hidden">
-                    <header class="mobile-header">
-                        <div class="flex items-center gap-3">
-                            <input type="text" id="mobileSearchInput" placeholder="Search movies & shows..." class="mobile-search flex-1">
-                            <button id="mobileFilterBtn" class="mobile-btn-primary p-3 rounded-xl">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M7 12h10M10 20h4"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </header>
-
-                    <!-- Quick Filters -->
-                    <div class="px-4 py-3 border-b border-gray-700/50">
-                        <div class="flex gap-2 overflow-x-auto mobile-scroll pb-2">
-                            <button class="mobile-tab whitespace-nowrap px-4 py-2 rounded-full text-xs font-medium bg-indigo-600 text-white">
-                                All
-                            </button>
-                            <button class="mobile-tab whitespace-nowrap px-4 py-2 rounded-full text-xs font-medium">
-                                Movies
-                            </button>
-                            <button class="mobile-tab whitespace-nowrap px-4 py-2 rounded-full text-xs font-medium">
-                                Series
-                            </button>
-                            <button class="mobile-tab whitespace-nowrap px-4 py-2 rounded-full text-xs font-medium">
-                                Action
-                            </button>
-                            <button class="mobile-tab whitespace-nowrap px-4 py-2 rounded-full text-xs font-medium">
-                                Comedy
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="mobile-results-loader" class="flex justify-center items-center py-16">
-                        <div class="mobile-skeleton w-12 h-12 rounded-full"></div>
-                    </div>
-                    <div id="mobile-no-results" class="hidden text-center py-16 px-4">
-                        <div class="text-6xl mb-4">🎬</div>
-                        <h3 class="text-xl font-semibold text-gray-400 mb-2">No Results Found</h3>
-                        <p class="text-gray-500 text-sm">Try adjusting your search or filters</p>
-                    </div>
-                    <div id="mobile-results-container" class="mobile-grid">
-                        <!-- Search results will be rendered here -->
-                    </div>
-                </div>
-
-                <!-- Mobile Lists Page -->
-                <div id="mobile-lists-page" class="hidden">
-                    <header class="mobile-header">
-                        <h2 class="text-2xl font-bold text-white">My Lists</h2>
-                    </header>
-
-                    <!-- User ID Section -->
-                    <div class="px-4 mb-6">
-                        <div class="mobile-card p-4">
-                            <label for="mobileUserIdInput" class="text-xs text-gray-400 block mb-2">Your User ID (for syncing):</label>
-                            <div class="flex items-center gap-2">
-                                <input type="text" id="mobileUserIdInput" class="mobile-search flex-1 text-sm" readonly>
-                                <button id="mobileCopyUserIdBtn" title="Copy ID" class="mobile-btn-primary p-2 rounded-lg">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM5 11a1 1 0 100 2h4a1 1 0 100-2H5z"></path>
-                                    </svg>
-                                </button>
-                                <button id="mobileLoadUserIdBtn" title="Load Bookmarks" class="mobile-btn-primary p-2 rounded-lg">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M4 12a8 8 0 108 8V12H4z"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- List Tabs -->
-                    <div class="px-4 mb-6">
-                        <nav class="flex bg-gray-800/50 rounded-xl p-1 backdrop-blur-sm">
-                            <button data-list-type="watchlist" class="mobile-tab flex-1 rounded-lg py-3 px-4 text-sm font-medium transition-all duration-300 active">
-                                📋 Watchlist
-                            </button>
-                            <button data-list-type="watched" class="mobile-tab flex-1 rounded-lg py-3 px-4 text-sm font-medium transition-all duration-300">
-                                ✅ Watched
-                            </button>
-                            <button data-list-type="favourite" class="mobile-tab flex-1 rounded-lg py-3 px-4 text-sm font-medium transition-all duration-300">
-                                ❤️ Favourites
-                            </button>
-                        </nav>
-                    </div>
-
-                    <div id="mobile-lists-container" class="mobile-grid">
-                        <!-- Bookmarked movies will be rendered here -->
-                    </div>
-                </div>
-            </main>
-
-            <!-- Mobile Bottom Navigation -->
-            <footer id="mobile-nav" class="fixed bottom-0 left-0 right-0 z-40">
-                <div class="flex justify-around items-center h-16 px-2">
-                    <button id="mobile-home-btn" data-page="home" class="mobile-nav-btn flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all duration-300 active">
-                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                        </svg>
-                        <span class="text-xs font-medium">Home</span>
-                    </button>
-                    <button id="mobile-discover-btn" data-page="discover" class="mobile-nav-btn flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all duration-300">
-                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        <span class="text-xs font-medium">Discover</span>
-                    </button>
-                    <button id="mobile-lists-btn" data-page="lists" class="mobile-nav-btn flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all duration-300">
-                        <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7zm0 3v1h4v-1H7z"></path>
-                        </svg>
-                        <span class="text-xs font-medium">My Lists</span>
-                    </button>
-                </div>
-            </footer>
-
-            <!-- Mobile Filter Modal -->
-            <div id="mobile-filter-modal" class="hidden fixed inset-0 z-50 mobile-modal">
-                <div class="p-6 space-y-6">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-2xl font-bold text-white">Filters</h3>
-                        <button id="mobileCloseFilterModalBtn" class="text-gray-400 hover:text-white p-2">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label for="mobileDirectorSearch" class="block text-sm font-medium text-gray-300 mb-2">Director/Creator</label>
-                            <input type="text" id="mobileDirectorSearch" placeholder="e.g., Christopher Nolan" class="mobile-search">
-                        </div>
-
-                        <div>
-                            <label for="mobileYearFilter" class="block text-sm font-medium text-gray-300 mb-2">Year</label>
-                            <input type="number" id="mobileYearFilter" placeholder="e.g., 2010" class="mobile-search">
-                        </div>
-
-                        <div>
-                            <label for="mobileContentTypeFilter" class="block text-sm font-medium text-gray-300 mb-2">Content Type</label>
-                            <select id="mobileContentTypeFilter" class="mobile-search">
-                                <option value="both" selected>Movies & Series</option>
-                                <option value="movie">Movies Only</option>
-                                <option value="tv">Series Only</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="mobileMinRatingFilter" class="block text-sm font-medium text-gray-300 mb-2">
-                                Min. Rating: <span id="mobileMinRatingValue" class="text-indigo-400 font-semibold">0.0</span>
-                            </label>
-                            <input type="range" id="mobileMinRatingFilter" min="0" max="10" step="0.5" value="0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-indigo-500">
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3 pt-4">
-                        <button id="mobileApplyFiltersBtn" class="mobile-btn-primary flex-1">Apply Filters</button>
-                        <button id="mobileResetFiltersBtn" class="mobile-btn-primary flex-1 bg-gray-600 hover:bg-gray-700">Reset</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pull to Refresh Indicator -->
-            <div id="pullRefreshIndicator" class="pull-refresh">
-                <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M4 12a8 8 0 108 8V12H4z"></path>
+    <!-- Movie Modal Structure -->
+    <div id="movieModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div id="modal-content-wrapper" class="bg-gray-900 rounded-lg max-w-screen-xl w-full max-h-[90vh] relative shadow-2xl overflow-y-auto">
+            <button id="closeModal" class="absolute top-2 right-2 z-20 text-white bg-black/50 hover:bg-red-600 rounded-full p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
-                <span>Pull to refresh</span>
-            </div>
-
-        </div>
-
-        <button id="scrollTopBtn" class="hidden fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 z-50">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-        </button>
-    
-        <!-- Movie Modal Structure (Shared by both UIs) -->
-        <div id="movieModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-            <div id="modal-content-wrapper" class="bg-gray-900 rounded-lg max-w-screen-xl w-full max-h-[90vh] relative shadow-2xl overflow-y-auto">
-                <button id="closeModal" class="absolute top-2 right-2 z-20 text-white bg-black/50 hover:bg-red-600 rounded-full p-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-                <div id="movieModalContent"></div>
-            </div>
+            </button>
+            <div id="movieModalContent"></div>
         </div>
     </div>
     
@@ -958,33 +491,8 @@
                 console.error("Failed to log user activity:", error);
             }
         };
-        
-        // --- UI DETECTION ---
-        const isMobile = window.innerWidth < 768;
 
         document.addEventListener('DOMContentLoaded', () => {
-             // Force mobile UI for testing - use a lower breakpoint
-             const forceMobile = window.innerWidth < 1024; // Use 1024px as breakpoint for testing
-             console.log('Window width:', window.innerWidth, 'Force mobile:', forceMobile);
-
-             if (forceMobile) {
-                console.log('Mobile UI activated');
-                document.getElementById('desktop-ui').classList.add('hidden');
-                document.getElementById('mobile-ui').classList.remove('hidden');
-                document.getElementById('app').classList.remove('container', 'mx-auto');
-
-                // Add a test button to verify mobile UI is working
-                setTimeout(() => {
-                    console.log('Mobile UI elements check:');
-                    console.log('Mobile nav:', document.getElementById('mobile-nav'));
-                    console.log('Mobile home page:', document.getElementById('mobile-home-page'));
-                    console.log('Mobile home container:', document.getElementById('mobile-home-container'));
-                }, 1000);
-            } else {
-                console.log('Desktop UI activated');
-                document.getElementById('desktop-ui').classList.remove('hidden');
-                document.getElementById('mobile-ui').classList.add('hidden');
-            }
             // --- CONFIG ---
             const imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
             const backdropBaseUrl = 'https://image.tmdb.org/t/p/w1280';
@@ -1001,7 +509,7 @@
             let userId = '';
             let userBookmarks = {};
 
-            // --- DOM ELEMENTS (DESKTOP) ---
+            // --- DOM ELEMENTS ---
             const homePage = document.getElementById('home-page');
             const discoverPage = document.getElementById('discover-page');
             const myListsPage = document.getElementById('my-lists-page');
@@ -1029,6 +537,7 @@
             const resetFiltersBtn = document.getElementById('resetFiltersBtn');
             const recentContainer = document.getElementById('recent-container');
             const upcomingContainer = document.getElementById('upcoming-container');
+            const movieModal = document.getElementById('movieModal');
             const genreFilterContainer = document.getElementById('genreFilterContainer');
             const genreFilterDisplay = document.getElementById('genreFilterDisplay');
             const genreFilterPlaceholder = document.getElementById('genreFilterPlaceholder');
@@ -1042,41 +551,13 @@
             const recentBtn = document.getElementById('recentBtn');
             const upcomingBtn = document.getElementById('upcomingBtn');
             const surpriseBtn = document.getElementById('surpriseBtn');
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
             const exportCsvBtn = document.getElementById('exportCsvBtn');
+            const closeModalBtn = document.getElementById('closeModal');
+            const movieModalContent = document.getElementById('movieModalContent');
             const userIdInput = document.getElementById('userIdInput');
             const copyUserIdBtn = document.getElementById('copyUserIdBtn');
             const loadUserIdBtn = document.getElementById('loadUserIdBtn');
-
-            // --- DOM ELEMENTS (MOBILE) ---
-            const mobileHomePage = document.getElementById('mobile-home-page');
-            const mobileDiscoverPage = document.getElementById('mobile-discover-page');
-            const mobileListsPage = document.getElementById('mobile-lists-page');
-            const mobileHomeContainer = document.getElementById('mobile-home-container');
-            const mobileResultsContainer = document.getElementById('mobile-results-container');
-            const mobileListsContainer = document.getElementById('mobile-lists-container');
-            const mobileSearchInput = document.getElementById('mobileSearchInput');
-            const mobileFilterBtn = document.getElementById('mobileFilterBtn');
-            const mobileFilterModal = document.getElementById('mobile-filter-modal');
-            const mobileCloseFilterModalBtn = document.getElementById('mobileCloseFilterModalBtn');
-            const mobileApplyFiltersBtn = document.getElementById('mobileApplyFiltersBtn');
-            const mobileResetFiltersBtn = document.getElementById('mobileResetFiltersBtn');
-            const mobileDirectorSearch = document.getElementById('mobileDirectorSearch');
-            const mobileYearFilter = document.getElementById('mobileYearFilter');
-            const mobileContentTypeFilter = document.getElementById('mobileContentTypeFilter');
-            const mobileMinRatingFilter = document.getElementById('mobileMinRatingFilter');
-            const mobileMinRatingValue = document.getElementById('mobileMinRatingValue');
-            const mobileUserIdInput = document.getElementById('mobileUserIdInput');
-            const mobileCopyUserIdBtn = document.getElementById('mobileCopyUserIdBtn');
-            const mobileLoadUserIdBtn = document.getElementById('mobileLoadUserIdBtn');
-            const mobileResultsLoader = document.getElementById('mobile-results-loader');
-            const mobileNoResults = document.getElementById('mobile-no-results');
-            const pullRefreshIndicator = document.getElementById('pullRefreshIndicator');
-
-            // --- DOM ELEMENTS (SHARED) ---
-            const movieModal = document.getElementById('movieModal');
-            const scrollTopBtn = document.getElementById('scrollTopBtn');
-            const closeModalBtn = document.getElementById('closeModal');
-            const movieModalContent = document.getElementById('movieModalContent');
             
             // --- BOOKMARK LOGIC ---
             const setupUserId = async () => {
@@ -1086,11 +567,7 @@
                     localStorage.setItem('cinebuff_user_id', existingId);
                 }
                 userId = existingId;
-                if (isMobile) {
-                    mobileUserIdInput.value = userId;
-                } else {
-                    userIdInput.value = userId;
-                }
+                userIdInput.value = userId;
                 await fetchBookmarks();
             };
 
@@ -1178,7 +655,6 @@
             };
 
             const loadFiltersFromLocalStorage = () => {
-                if(isMobile) return false; // Don't load complex filters on mobile for now
                 const savedFiltersJSON = localStorage.getItem('movieHubFilters');
                 if (!savedFiltersJSON) return false;
 
@@ -1311,7 +787,7 @@
                     <div class="p-2">
                         <h3 class="font-bold text-sm truncate text-white">${item.title}</h3>
                         <div class="flex justify-between items-center text-xs mt-1 text-gray-400">
-                            <span>${item.year}</span>
+                            <span>${formatDate(item.releaseDate)}</span>
                             <span class="flex items-center">
                                 <svg class="w-3 h-3 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.368-2.447a1 1 0 00-1.175 0l-3.368 2.447c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.072 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"></path>
@@ -1331,9 +807,7 @@
             const renderGrid = (container, items) => { container.innerHTML = items.map(renderMovieGridCard).join(''); };
             
             const renderBookmarkList = (listType) => {
-                const targetContainer = isMobile ? mobileListsContainer : listsContainer;
-
-                document.querySelectorAll('.list-tab-btn, .mobile-list-tab').forEach(btn => {
+                 document.querySelectorAll('.list-tab-btn').forEach(btn => {
                     if (btn.dataset.listType === listType) {
                         btn.classList.add('text-indigo-400', 'border-indigo-500');
                         btn.classList.remove('text-gray-400', 'hover:text-gray-200', 'hover:border-gray-500');
@@ -1350,13 +824,12 @@
                         title: movie.title,
                         thumbnail: movie.poster ? `${imageBaseUrl}${movie.poster}` : 'https://placehold.co/500x750/1f2937/ffffff?text=No+Image',
                         type: movie.type,
-                        year: 'List'
                     }));
                 
                 if(filteredMovies.length > 0) {
-                    targetContainer.innerHTML = filteredMovies.map(renderMovieGridCard).join('');
+                    listsContainer.innerHTML = filteredMovies.map(renderMovieGridCard).join('');
                 } else {
-                    targetContainer.innerHTML = `<p class="text-gray-500 col-span-full text-center mt-8">Your list is empty.</p>`;
+                    listsContainer.innerHTML = `<p class="text-gray-500 col-span-full text-center mt-8">Your list is empty.</p>`;
                 }
             };
 
@@ -1419,7 +892,6 @@
 
             // --- DATA LOADING ---
             const loadStaticData = async() => {
-                if(isMobile) return; // Don't load all this data for mobile initially
                 const [movieGenreData, tvGenreData, certData, countryData] = await Promise.all([
                     fetchFromTMDb('genre/movie/list'),
                     fetchFromTMDb('genre/tv/list'),
@@ -1462,7 +934,6 @@
             };
             
             const fetchRowDetails = async (movieDataList, tableRows) => {
-                if(isMobile) return; // not needed for mobile grid view
                 for (let i = 0; i < movieDataList.length; i++) {
                     const movie = movieDataList[i];
                     const row = Array.from(tableRows).find(r => r.dataset.id == movie.id);
@@ -1550,61 +1021,114 @@
 
             // --- CORE LOGIC ---
             const handleSearchAndDiscover = async(isInitialLoad = false) => {
-                if(!isInitialLoad && !isMobile) showDiscoverPage();
+                if(!isInitialLoad) showDiscoverPage();
 
-                const searchTerm = isMobile ? mobileSearchInput.value.trim() : searchInput.value.trim();
-                const directorName = isMobile ? mobileDirectorSearch.value.trim() : directorSearch.value.trim();
-                const contentType = isMobile ? mobileContentTypeFilter.value : contentTypeFilter.value;
-                const selectedYear = isMobile ? mobileYearFilter.value : yearFilter.value;
-                const minRating = isMobile ? mobileMinRatingFilter.value : minRatingFilter.value;
+                const searchTerm = searchInput.value.trim();
+                if (searchTerm) {
+                    gtag('event', 'search', { search_term: searchTerm });
+                }
                 
-                if (searchTerm) gtag('event', 'search', { search_term: searchTerm });
-                
+                // --- Log the search activity ---
                 if (!isInitialLoad) {
-                    const searchDetails = { searchTerm, directorName, contentType, year: selectedYear, minRating };
+                    const searchDetails = {
+                        searchTerm: searchInput.value.trim(),
+                        searchType: searchTypeDropdown.value,
+                        directorName: directorSearch.value.trim(),
+                        genres: selectedGenres.map(g => g.name),
+                        year: yearFilter.value,
+                        minRating: minRatingFilter.value,
+                        contentType: contentTypeFilter.value
+                    };
                     logUserActivity('search', searchDetails);
                 }
 
-                if(isMobile){
-                    mobileResultsContainer.innerHTML = '';
-                    mobileResultsLoader.style.display = 'flex';
-                    mobileNoResults.classList.add('hidden');
-                } else {
-                    loader.style.display = 'none';
-                    noResults.classList.add('hidden');
-                    movieListContainer.classList.remove('hidden');
-                    exportCsvBtn.classList.remove('hidden');
-                    const tbody = movieList.querySelector('tbody');
-                    tbody.innerHTML = Array(10).fill().map(renderMovieListItemSkeleton).join('');
-                }
+                loader.style.display = 'none';
+                noResults.classList.add('hidden');
+                movieListContainer.classList.remove('hidden');
+                exportCsvBtn.classList.remove('hidden');
+                const tbody = movieList.querySelector('tbody');
+                tbody.innerHTML = Array(10).fill().map(renderMovieListItemSkeleton).join('');
 
                 currentPage = 1;
                 canLoadMore = true;
+
+                const searchType = searchTypeDropdown.value;
+                const directorName = directorSearch.value.trim();
+                const contentType = contentTypeFilter.value;
+                const selectedCertCountry = certCountryFilter.value;
+                const selectedCertification = certificationFilter.value;
+                const genreIds = selectedGenres.map(g => g.id).join(',');
+                const selectedYear = yearFilter.value;
+                const minRating = minRatingFilter.value;
+                const maxRating = maxRatingFilter.value;
+                const selectedLanguage = document.getElementById('languageFilter').value;
+
                 let finalResults = [];
                 paginationParams = {}; 
-                
-                const searchType = isMobile ? 'title' : searchTypeDropdown.value; // Mobile simplifies to title search
-                const maxRating = isMobile ? 10 : maxRatingFilter.value;
-                const genreIds = selectedGenres.map(g => g.id).join(',');
-                const selectedLanguage = isMobile ? '' : document.getElementById('languageFilter').value;
-                 const selectedCertCountry = isMobile ? '' : certCountryFilter.value;
-                const selectedCertification = isMobile ? '' : certificationFilter.value;
 
                 const baseDiscoverParams = {
                     sort_by: 'vote_average.desc',
-                    'vote_count.gte': isMobile ? 50 : 200,
+                    'vote_count.gte': 200,
                     ...(minRating > 0 && { 'vote_average.gte': minRating }),
                     ...(maxRating < 10 && { 'vote_average.lte': maxRating }),
                     with_genres: genreIds,
                     ...(selectedLanguage && { with_original_language: selectedLanguage })
                 };
+                
+                if (directorName) {
+                    canLoadMore = false; 
+                    gridTitle.textContent = `Searching for "${directorName}"...`;
+                    const personData = await fetchFromTMDb('search/person', { query: directorName });
 
-                // Logic is simplified for mobile: only search by title or discover with simple filters
-                if (searchTerm) {
+                    personData?.results?.sort((a, b) => b.popularity - a.popularity);
+                    const director = personData?.results?.[0]; 
+
+                    if (director) {
+                        gridTitle.textContent = `Works by ${director.name}`;
+                        const creditsData = await fetchFromTMDb(`person/${director.id}/combined_credits`);
+                        if (creditsData) {
+                            let directedWorks = (creditsData.crew || []).filter(work => work.job === 'Director' || work.job === 'Creator');
+                            
+                            if (contentType !== 'both') {
+                                directedWorks = directedWorks.filter(work => work.media_type === contentType);
+                            }
+                            if (genreIds) {
+                                const selectedGenreIds = genreIds.split(',').map(id => parseInt(id));
+                                directedWorks = directedWorks.filter(work => work.genre_ids && work.genre_ids.some(id => selectedGenreIds.includes(id)));
+                            }
+                            if (selectedYear) {
+                              directedWorks = directedWorks.filter(work => {
+                                  const releaseYear = (work.media_type === 'movie' ? work.release_date : work.first_air_date)?.substring(0, 4);
+                                  return releaseYear == selectedYear;
+                              });
+                            }
+                            if (minRating > 0) { directedWorks = directedWorks.filter(work => work.vote_average >= minRating); }
+                            if (maxRating < 10) { directedWorks = directedWorks.filter(work => work.vote_average <= maxRating); }
+                            if (selectedLanguage) { directedWorks = directedWorks.filter(work => work.original_language === selectedLanguage); }
+                            
+                            finalResults = directedWorks;
+                        }
+                    } else {
+                        gridTitle.textContent = `Director/Creator "${directorName}" not found`;
+                    }
+                } else if (searchTerm && searchType === 'keyword') {
+                    paginationParams.mode = 'discover'; 
+                    gridTitle.textContent = `Searching for keyword "${searchTerm}"...`;
+                    const keywordData = await fetchFromTMDb('search/keyword', { query: searchTerm });
+                    if (keywordData && keywordData.results.length > 0) {
+                        baseDiscoverParams.with_keywords = keywordData.results[0].id;
+                        gridTitle.textContent = `Results for keyword "${searchTerm}"`;
+                    } else {
+                        gridTitle.textContent = `Keyword "${searchTerm}" not found`;
+                        canLoadMore = false;
+                    }
+                }
+
+                if (searchTerm && searchType === 'title') {
                     paginationParams = { 
                         mode: 'title', 
                         type: contentType,
-                        queryParams: { query: searchTerm, year: selectedYear }
+                        queryParams: { query: searchTerm, language: selectedLanguage, year: selectedYear }
                     };
                     let movieData, tvData;
                     if (contentType === 'movie') {
@@ -1617,39 +1141,40 @@
                         tvData = { results: (multiData.results || []).filter(item => item.media_type === 'tv')};
                     }
                     finalResults = [...(movieData?.results || []), ...(tvData?.results || [])];
-                } else { // Discover
+                    if(!directorName) gridTitle.textContent = `Results for "${searchTerm}"`;
+                } else if (!directorName) { // Standard Discover or Keyword Discover
                     paginationParams.mode = 'discover';
                     const movieParams = { ...baseDiscoverParams, ...(selectedYear && { primary_release_year: selectedYear }) };
+                    if (selectedCertCountry && selectedCertification && contentType !== 'tv') {
+                        movieParams.certification_country = selectedCertCountry;
+                        movieParams.certification = selectedCertification;
+                    }
                     const tvParams = { ...baseDiscoverParams, ...(selectedYear && { first_air_date_year: selectedYear }) };
                     
                     paginationParams = { ...paginationParams, type: contentType, movieParams, tvParams };
+
                     let movieData, tvData;
-                    if (contentType === 'movie' || contentType === 'both') movieData = await fetchFromTMDb('discover/movie', { ...movieParams, page: 1 });
-                    if (contentType === 'tv' || contentType === 'both') tvData = await fetchFromTMDb('discover/tv', { ...tvParams, page: 1 });
+                    if (contentType === 'movie' || contentType === 'both') {
+                        movieData = await fetchFromTMDb('discover/movie', { ...movieParams, page: 1 });
+                    }
+                    if (contentType === 'tv' || contentType === 'both') {
+                         tvData = await fetchFromTMDb('discover/tv', { ...tvParams, page: 1 });
+                    }
                     finalResults.push(...(movieData?.results || []), ...(tvData?.results || []));
+                    if(!searchTerm) gridTitle.textContent = 'Discover Top Rated Movies & Series';
                 }
                 
                 finalResults.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
 
-                if(isMobile) mobileResultsLoader.style.display = 'none';
-
                 if (finalResults.length > 0) {
                     const movieData = finalResults.map(mapApiData);
-                    if(isMobile) {
-                        renderGrid(mobileResultsContainer, movieData);
-                    } else {
-                        renderTable(movieList, movieData);
-                        fetchRowDetails(movieData, movieList.querySelectorAll('tbody tr'));
-                    }
+                    renderTable(movieList, movieData);
+                    fetchRowDetails(movieData, movieList.querySelectorAll('tbody tr'));
                 } else { 
                     canLoadMore = false;
-                    if(isMobile) {
-                        mobileNoResults.classList.remove('hidden');
-                    } else {
-                        movieListContainer.classList.add('hidden');
-                        exportCsvBtn.classList.add('hidden');
-                        noResults.classList.remove('hidden'); 
-                    }
+                    movieListContainer.classList.add('hidden');
+                    exportCsvBtn.classList.add('hidden');
+                    noResults.classList.remove('hidden'); 
                 }
             };
 
@@ -1657,7 +1182,7 @@
                 if (isLoadingMore || !canLoadMore) return;
                 isLoadingMore = true; 
                 currentPage++; 
-                if(!isMobile) loaderMore.style.display = 'flex';
+                loaderMore.style.display = 'flex';
 
                 let newResults = [];
                 const {mode, type, queryParams, movieParams, tvParams} = paginationParams;
@@ -1670,8 +1195,12 @@
                     let movieDataPromise = Promise.resolve({results: []});
                     let tvDataPromise = Promise.resolve({results: []});
 
-                    if (type === 'movie' || type === 'both') movieDataPromise = fetchFromTMDb('discover/movie', { ...movieParams, page: currentPage });
-                    if (type === 'tv' || type === 'both') tvDataPromise = fetchFromTMDb('discover/tv', { ...tvParams, page: currentPage });
+                    if (type === 'movie' || type === 'both') {
+                        movieDataPromise = fetchFromTMDb('discover/movie', { ...movieParams, page: currentPage });
+                    }
+                    if (type === 'tv' || type === 'both') {
+                        tvDataPromise = fetchFromTMDb('discover/tv', { ...tvParams, page: currentPage });
+                    }
                     const [movieData, tvData] = await Promise.all([movieDataPromise, tvDataPromise]);
                     newResults = [...(movieData?.results || []), ...(tvData?.results || [])];
                 }
@@ -1679,19 +1208,15 @@
                 if (newResults.length > 0) {
                     newResults.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
                     const movieData = newResults.map(mapApiData);
-                    if (isMobile) {
-                        mobileResultsContainer.innerHTML += movieData.map(renderMovieGridCard).join('');
-                    } else {
-                        const initialRowCount = movieList.querySelectorAll('tbody tr').length;
-                        renderTable(movieList, movieData, true);
-                        const newRows = Array.from(movieList.querySelectorAll('tbody tr')).slice(initialRowCount);
-                        fetchRowDetails(movieData, newRows);
-                    }
+                    const initialRowCount = movieList.querySelectorAll('tbody tr').length;
+                    renderTable(movieList, movieData, true);
+                    const newRows = Array.from(movieList.querySelectorAll('tbody tr')).slice(initialRowCount);
+                    fetchRowDetails(movieData, newRows);
                 } else { 
                     canLoadMore = false; 
                     currentPage--; 
                 }
-                if(!isMobile) loaderMore.style.display = 'none'; 
+                loaderMore.style.display = 'none'; 
                 isLoadingMore = false;
             };
             
@@ -1726,17 +1251,25 @@
 
                     for (let i = 0; i < cols.length; i++) {
                         const headerText = headerCells[i] ? headerCells[i].innerText.toUpperCase() : '';
-                        if (headerText === 'TRAILER') continue;
+                        if (headerText === 'TRAILER') {
+                            continue;
+                        }
+
                         let cellText = cols[i].innerText;
+
                         if (i === 0) {
                             const img = cols[i].querySelector('img');
-                            if (img) cellText = img.alt;
+                            if (img) {
+                                cellText = img.alt;
+                            }
                         }
+                        
                         const sanitizedCell = `"${cellText.replace(/"/g, '""')}"`;
                         rowData.push(sanitizedCell);
                     }
                     csv.push(rowData.join(','));
                 }
+
                 downloadCSV(csv.join('\n'), filename);
             };
 
@@ -1797,12 +1330,17 @@
                     const startIndex = jsonString.indexOf('[');
                     const endIndex = jsonString.lastIndexOf(']');
 
-                    if (startIndex === -1 || endIndex === -1) throw new Error("No JSON array found in AI response.");
+                    if (startIndex === -1 || endIndex === -1) {
+                        throw new Error("No JSON array found in AI response.");
+                    }
 
                     jsonString = jsonString.substring(startIndex, endIndex + 1);
+                    
                     const recommendations = JSON.parse(jsonString);
 
-                    if (!Array.isArray(recommendations)) throw new Error("Parsed data is not an array.");
+                    if (!Array.isArray(recommendations)) {
+                        throw new Error("Parsed data is not an array.");
+                    }
 
                     const searchPromises = recommendations.map(recString => {
                         const match = recString.match(/(.+) \((\d{4})\)/);
@@ -1826,16 +1364,26 @@
                         return '';
                     }).join('');
                     
-                    if (html.trim() === '') throw new Error("No movies found from AI response");
+                    if (html.trim() === '') {
+                         throw new Error("No movies found from AI response");
+                    }
                     container.innerHTML = html;
                 } catch (err) {
                     console.error("AI recs parse error:", err);
                     recommendationTitle.textContent = 'Genre Based Recommendation';
+                    // Fallback to genre-based recommendations
                     if (genreIds && genreIds.length > 0) {
                         const discoverPath = type === 'movie' ? 'discover/movie' : 'discover/tv';
-                        const recommendationsData = await fetchFromTMDb(discoverPath, { with_genres: genreIds[0], sort_by: 'popularity.desc', page: 1 });
+                        const recommendationsData = await fetchFromTMDb(discoverPath, {
+                            with_genres: genreIds[0],
+                            sort_by: 'popularity.desc',
+                            page: 1
+                        });
                         if (recommendationsData && recommendationsData.results) {
-                            const similarItems = recommendationsData.results.filter(item => item.id !== id).slice(0, 6).map(mapApiDataForModal);
+                            const similarItems = recommendationsData.results
+                                .filter(item => item.id !== id)
+                                .slice(0, 6)
+                                .map(mapApiDataForModal);
                             container.innerHTML = similarItems.map(renderSimilarMovieCard).join('');
                         } else {
                             container.innerHTML = `<p class="text-sm text-gray-400 col-span-full">Could not load recommendations.</p>`;
@@ -1851,7 +1399,9 @@
                 movieModal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
 
-                const data = await fetchFromTMDb(`${type}/${id}`, { append_to_response: 'credits,watch/providers,videos,keywords,release_dates,content_ratings' });
+                const data = await fetchFromTMDb(`${type}/${id}`, {
+                    append_to_response: 'credits,watch/providers,videos,keywords,release_dates,content_ratings',
+                });
 
                 if (!data) {
                     movieModalContent.innerHTML = `<p>Failed to load movie details.</p>`;
@@ -1860,16 +1410,32 @@
 
                 const title = type === 'movie' ? data.title : data.name;
 
+                // --- Log the movie view activity ---
                 logUserActivity('view_movie_details', { movieId: id, movieType: type, movieTitle: title });
+
                 gtag('event', 'view_item', { 'event_category': 'Engagement', 'event_label': title });
 
                 const releaseDate = type === 'movie' ? data.release_date : data.first_air_date;
                 const year = releaseDate ? releaseDate.substring(0, 4) : 'N/A';
-                const director = type === 'movie' ? (data.credits.crew.find(c => c.job === 'Director')?.name || 'N/A') : (data.created_by?.map(c => c.name).join(', ') || 'N/A');
+
+                const director = type === 'movie'
+                    ? (data.credits.crew.find(c => c.job === 'Director')?.name || 'N/A')
+                    : (data.created_by?.map(c => c.name).join(', ') || 'N/A');
+                
                 const genres = (data.genres || []).map(g => g.name).join(', ');
                 const cast = data.credits.cast.slice(0, 5).map(c => c.name).join(', ');
+                const ottHtml = (data['watch/providers']?.results.IN?.flatrate || [])
+                    .map(p => `<img src="${imageBaseUrl}${p.logo_path}" alt="${p.provider_name}" title="${p.provider_name}" class="h-10">`)
+                    .join('');
+
                 const trailer = data.videos?.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
-                const trailerBtn = trailer ? `<a href="https://www.youtube.com/watch?v=${trailer.key}" target="_blank" class="trailer-btn"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg><span>Watch Trailer</span></a>` : '';
+                const trailerBtn = trailer
+                    ? `<a href="https://www.youtube.com/watch?v=${trailer.key}" target="_blank" class="trailer-btn">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                        <span>Watch Trailer</span>
+                       </a>`
+                    : '';
+                
                 const backdropUrl = data.backdrop_path ? `${backdropBaseUrl}${data.backdrop_path}` : '';
                 
                 let certification = 'N/A';
@@ -1877,24 +1443,33 @@
                     const usRelease = data.release_dates.results.find(r => r.iso_3166_1 === 'US');
                     if (usRelease && usRelease.release_dates.length > 0) {
                         const theatricalRelease = usRelease.release_dates.find(rd => rd.type === 3 && rd.certification);
-                        certification = theatricalRelease ? theatricalRelease.certification : (usRelease.release_dates.find(rd => rd.certification)?.certification || 'N/A');
+                        if (theatricalRelease) {
+                            certification = theatricalRelease.certification;
+                        } else {
+                            const anyRatedRelease = usRelease.release_dates.find(rd => rd.certification);
+                            if (anyRatedRelease) {
+                                certification = anyRatedRelease.certification;
+                            }
+                        }
                     }
                 } else if (type === 'tv' && data.content_ratings) {
                     const usRating = data.content_ratings.results.find(r => r.iso_3166_1 === 'US');
-                    if (usRating && usRating.rating) certification = usRating.rating;
+                    if (usRating && usRating.rating) {
+                        certification = usRating.rating;
+                    }
                 }
 
                 movieModalContent.innerHTML = `
                 <div class="movie-detail-page rounded-lg" style="background-image: url('${backdropUrl}')">
                     <div class="overlay p-4 md:p-6 rounded-lg">
-                        <div class="grid grid-cols-1 ${isMobile ? '' : 'lg:grid-cols-5'} gap-6">
-                            <div class="${isMobile ? '' : 'lg:col-span-3'}">
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                            <div class="lg:col-span-3">
                                 <div class="grid grid-cols-1 sm:grid-cols-5 gap-6">
-                                    <div class="poster-section ${isMobile ? 'w-1/2 mx-auto' : 'sm:col-span-2'}">
+                                    <div class="poster-section sm:col-span-2">
                                         <img src="${data.poster_path ? imageBaseUrl + data.poster_path : 'https://placehold.co/500x750'}" alt="${title}" class="w-full h-auto shadow-lg">
                                     </div>
-                                    <div class="${isMobile ? 'text-center' : 'sm:col-span-3'} text-white">
-                                        <h1 class="${isMobile ? 'text-2xl' : 'title'}">${title} <span class="text-xl font-normal text-gray-300">(${year})</span></h1>
+                                    <div class="sm:col-span-3 text-white">
+                                        <h1 class="title">${title} <span class="text-2xl font-normal text-gray-300">(${year})</span></h1>
                                         <div class="info space-y-3 text-gray-300">
                                             <p class="release-date inline-block mb-4">Released: ${formatDate(releaseDate)}</p>
                                             <p class="max-h-[120px] overflow-y-auto pr-2">${data.overview || 'No overview available.'}</p>
@@ -1904,12 +1479,20 @@
                                             <p><strong>Rating:</strong> ⭐ ${data.vote_average.toFixed(1)}/10</p>
                                             <p><strong>Certification:</strong> ${certification}</p>
                                         </div>
-                                         <div class="mt-4 flex space-x-2 ${isMobile ? 'justify-center' : ''}">
-                                            <button data-status="watchlist" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Watchlist"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7z"></path></svg></button>
-                                            <button data-status="watched" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Mark as Watched"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></button>
-                                            <button data-status="favourite" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Favourites"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg></button>
+                                         <div class="mt-4 flex space-x-2">
+                                            <button data-status="watchlist" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Watchlist">
+                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7z"></path></svg>
+                                            </button>
+                                            <button data-status="watched" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Mark as Watched">
+                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                            </button>
+                                            <button data-status="favourite" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Favourites">
+                                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg>
+                                            </button>
                                         </div>
-                                        <div class="mt-4 ${isMobile ? 'text-center' : ''}">${trailerBtn}</div>
+                                        <div class="mt-4">
+                                            ${trailerBtn}
+                                        </div>
                                     </div>
                                 </div>
                                  <div class="mt-4 p-4 bg-gray-900/50 rounded-lg">
@@ -1921,7 +1504,8 @@
                                     <div id="ai-response" class="text-gray-300 bg-gray-800 p-4 rounded-md min-h-[140px]"></div>
                                 </div>
                             </div>
-                            <div class="${isMobile ? 'mt-6' : 'lg:col-span-2'}">
+
+                            <div class="lg:col-span-2">
                                 <section class="recommendations">
                                     <h2 id="recommendation-title">AI Recommended</h2>
                                     <div class="recommended-grid" id="ai-recommendations"></div>
@@ -1929,16 +1513,24 @@
                             </div>
                         </div>
                     </div>
-                </div>`;
+                </div>
+                `;
                 
                 updateBookmarkButtons(id);
+
                 document.querySelectorAll('.bookmark-btn').forEach(btn => {
-                    btn.addEventListener('click', () => updateBookmark(id, title, data.poster_path, type, btn.dataset.status));
+                    btn.addEventListener('click', () => {
+                        updateBookmark(id, title, data.poster_path, type, btn.dataset.status);
+                    });
                 });
+
                 document.getElementById('ai-ask-btn').addEventListener('click', async () => {
                     const query = document.getElementById('ai-query').value.trim();
                     if (!query) return;
-                    logUserActivity('ask_ai', { query, movieId: id, movieTitle: title });
+
+                    // --- Log the AI query activity ---
+                    logUserActivity('ask_ai', { query: query, movieId: id, movieTitle: title });
+                    
                     gtag('event', 'ask_ai', { 'event_category': 'Engagement', 'event_label': query });
                     const respBox = document.getElementById('ai-response');
                     respBox.innerHTML = '<div class="flex items-center gap-2"><div class="loader-sm"></div><span>Thinking...</span></div>';
@@ -1951,514 +1543,179 @@
                 fetchAndRenderAIRecommendations(id, type, title, genreIds);
             }
             
-            // --- ENHANCED MOBILE FEATURES ---
-            let currentSection = 'trending';
-            let isRefreshing = false;
-            let startY = 0;
-            let currentY = 0;
-
-            // Swipe gesture handling
-            const handleSwipe = (element, callback) => {
-                let startX = 0;
-                let startY = 0;
-                let isSwiping = false;
-
-                element.addEventListener('touchstart', e => {
-                    startX = e.touches[0].clientX;
-                    startY = e.touches[0].clientY;
-                    isSwiping = true;
-                });
-
-                element.addEventListener('touchmove', e => {
-                    if (!isSwiping) return;
-                    const deltaX = e.touches[0].clientX - startX;
-                    const deltaY = e.touches[0].clientY - startY;
-
-                    // Prevent vertical scrolling during horizontal swipe
-                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-                        e.preventDefault();
-                        callback(deltaX > 0 ? 'right' : 'left');
-                        isSwiping = false;
-                    }
-                });
-
-                element.addEventListener('touchend', () => {
-                    isSwiping = false;
-                });
-            };
-
-            // Pull to refresh functionality
-            const setupPullToRefresh = (container) => {
-                let isPulling = false;
-                let pullDistance = 0;
-
-                container.addEventListener('touchstart', e => {
-                    if (container.scrollTop === 0) {
-                        startY = e.touches[0].clientY;
-                        isPulling = true;
-                    }
-                });
-
-                container.addEventListener('touchmove', e => {
-                    if (!isPulling) return;
-                    currentY = e.touches[0].clientY;
-                    pullDistance = currentY - startY;
-
-                    if (pullDistance > 0 && pullDistance < 100) {
-                        e.preventDefault();
-                        pullRefreshIndicator.style.transform = `translateY(${Math.min(pullDistance - 60, 0)}px)`;
-                        if (pullDistance > 60) {
-                            pullRefreshIndicator.classList.add('visible');
-                        }
-                    }
-                });
-
-                container.addEventListener('touchend', async () => {
-                    if (!isPulling) return;
-                    isPulling = false;
-
-                    if (pullDistance > 80 && !isRefreshing) {
-                        isRefreshing = true;
-                        await refreshCurrentSection();
-                        isRefreshing = false;
-                    }
-
-                    pullRefreshIndicator.classList.remove('visible');
-                    pullRefreshIndicator.style.transform = 'translateY(-60px)';
-                });
-            };
-
-            // Refresh current section
-            const refreshCurrentSection = async () => {
-                if (currentSection === 'trending') {
-                    const data = await fetchFromTMDb('trending/all/day');
-                    if (data && data.results) {
-                        renderGrid(mobileHomeContainer, data.results.slice(0, 12).map(mapApiData));
-                    }
-                } else {
-                    // Refresh other sections similarly
-                    const today = new Date().toISOString().split('T')[0];
-                    let params = {};
-                    if (currentSection === 'recent') {
-                        const threeMonthsAgo = new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split('T')[0];
-                        params = {'primary_release_date.gte': threeMonthsAgo, 'primary_release_date.lte': today, 'sort_by':'popularity.desc'};
-                    } else if (currentSection === 'upcoming') {
-                        const sixMonthsLater = new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0];
-                        params = {'primary_release_date.gte': today, 'primary_release_date.lte': sixMonthsLater, 'sort_by':'popularity.desc'};
-                    }
-                    const data = await fetchFromTMDb('discover/movie', params);
-                    if (data && data.results) {
-                        renderGrid(mobileHomeContainer, data.results.slice(0, 12).map(mapApiData));
-                    }
-                }
-            };
-
-            // Enhanced mobile card rendering
-            const renderMobileCard = (item) => `
-                <div class="mobile-card cursor-pointer" data-id="${item.id}" data-type="${item.type}">
-                    <img src="${item.thumbnail}" alt="${item.title}" onerror="this.onerror=null;this.src='https://placehold.co/500x750/1f2937/ffffff?text=No+Image';" class="w-full h-48 object-cover rounded-t-2xl">
-                    <div class="p-4">
-                        <h3 class="mobile-title line-clamp-2">${item.title}</h3>
-                        <div class="flex items-center justify-between mt-2">
-                            <span class="mobile-subtitle">${item.year}</span>
-                            <div class="flex items-center space-x-1">
-                                <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.368-2.447a1 1 0 00-1.175 0l-3.368 2.447c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.072 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"></path>
-                                </svg>
-                                <span class="text-sm font-medium text-gray-300">${item.rating ? item.rating.toFixed(1) : 'N/A'}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-
-            // Enhanced grid rendering for mobile
-            const renderMobileGrid = (container, items) => {
-                container.innerHTML = items.map(renderMobileCard).join('');
-            };
-
-            // Switch home section with animation
-            const switchHomeSection = async (section) => {
-                currentSection = section;
-
-                // Update tab active states
-                document.querySelectorAll('.mobile-home-tab').forEach(tab => {
-                    tab.classList.remove('active');
-                    if (tab.dataset.section === section) {
-                        tab.classList.add('active');
-                    }
-                });
-
-                // Load data for the section
-                renderSkeletons(mobileHomeContainer, renderMovieGridCardSkeleton, 6);
-
-                let path = section === 'trending' ? 'trending/all/day' : 'discover/movie';
-                let params = {};
-                const today = new Date().toISOString().split('T')[0];
-
-                if (section === 'recent') {
-                    const threeMonthsAgo = new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split('T')[0];
-                    params = {'primary_release_date.gte': threeMonthsAgo, 'primary_release_date.lte': today, 'sort_by': 'popularity.desc'};
-                } else if (section === 'upcoming') {
-                    const sixMonthsLater = new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0];
-                    params = {'primary_release_date.gte': today, 'primary_release_date.lte': sixMonthsLater, 'sort_by': 'popularity.desc'};
-                }
-
-                const data = await fetchFromTMDb(path, params);
-                if (data && data.results) {
-                    renderGrid(mobileHomeContainer, data.results.slice(0, 12).map(mapApiData));
-                }
-            };
-
-            // Toast notification function
-            const showToast = (message, duration = 3000) => {
-                // Create toast element
-                const toast = document.createElement('div');
-                toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300';
-                toast.textContent = message;
-                document.body.appendChild(toast);
-
-                // Animate in
-                setTimeout(() => {
-                    toast.style.transform = 'translateX(-50%) translateY(0)';
-                    toast.style.opacity = '1';
-                }, 100);
-
-                // Remove after duration
-                setTimeout(() => {
-                    toast.style.transform = 'translateX(-50%) translateY(-100%)';
-                    toast.style.opacity = '0';
-                    setTimeout(() => {
-                        document.body.removeChild(toast);
-                    }, 300);
-                }, duration);
-            };
-
-            // --- MOBILE EVENT HANDLERS ---
-            const addMobileEventListener = (element, eventType, handler) => {
-                if (!element) return;
-
-                // Add both touch and click events for mobile compatibility
-                element.addEventListener('touchstart', handler, { passive: false });
-                element.addEventListener('click', handler);
-
-                // Prevent double firing on touch devices
-                let touchStartTime = 0;
-                element.addEventListener('touchstart', () => {
-                    touchStartTime = Date.now();
-                });
-                element.addEventListener('click', (e) => {
-                    if (Date.now() - touchStartTime < 300) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                });
-            };
-
             // --- EVENT LISTENERS ---
-            const setupEventListeners = () => {
-                if(isMobile) {
-                    // Setup pull to refresh
-                    setupPullToRefresh(mobileMainContent);
+            applyFiltersBtn.addEventListener('click', () => {
+                saveFiltersToLocalStorage();
+                handleSearchAndDiscover(false);
+            });
 
-                    // Enhanced mobile navigation with animations
-                    const mobileNav = document.getElementById('mobile-nav');
-                    if (mobileNav) {
-                        addMobileEventListener(mobileNav, 'click', e => {
-                            const target = e.target.closest('.mobile-nav-btn');
-                            if(!target) return;
+            resetFiltersBtn.addEventListener('click', () => {
+                clearFiltersAndStorage();
+                handleSearchAndDiscover(true);
+            });
 
-                            e.preventDefault();
-                            e.stopPropagation();
+            exportCsvBtn.addEventListener('click', () => {
+                exportTableToCSV('movie_hub_export.csv');
+            });
+            
+            minRatingFilter.addEventListener('input', (e) => {
+                const minVal = parseFloat(e.target.value);
+                const maxVal = parseFloat(maxRatingFilter.value);
+                minRatingValue.textContent = minVal.toFixed(1);
+                if (minVal > maxVal) {
+                    maxRatingFilter.value = minVal;
+                    maxRatingValue.textContent = minVal.toFixed(1);
+                }
+            });
 
-                            // Smooth transition between pages
-                            const currentPage = document.querySelector('#mobile-main-content > div:not(.hidden)');
-                            const targetPageId = `mobile-${target.dataset.page}-page`;
-                            const targetPage = document.getElementById(targetPageId);
+            maxRatingFilter.addEventListener('input', (e) => {
+                const maxVal = parseFloat(e.target.value);
+                const minVal = parseFloat(minRatingFilter.value);
+                maxRatingValue.textContent = maxVal.toFixed(1);
+                if (maxVal < minVal) {
+                    minRatingFilter.value = maxVal;
+                    minRatingValue.textContent = maxVal.toFixed(1);
+                }
+            });
 
-                            if (currentPage && targetPage && currentPage !== targetPage) {
-                                currentPage.style.transform = 'translateX(-100%)';
-                                currentPage.style.opacity = '0';
-                                setTimeout(() => {
-                                    currentPage.classList.add('hidden');
-                                    currentPage.style.transform = '';
-                                    currentPage.style.opacity = '';
-
-                                    targetPage.classList.remove('hidden');
-                                    targetPage.style.transform = 'translateX(100%)';
-                                    targetPage.style.opacity = '0';
-
-                                    setTimeout(() => {
-                                        targetPage.style.transform = '';
-                                        targetPage.style.opacity = '';
-                                    }, 50);
-                                }, 300);
-                            }
-
-                            // Update active states
-                            document.querySelectorAll('.mobile-nav-btn').forEach(b => {
-                                b.classList.remove('active');
-                                b.classList.add('text-gray-400');
-                            });
-                            target.classList.add('active');
-                            target.classList.remove('text-gray-400');
-
-                            // Handle page-specific logic
-                            if(target.dataset.page === 'lists') {
-                                renderBookmarkList('watchlist');
-                            }
-                        });
-                    }
-
-                    // Enhanced mobile home tabs with swipe
-                    const homeNav = document.querySelector('#mobile-home-page nav');
-                    if (homeNav) {
-                        addMobileEventListener(homeNav, 'click', async e => {
-                            if(e.target.matches('.mobile-home-tab')) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                const section = e.target.dataset.section;
-                                await switchHomeSection(section);
-                            }
-                        });
-                    }
-
-                    // Add swipe gesture to home container
-                    handleSwipe(mobileHomeContainer, async (direction) => {
-                        const sections = ['trending', 'recent', 'upcoming'];
-                        const currentIndex = sections.indexOf(currentSection);
-                        let newIndex;
-
-                        if (direction === 'left' && currentIndex < sections.length - 1) {
-                            newIndex = currentIndex + 1;
-                        } else if (direction === 'right' && currentIndex > 0) {
-                            newIndex = currentIndex - 1;
-                        }
-
-                        if (newIndex !== undefined) {
-                            await switchHomeSection(sections[newIndex]);
-                        }
-                    });
-
-                    // Enhanced filter modal buttons
-                    if (mobileFilterBtn) {
-                        addMobileEventListener(mobileFilterBtn, 'click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            mobileFilterModal.classList.remove('hidden');
-                            mobileFilterModal.style.transform = 'translateY(100%)';
-                            setTimeout(() => {
-                                mobileFilterModal.style.transform = '';
-                            }, 50);
-                        });
-                    }
-
-                    if (mobileCloseFilterModalBtn) {
-                        addMobileEventListener(mobileCloseFilterModalBtn, 'click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            mobileFilterModal.style.transform = 'translateY(100%)';
-                            setTimeout(() => {
-                                mobileFilterModal.classList.add('hidden');
-                            }, 300);
-                        });
-                    }
-
-                    if (mobileApplyFiltersBtn) {
-                        addMobileEventListener(mobileApplyFiltersBtn, 'click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            mobileFilterModal.style.transform = 'translateY(100%)';
-                            setTimeout(() => {
-                                mobileFilterModal.classList.add('hidden');
-                                handleSearchAndDiscover();
-                            }, 300);
-                        });
-                    }
-
-                    if (mobileResetFiltersBtn) {
-                        addMobileEventListener(mobileResetFiltersBtn, 'click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            // Reset all filter values
-                            if (mobileDirectorSearch) mobileDirectorSearch.value = '';
-                            if (mobileYearFilter) mobileYearFilter.value = '';
-                            if (mobileContentTypeFilter) mobileContentTypeFilter.value = 'both';
-                            if (mobileMinRatingFilter) mobileMinRatingFilter.value = '0';
-                            if (mobileMinRatingValue) mobileMinRatingValue.textContent = '0.0';
-                        });
-                    }
-
-                    if (mobileMinRatingFilter) {
-                        mobileMinRatingFilter.addEventListener('input', e => {
-                            if (mobileMinRatingValue) {
-                                mobileMinRatingValue.textContent = parseFloat(e.target.value).toFixed(1);
-                            }
-                        });
-                    }
-
-                    if (mobileSearchInput) {
-                        mobileSearchInput.addEventListener('keyup', e => {
-                            if(e.key === 'Enter') handleSearchAndDiscover();
-                        });
-                    }
-
-                    // Enhanced mobile lists with animations
-                    const mobileListsNav = document.querySelector('#mobile-lists-page nav');
-                    if (mobileListsNav) {
-                        addMobileEventListener(mobileListsNav, 'click', e => {
-                            if (e.target.matches('.mobile-list-tab')) {
-                                e.preventDefault();
-                                e.stopPropagation();
-
-                                // Animate tab transition
-                                document.querySelectorAll('.mobile-list-tab').forEach(tab => {
-                                    tab.classList.remove('active');
-                                });
-                                e.target.classList.add('active');
-
-                                renderBookmarkList(e.target.dataset.listType);
-                            }
-                        });
-                    }
-
-                    // Enhanced user ID management
-                    if (mobileCopyUserIdBtn) {
-                        addMobileEventListener(mobileCopyUserIdBtn, 'click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (mobileUserIdInput) {
-                                mobileUserIdInput.select();
-                                document.execCommand('copy');
-                                // Show success feedback
-                                const originalText = mobileCopyUserIdBtn.innerHTML;
-                                mobileCopyUserIdBtn.innerHTML = '✅';
-                                setTimeout(() => {
-                                    mobileCopyUserIdBtn.innerHTML = originalText;
-                                }, 1000);
-                            }
-                        });
-                    }
-
-                    if (mobileLoadUserIdBtn) {
-                        addMobileEventListener(mobileLoadUserIdBtn, 'click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (mobileUserIdInput) {
-                                const newUserId = mobileUserIdInput.value.trim();
-                                if (newUserId) {
-                                    userId = newUserId;
-                                    localStorage.setItem('cinebuff_user_id', userId);
-                                    fetchBookmarks().then(() => renderBookmarkList('watchlist'));
-                                    showToast('Bookmarks loaded successfully!');
-                                }
-                            }
-                        });
-                    }
-
-                    // Quick filter buttons
-                    document.querySelectorAll('.mobile-tab[data-filter]').forEach(btn => {
-                        addMobileEventListener(btn, 'click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const filter = btn.dataset.filter;
-                            // Apply quick filter logic here
-                            console.log('Applying filter:', filter);
-                        });
-                    });
-
-                    // Test button event listener
-                    const mobileTestBtn = document.getElementById('mobile-test-btn');
-                    if (mobileTestBtn) {
-                        addMobileEventListener(mobileTestBtn, 'click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log('Mobile test button clicked!');
-                            alert('Mobile interaction working! 🎉');
-                        });
-                    }
-
-                    // Mobile movie cards click handling
-                    const handleMobileCardClick = (e) => {
-                        const card = e.target.closest('.mobile-card');
-                        if (card && card.dataset.id) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            showMovieModal(card.dataset.id, card.dataset.type || 'movie');
-                        }
-                    };
-
-                    if (mobileHomeContainer) {
-                        addMobileEventListener(mobileHomeContainer, 'click', handleMobileCardClick);
-                    }
-
-                    if (mobileResultsContainer) {
-                        addMobileEventListener(mobileResultsContainer, 'click', handleMobileCardClick);
-                    }
-
-                    if (mobileListsContainer) {
-                        addMobileEventListener(mobileListsContainer, 'click', handleMobileCardClick);
-                    }
-
+            contentTypeFilter.addEventListener('change', (e) => {
+                if (e.target.value === 'tv') {
+                    certCountryFilter.disabled = true;
+                    certificationFilter.disabled = true;
+                    certCountryFilter.value = '';
+                    certificationFilter.value = '';
+                    certificationFilter.innerHTML = '<option value="">Select Rating</option>';
                 } else {
-                    // Desktop Listeners
-                    applyFiltersBtn.addEventListener('click', () => { saveFiltersToLocalStorage(); handleSearchAndDiscover(false); });
-                    resetFiltersBtn.addEventListener('click', () => { clearFiltersAndStorage(); handleSearchAndDiscover(true); });
-                    exportCsvBtn.addEventListener('click', () => exportTableToCSV('movie_hub_export.csv'));
-                    minRatingFilter.addEventListener('input', e => { const minVal = parseFloat(e.target.value); minRatingValue.textContent = minVal.toFixed(1); if (minVal > parseFloat(maxRatingFilter.value)) { maxRatingFilter.value = minVal; maxRatingValue.textContent = minVal.toFixed(1); } });
-                    maxRatingFilter.addEventListener('input', e => { const maxVal = parseFloat(e.target.value); maxRatingValue.textContent = maxVal.toFixed(1); if (maxVal < parseFloat(minRatingFilter.value)) { minRatingFilter.value = maxVal; minRatingValue.textContent = maxVal.toFixed(1); } });
-                    contentTypeFilter.addEventListener('change', e => { if (e.target.value === 'tv') { certCountryFilter.disabled = true; certificationFilter.disabled = true; certCountryFilter.value = ''; certificationFilter.value = ''; certificationFilter.innerHTML = '<option value="">Select Rating</option>'; } else { certCountryFilter.disabled = false; } });
-                    searchInput.addEventListener('keyup', e => { if (e.key === 'Enter') applyFiltersBtn.click(); });
-                    directorSearch.addEventListener('keyup', e => { if (e.key === 'Enter') applyFiltersBtn.click(); });
-                    discoverLinkBtn.addEventListener('click', showDiscoverPage);
-                    myListsBtn.addEventListener('click', showMyListsPage);
-                    homeBtn.addEventListener('click', showHomePage);
-                    homeFromListsBtn.addEventListener('click', showHomePage);
-                    copyUserIdBtn.addEventListener('click', () => { userIdInput.select(); document.execCommand('copy'); });
-                    loadUserIdBtn.addEventListener('click', () => { const newUserId = userIdInput.value.trim(); if (newUserId) { userId = newUserId; localStorage.setItem('cinebuff_user_id', userId); fetchBookmarks(); if(!myListsPage.classList.contains('hidden')) renderBookmarkList('watchlist'); alert('Bookmarks for this ID have been loaded.'); } });
-                    document.querySelector('#my-lists-page nav').addEventListener('click', e => { if (e.target.matches('.list-tab-btn')) renderBookmarkList(e.target.dataset.listType); });
-                    trendingBtn.addEventListener('click', fetchAndDisplayTrending);
-                    surpriseBtn.addEventListener('click', getSurpriseMovie);
-                    recentBtn.addEventListener('click', () => document.getElementById('recent-section').scrollIntoView());
-                    upcomingBtn.addEventListener('click', () => document.getElementById('upcoming-section').scrollIntoView());
-                    certCountryFilter.addEventListener('change', e => { const countryCode = e.target.value; certificationFilter.innerHTML = '<option value="">Select Rating</option>'; if (countryCode && certificationsData[countryCode]) { certificationFilter.disabled = false; certificationsData[countryCode].forEach(cert => { const option = document.createElement('option'); option.value = cert.certification; option.textContent = `${cert.certification} (${cert.meaning})`; certificationFilter.appendChild(option); }); } else { certificationFilter.disabled = true; } });
-                    genreFilterDisplay.addEventListener('click', () => genreFilterDropdown.classList.toggle('hidden'));
-                    genreFilterDropdown.addEventListener('change', e => { if (e.target.type === 'checkbox') updateSelectedGenres(e.target.value, e.target.dataset.name, e.target.checked); });
-                    selectedGenresContainer.addEventListener('click', e => { if(e.target.classList.contains('genre-pill-remove')) { e.stopPropagation(); const id = e.target.dataset.id; const checkbox = document.querySelector(`#genreFilterDropdown input[value="${id}"]`); if (checkbox) checkbox.checked = false; updateSelectedGenres(id, '', false); } });
-                    window.addEventListener('click', e => { if (!genreFilterContainer.contains(e.target)) genreFilterDropdown.classList.add('hidden'); });
-                    document.getElementById('recent-lang-filters').addEventListener('click', e => { if(e.target.matches('.lang-filter-btn')) { document.querySelectorAll('#recent-lang-filters .btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary')); e.target.classList.replace('btn-secondary', 'btn-primary'); loadByLang(recentContainer, 'recent', e.target.dataset.lang); } });
-                    document.getElementById('upcoming-lang-filters').addEventListener('click', e => { if(e.target.matches('.lang-filter-btn')) { document.querySelectorAll('#upcoming-lang-filters .btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary')); e.target.classList.replace('btn-secondary', 'btn-primary'); loadByLang(upcomingContainer, 'upcoming', e.target.dataset.lang); } });
+                    certCountryFilter.disabled = false;
+                }
+            });
+
+            searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFiltersBtn.click(); });
+            directorSearch.addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFiltersBtn.click(); });
+            
+            discoverLinkBtn.addEventListener('click', showDiscoverPage);
+            myListsBtn.addEventListener('click', showMyListsPage);
+            homeBtn.addEventListener('click', showHomePage);
+            homeFromListsBtn.addEventListener('click', showHomePage);
+
+            copyUserIdBtn.addEventListener('click', () => {
+                userIdInput.select();
+                document.execCommand('copy');
+            });
+
+            loadUserIdBtn.addEventListener('click', () => {
+                const newUserId = userIdInput.value.trim();
+                if (newUserId) {
+                    userId = newUserId;
+                    localStorage.setItem('cinebuff_user_id', userId);
+                    fetchBookmarks();
+                    if(!myListsPage.classList.contains('hidden')) {
+                        renderBookmarkList('watchlist');
+                    }
+                    alert('Bookmarks for this ID have been loaded.');
+                }
+            });
+            
+            document.querySelector('.list-tab-btn[data-list-type="watchlist"]').parentElement.addEventListener('click', (e) => {
+                if (e.target.matches('.list-tab-btn')) {
+                    renderBookmarkList(e.target.dataset.listType);
+                }
+            });
+
+            
+            scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+            trendingBtn.addEventListener('click', fetchAndDisplayTrending);
+            surpriseBtn.addEventListener('click', getSurpriseMovie);
+            recentBtn.addEventListener('click', () => document.getElementById('recent-section').scrollIntoView());
+            upcomingBtn.addEventListener('click', () => document.getElementById('upcoming-section').scrollIntoView());
+
+
+            certCountryFilter.addEventListener('change', (e) => {
+                const countryCode = e.target.value;
+                certificationFilter.innerHTML = '<option value="">Select Rating</option>';
+                if (countryCode && certificationsData[countryCode]) {
+                    certificationFilter.disabled = false;
+                    certificationsData[countryCode].forEach(cert => {
+                        const option = document.createElement('option');
+                        option.value = cert.certification;
+                        option.textContent = `${cert.certification} (${cert.meaning})`;
+                        certificationFilter.appendChild(option);
+                    });
+                } else {
+                    certificationFilter.disabled = true;
+                }
+            });
+            
+            document.body.addEventListener('click', (e) => { 
+                const itemElement = e.target.closest('tr[data-id], .card-grid[data-id]');
+                if (itemElement && !e.target.closest('.youtube-link')) {
+                   showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie');
                 }
 
-                // Shared Listeners
-                document.body.addEventListener('click', e => { const itemElement = e.target.closest('tr[data-id], .card-grid[data-id]'); if (itemElement && !e.target.closest('.youtube-link')) showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie'); const recommendedItemElement = e.target.closest('#movieModalContent .recommended-card[data-id]'); if (recommendedItemElement) showMovieModal(recommendedItemElement.dataset.id, recommendedItemElement.dataset.type || 'movie'); });
-                closeModalBtn.addEventListener('click', () => { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; });
-                movieModal.addEventListener('click', e => { if (e.target === movieModal) { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; } });
-                scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-                window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoadingMore && canLoadMore) loadMoreMovies(); if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) { scrollTopBtn.classList.remove('hidden'); } else { scrollTopBtn.classList.add('hidden'); } });
-            }
+                const recommendedItemElement = e.target.closest('#movieModalContent .recommended-card[data-id]');
+                if (recommendedItemElement) {
+                    showMovieModal(recommendedItemElement.dataset.id, recommendedItemElement.dataset.type || 'movie');
+                }
+            });
+            
+            genreFilterDisplay.addEventListener('click', () => genreFilterDropdown.classList.toggle('hidden'));
+            genreFilterDropdown.addEventListener('change', (e) => { 
+                if (e.target.type === 'checkbox') {
+                    const type = e.target.dataset.type || 'genre';
+                    updateSelectedGenres(e.target.value, e.target.dataset.name, e.target.checked, type);
+                } 
+            });
+            selectedGenresContainer.addEventListener('click', (e) => { 
+                if(e.target.classList.contains('genre-pill-remove')) { 
+                    e.stopPropagation(); 
+                    const id = e.target.dataset.id;
+                    const checkbox = document.querySelector(`#genreFilterDropdown input[value="${id}"]`);
+                    if (checkbox) checkbox.checked = false;
+                    updateSelectedGenres(id, '', false); 
+                } 
+            });
+            window.addEventListener('click', (e) => { if (!genreFilterContainer.contains(e.target)) genreFilterDropdown.classList.add('hidden'); });
+
+            document.getElementById('recent-lang-filters').addEventListener('click', (e) => { if(e.target.matches('.lang-filter-btn')) { document.querySelectorAll('#recent-lang-filters .btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary')); e.target.classList.replace('btn-secondary', 'btn-primary'); loadByLang(recentContainer, 'recent', e.target.dataset.lang); } });
+            document.getElementById('upcoming-lang-filters').addEventListener('click', (e) => { if(e.target.matches('.lang-filter-btn')) { document.querySelectorAll('#upcoming-lang-filters .btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary')); e.target.classList.replace('btn-secondary', 'btn-primary'); loadByLang(upcomingContainer, 'upcoming', e.target.dataset.lang); } });
+            
+             closeModalBtn.addEventListener('click', () => {
+                movieModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+
+            movieModal.addEventListener('click', (e) => {
+                if (e.target === movieModal) {
+                    movieModal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            window.addEventListener('scroll', () => {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoadingMore && canLoadMore) {
+                    loadMoreMovies();
+                }
+                if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                    scrollTopBtn.classList.remove('hidden');
+                } else {
+                    scrollTopBtn.classList.add('hidden');
+                }
+            });
 
             // --- INITIALIZATION ---
             const initializeApp = async () => {
                 await setupUserId();
-                await loadStaticData(); // This is desktop-only for now
+                await loadStaticData();
                 
-                if (isMobile) {
-                    // Initial mobile load
-                    const trendingData = await fetchFromTMDb('trending/all/day');
-                    if(trendingData && trendingData.results) renderGrid(mobileHomeContainer, trendingData.results.map(mapApiData));
+                if (loadFiltersFromLocalStorage()) {
+                    handleSearchAndDiscover(false);
                 } else {
-                    // Initial desktop load
-                    if (loadFiltersFromLocalStorage()) {
-                        handleSearchAndDiscover(false);
-                    } else {
-                        showHomePage();
-                        fetchAndDisplayTrending();
-                        loadByLang(recentContainer, 'recent', 'en');
-                        loadByLang(upcomingContainer, 'upcoming', 'en');
-                        handleSearchAndDiscover(true);
-                    }
+                    showHomePage();
+                    fetchAndDisplayTrending();
+                    loadByLang(recentContainer, 'recent', 'en');
+                    loadByLang(upcomingContainer, 'upcoming', 'en');
+                    handleSearchAndDiscover(true);
                 }
-                 setupEventListeners();
             };
 
             initializeApp();
@@ -2466,3 +1723,6 @@
     </script>
 </body>
 </html>
+
+
+
