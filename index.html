@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineBuff</title>
+    <title>ShowShelf</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Google tag (gtag.js) -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-85SRQX986E"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -22,6 +22,7 @@
             color: #f3f4f6; 
             position: relative;
             min-height: 100vh;
+            padding-bottom: 100px; /* Added padding for floating nav */
         }
         body::before {
             content: '';
@@ -195,74 +196,210 @@
             background-color: #ef4444;
             color: white;
         }
+
+        /* Floating Navigation Bar */
+        .floating-nav {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(31, 41, 55, 0.5); /* gray-800 with opacity */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.6); /* gray-600 with opacity */
+            border-radius: 9999px;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 40;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        .nav-btn {
+            background-color: transparent;
+            color: #d1d5db; /* gray-300 */
+            padding: 0.75rem;
+            border-radius: 9999px;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-btn:hover {
+            background-color: rgba(75, 85, 99, 0.5); /* gray-600 with opacity */
+            color: #fff;
+        }
+        .nav-btn.active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: #fff;
+        }
+
+        /* Home Filter Navigation Pill */
+        .home-filter-nav {
+            position: sticky;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: max-content;
+            max-width: calc(100% - 2rem); /* <-- Fix for mobile centering */
+            margin: 0 auto 2.5rem auto;
+            background-color: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.6);
+            border-radius: 9999px;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 30;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        .home-filter-btn {
+            background-color: transparent;
+            color: #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .home-filter-btn:hover {
+            background-color: rgba(75, 85, 99, 0.5);
+            color: #fff;
+        }
+        .home-filter-btn.active {
+            background-color: #4f46e5;
+            color: #fff;
+        }
+        .home-filter-btn svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        /* Carousel Styles */
+        .swiper-button-next, .swiper-button-prev {
+            color: #f3f4f6 !important;
+            background-color: rgba(31, 41, 55, 0.5);
+            border-radius: 50%;
+            width: 44px !important;
+            height: 44px !important;
+            backdrop-filter: blur(5px);
+            transition: background-color 0.2s;
+        }
+        .swiper-button-next:hover, .swiper-button-prev:hover {
+            background-color: rgba(75, 85, 99, 0.7);
+        }
+        .swiper-button-next::after, .swiper-button-prev::after {
+            font-size: 20px !important;
+            font-weight: bold;
+        }
+        .swiper-button-disabled {
+            opacity: 0.35 !important;
+            pointer-events: auto !important;
+        }
+        #featured-section .swiper-container {
+            padding: 0 10px;
+        }
+
+        /* Media Type Toggle */
+        .media-type-btn {
+            transition: color 0.3s ease-in-out;
+        }
+        #toggle-bg.tv {
+            transform: translateX(calc(100% + 4px));
+        }
     </style>
 </head>
 <body>
     <div id="app" class="container mx-auto p-4 md:p-6 lg:p-8">
 
         <div id="home-page">
-             <header class="mb-10 relative flex flex-col md:flex-row items-center justify-between gap-4">
+             <header class="mb-6 relative flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="w-full md:w-1/3">
-                    <!-- User ID section has been moved to the My Lists page -->
-                </div>
+                    </div>
                 <div class="w-full md:w-1/3 text-center">
-                    <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">CineBuff</h1>
+                    <div class="flex justify-center items-center gap-3">
+                        <!-- SVG Logo -->
+                        <svg class="w-14 h-14 text-indigo-400" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="48" width="56" height="6" fill="currentColor" rx="2"></rect>
+                            <rect x="6" y="18" width="10" height="30" fill="currentColor" rx="1"></rect>
+                            <rect x="44" y="18" width="10" height="30" fill="currentColor" rx="1"></rect>
+                            <rect x="18" y="24" width="24" height="24" fill="currentColor" rx="2"></rect>
+                            <path d="M27 31L36 36L27 41V31Z" fill="#f3f4f6"></path>
+                        </svg>
+                        <h1 class="text-4xl md:text-5xl font-bold text-white">ShowShelf</h1>
+                    </div>
                     <p class="text-lg text-gray-400">Your cinematic universe, beautifully organized.</p>
                 </div>
                 <div class="w-full md:w-1/3 flex justify-center md:justify-end gap-2">
-                     <button id="myListsBtn" class="btn-secondary p-3 rounded-lg" title="My Lists">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7zm0 3v1h4v-1H7z"></path></svg>
-                    </button>
-                    <button id="discoverLinkBtn" class="btn-secondary p-3 rounded-lg" title="Go to Discover & Search">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </button>
+                     <!-- Old buttons are removed from here for the new nav bar -->
                 </div>
             </header>
-    
-            <section id="featured-section" class="mb-12 bg-gray-900/50 p-6 rounded-xl">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-                    <h2 id="featured-title" class="text-3xl font-bold text-indigo-300 mb-4 md:mb-0">Trending Today</h2>
-                    <div class="flex flex-wrap justify-center md:flex-nowrap items-center gap-2">
-                         <button id="trendingBtn" class="btn-primary text-sm font-semibold py-2 px-4 rounded-md">Trending Today</button>
-                         <button id="recentBtn" class="btn-secondary text-sm font-semibold py-2 px-4 rounded-md">Recent Releases</button>
-                         <button id="upcomingBtn" class="btn-secondary text-sm font-semibold py-2 px-4 rounded-md">Upcoming Movies</button>
-                         <button id="surpriseBtn" class="btn-secondary text-sm font-semibold py-2 px-4 rounded-md flex items-center">Surprise Me</button>
-                    </div>
-                </div>
-                <div id="featured-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
-            </section>
             
-            <section id="recent-section" class="mb-12">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-2xl font-semibold text-indigo-400">Recently Released</h3>
-                    <div id="recent-lang-filters" class="flex space-x-2">
-                        <button data-lang="en" class="lang-filter-btn btn-primary text-sm py-1 px-3 rounded-md">English</button>
+            <nav id="home-filter-nav" class="home-filter-nav">
+                <button data-filter="trending" class="home-filter-btn active flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.934l-6.796 12.08a1 1 0 00.662 1.618h10.944a1 1 0 00.662-1.618L13.24 3.104a1.001 1.001 0 00-.822-.551zM11 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>
+                    <span class="hidden sm:inline">Trending</span>
+                </button>
+                <button data-filter="foryou" class="home-filter-btn flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+                    <span class="hidden sm:inline">For You</span>
+                </button>
+                <button data-filter="recent" class="home-filter-btn flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                    <span class="hidden sm:inline">Recent</span>
+                </button>
+                <button data-filter="upcoming" class="home-filter-btn flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z"></path></svg>
+                    <span class="hidden sm:inline">Upcoming</span>
+                </button>
+                <button data-filter="surprise" class="home-filter-btn flex items-center gap-2" title="Surprise Me">
+                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h1.17C5.06 5.687 5 5.35 5 5zm4 1a1 1 0 10-2 0v1h2V6zM3 9v7h14V9H3z" clip-rule="evenodd"></path><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path></svg>
+                     <span class="hidden sm:inline">Surprise</span>
+                </button>
+            </nav>
+    
+            <section id="featured-section" class="mb-12 bg-gray-900/50 p-6 rounded-xl relative">
+                <div class="flex justify-center items-center mb-6">
+                    <h2 id="featured-title" class="text-3xl font-bold text-indigo-300">Trending Today</h2>
+                </div>
+                <div class="flex flex-col md:flex-row flex-wrap justify-center items-center gap-4 mb-6">
+                    <div id="language-filter-container" class="flex justify-center items-center gap-2">
+                        <button data-lang="all" class="lang-filter-btn btn-primary text-sm py-1 px-3 rounded-md">All</button>
+                        <button data-lang="en" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">English</button>
                         <button data-lang="hi" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Hindi</button>
                         <button data-lang="bn" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Bengali</button>
                     </div>
-                </div>
-                <div id="recent-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4"></div>
-            </section>
-
-            <section id="upcoming-section" class="mb-12">
-                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-2xl font-semibold text-indigo-400">Upcoming Movies</h3>
-                    <div id="upcoming-lang-filters" class="flex space-x-2">
-                        <button data-lang="en" class="lang-filter-btn btn-primary text-sm py-1 px-3 rounded-md">English</button>
-                        <button data-lang="hi" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Hindi</button>
-                        <button data-lang="bn" class="lang-filter-btn btn-secondary text-sm py-1 px-3 rounded-md">Bengali</button>
+                    <div id="media-type-toggle-container" class="flex justify-center items-center">
+                        <div class="relative inline-block w-48 h-10 rounded-full p-1 bg-gray-800/50 backdrop-blur-sm border border-gray-600/50">
+                            <div id="toggle-bg" class="absolute top-1 left-1 w-[calc(50%-4px)] h-8 bg-indigo-600 rounded-full transition-transform duration-300 ease-in-out"></div>
+                            <button data-type="movie" class="media-type-btn text-white absolute top-1 left-1 w-1/2 h-8 text-sm font-semibold z-10">Movies</button>
+                            <button data-type="tv" class="media-type-btn text-gray-400 absolute top-1 right-1 w-1/2 h-8 text-sm font-semibold z-10">TV Series</button>
+                        </div>
                     </div>
                 </div>
-                <div id="upcoming-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4"></div>
+                <!-- Swiper -->
+                <div class="swiper-container overflow-hidden">
+                    <div id="featured-container" class="swiper-wrapper">
+                        <!-- Movie cards will be injected here as swiper-slides -->
+                    </div>
+                </div>
+                <!-- Add Navigation -->
+                <div class="swiper-button-next text-white"></div>
+                <div class="swiper-button-prev text-white"></div>
             </section>
         </div>
 
         <div id="discover-page" class="hidden">
             <header class="relative text-center mb-4">
                 <h2 class="text-4xl md:text-5xl font-bold text-white">Discover & Search</h2>
-                 <button id="homeBtn" class="absolute top-0 right-0 btn-secondary p-3 rounded-lg" title="Go to Home">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                </button>
+                 <!-- Old home button removed -->
             </header>
             <div id="filter-section" class="bg-gray-900/50 p-6 rounded-xl mt-8 space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -413,9 +550,7 @@
                     <h2 class="text-4xl md:text-5xl font-bold text-white">My Lists</h2>
                 </div>
                 <div class="w-full md:w-1/3 flex justify-center md:justify-end">
-                     <button id="homeFromListsBtn" class="btn-secondary p-3 rounded-lg" title="Go to Home">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                    </button>
+                     <!-- Old home button removed -->
                 </div>
             </header>
             <div class="mt-8">
@@ -433,17 +568,28 @@
                     </nav>
                 </div>
                 <div id="lists-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-                    <!-- Bookmarked movies will be rendered here -->
-                </div>
+                    </div>
             </div>
         </div>
     </div>
 
-    <button id="scrollTopBtn" class="hidden fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 z-50" title="Go to top">
+    <!-- Floating Navigation Bar -->
+    <nav class="floating-nav">
+        <button id="navHomeBtn" class="nav-btn" title="Home">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+        </button>
+        <button id="navDiscoverBtn" class="nav-btn" title="Discover">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </button>
+        <button id="navBookmarksBtn" class="nav-btn" title="My Lists">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7zm0 3v1h4v-1H7z"></path></svg>
+        </button>
+    </nav>
+
+    <button id="scrollTopBtn" class="hidden fixed bottom-24 right-4 md:bottom-8 md:right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 z-50" title="Go to top">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
     </button>
 
-    <!-- Movie Modal Structure -->
     <div id="movieModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div id="modal-content-wrapper" class="bg-gray-900 rounded-lg max-w-screen-xl w-full max-h-[90vh] relative shadow-2xl overflow-y-auto">
             <button id="closeModal" class="absolute top-2 right-2 z-20 text-white bg-black/50 hover:bg-red-600 rounded-full p-2">
@@ -455,37 +601,41 @@
         </div>
     </div>
     
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="api.js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteField, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteField, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- FIREBASE CONFIG (REPLACE WITH YOURS) ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyBCP65YtGVYFB_fonHyQCjLn6m4KxHBNvY",
-            authDomain: "cinebuff-app.firebaseapp.com",
-            projectId: "cinebuff-app",
-            storageBucket: "cinebuff-app.firebasestorage.app",
-            messagingSenderId: "862999221890",
-            appId: "1:862999221890:web:cd39ac28b7ec0d2f1d869b",
-            measurementId: "G-0P7SV14B7V"
-        };
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined'
+            ? JSON.parse(__firebase_config)
+            : {
+                apiKey: "AIzaSyBCP65YtGVYFB_fonHyQCjLn6m4KxHBNvY",
+                authDomain: "cinebuff-app.firebaseapp.com",
+                projectId: "cinebuff-app",
+                storageBucket: "cinebuff-app.firebasestorage.app",
+                messagingSenderId: "862999221890",
+                appId: "1:862999221890:web:cd39ac28b7ec0d2f1d869b",
+                measurementId: "G-0P7SV14B7V"
+            };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        // --- NEW: User Activity Logger ---
+
+        // --- User Activity Logger ---
         const logUserActivity = async (action, details = {}) => {
-            // We only log activity if we have a user ID
             if (!userId) return; 
             try {
-                // Adds a new document to the 'activity_logs' collection
                 await addDoc(collection(db, "activity_logs"), {
                     userId: userId,
-                    action: action, // e.g., 'search', 'view_movie_details'
-                    details: details, // e.g., { searchTerm: 'Matrix' }
-                    timestamp: serverTimestamp() // Uses the reliable server time
+                    action: action, 
+                    details: details,
+                    timestamp: serverTimestamp() 
                 });
             } catch (error) {
                 console.error("Failed to log user activity:", error);
@@ -496,11 +646,11 @@
             // --- CONFIG ---
             const imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
             const backdropBaseUrl = 'https://image.tmdb.org/t/p/w1280';
-
+            
             // --- STATE ---
             let currentPage = 1;
-            let isLoadingMore = false;
-            let canLoadMore = true;
+            let isLoadingMoreDiscover = false;
+            let canLoadMoreDiscover = true;
             let paginationParams = {};
             let genresMap = {};
             let selectedGenres = [];
@@ -508,6 +658,10 @@
             let countryCodeMap = {};
             let userId = '';
             let userBookmarks = {};
+            let swiper;
+            let currentCarouselLang = 'all';
+            let currentMediaType = 'movie';
+
 
             // --- DOM ELEMENTS ---
             const homePage = document.getElementById('home-page');
@@ -515,9 +669,6 @@
             const myListsPage = document.getElementById('my-lists-page');
             const featuredContainer = document.getElementById('featured-container');
             const featuredTitle = document.getElementById('featured-title');
-            const discoverLinkBtn = document.getElementById('discoverLinkBtn');
-            const myListsBtn = document.getElementById('myListsBtn');
-            const homeFromListsBtn = document.getElementById('homeFromListsBtn');
             const listsContainer = document.getElementById('lists-container');
             const movieListContainer = document.getElementById('movie-list-container');
             const movieList = document.getElementById('movie-list');
@@ -535,8 +686,6 @@
             const maxRatingValue = document.getElementById('maxRatingValue');
             const applyFiltersBtn = document.getElementById('applyFiltersBtn');
             const resetFiltersBtn = document.getElementById('resetFiltersBtn');
-            const recentContainer = document.getElementById('recent-container');
-            const upcomingContainer = document.getElementById('upcoming-container');
             const movieModal = document.getElementById('movieModal');
             const genreFilterContainer = document.getElementById('genreFilterContainer');
             const genreFilterDisplay = document.getElementById('genreFilterDisplay');
@@ -546,11 +695,6 @@
             const certCountryFilter = document.getElementById('certCountryFilter');
             const certificationFilter = document.getElementById('certificationFilter');
             const contentTypeFilter = document.getElementById('contentTypeFilter');
-            const homeBtn = document.getElementById('homeBtn');
-            const trendingBtn = document.getElementById('trendingBtn');
-            const recentBtn = document.getElementById('recentBtn');
-            const upcomingBtn = document.getElementById('upcomingBtn');
-            const surpriseBtn = document.getElementById('surpriseBtn');
             const scrollTopBtn = document.getElementById('scrollTopBtn');
             const exportCsvBtn = document.getElementById('exportCsvBtn');
             const closeModalBtn = document.getElementById('closeModal');
@@ -558,15 +702,31 @@
             const userIdInput = document.getElementById('userIdInput');
             const copyUserIdBtn = document.getElementById('copyUserIdBtn');
             const loadUserIdBtn = document.getElementById('loadUserIdBtn');
+            const navHomeBtn = document.getElementById('navHomeBtn');
+            const navDiscoverBtn = document.getElementById('navDiscoverBtn');
+            const navBookmarksBtn = document.getElementById('navBookmarksBtn');
+            const homeFilterNav = document.getElementById('home-filter-nav');
+            const languageFilterContainer = document.getElementById('language-filter-container');
+            const mediaTypeToggleContainer = document.getElementById('media-type-toggle-container');
             
             // --- BOOKMARK LOGIC ---
             const setupUserId = async () => {
-                let existingId = localStorage.getItem('cinebuff_user_id');
-                if (!existingId) {
-                    existingId = crypto.randomUUID();
-                    localStorage.setItem('cinebuff_user_id', existingId);
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    userId = auth.currentUser?.uid;
+                    if (!userId) {
+                        userId = localStorage.getItem('cinebuff_user_id') || crypto.randomUUID();
+                    }
+                    localStorage.setItem('cinebuff_user_id', userId);
+                } catch (error) {
+                    console.error("Firebase Auth Error:", error);
+                    userId = localStorage.getItem('cinebuff_user_id') || crypto.randomUUID();
+                    localStorage.setItem('cinebuff_user_id', userId);
                 }
-                userId = existingId;
                 userIdInput.value = userId;
                 await fetchBookmarks();
             };
@@ -576,11 +736,7 @@
                 try {
                     const docRef = doc(db, "bookmarks", userId);
                     const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) {
-                        userBookmarks = docSnap.data();
-                    } else {
-                        userBookmarks = {};
-                    }
+                    userBookmarks = docSnap.exists() ? docSnap.data() : {};
                 } catch (error) {
                     console.error('Failed to fetch bookmarks:', error);
                     userBookmarks = {};
@@ -589,36 +745,22 @@
             
             const updateBookmark = async (movieId, movieTitle, moviePoster, movieType, status) => {
                 const currentStatus = userBookmarks[movieId]?.status;
-                const newStatus = currentStatus === status ? null : status; // Un-bookmark if same button is clicked
+                const newStatus = currentStatus === status ? null : status; 
 
-                // --- Log the bookmarking activity ---
-                if (newStatus) {
-                    logUserActivity('add_to_list', { movieId, movieTitle, list: newStatus });
-                } else {
-                    logUserActivity('remove_from_list', { movieId, movieTitle, list: status });
-                }
+                logUserActivity(newStatus ? 'add_to_list' : 'remove_from_list', { movieId, movieTitle, list: newStatus || status });
                 
                 try {
                     const docRef = doc(db, "bookmarks", userId);
                     const movieKey = String(movieId);
 
                     if (newStatus) {
-                        await setDoc(docRef, {
-                            [movieKey]: {
-                                title: movieTitle,
-                                poster: moviePoster,
-                                type: movieType,
-                                status: newStatus
-                            }
-                        }, { merge: true });
-                        userBookmarks[movieId] = { title: movieTitle, poster: moviePoster, type: movieType, status: newStatus };
+                        const bookmarkData = { title: movieTitle, poster: moviePoster, type: movieType, status: newStatus };
+                        await setDoc(docRef, { [movieKey]: bookmarkData }, { merge: true });
+                        userBookmarks[movieId] = bookmarkData;
                     } else {
-                         await updateDoc(docRef, {
-                            [movieKey]: deleteField()
-                        });
+                         await updateDoc(docRef, { [movieKey]: deleteField() });
                         delete userBookmarks[movieId];
                     }
-                    
                     updateBookmarkButtons(movieId);
                 } catch (error) {
                     console.error('Error updating bookmark:', error);
@@ -628,11 +770,7 @@
             const updateBookmarkButtons = (movieId) => {
                 const status = userBookmarks[movieId]?.status;
                 document.querySelectorAll('.bookmark-btn').forEach(btn => {
-                    if (btn.dataset.status === status) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
+                    btn.classList.toggle('active', btn.dataset.status === status);
                 });
             };
 
@@ -683,7 +821,7 @@
                 if (filters.selectedCertCountry) {
                     certCountryFilter.value = filters.selectedCertCountry;
                     certCountryFilter.dispatchEvent(new Event('change'));
-                    setTimeout(() => { // Allow dependent dropdown to populate
+                    setTimeout(() => { 
                         if (filters.selectedCertification) {
                             certificationFilter.value = filters.selectedCertification;
                         }
@@ -714,25 +852,37 @@
             }
 
             // --- PAGE NAVIGATION ---
+            const updateNavActiveState = (activePage) => {
+                navHomeBtn.classList.toggle('active', activePage === 'home');
+                navDiscoverBtn.classList.toggle('active', activePage === 'discover');
+                navBookmarksBtn.classList.toggle('active', activePage === 'bookmarks');
+            };
+
             const showHomePage = () => {
                 homePage.classList.remove('hidden');
                 discoverPage.classList.add('hidden');
                 myListsPage.classList.add('hidden');
+                homeFilterNav.classList.remove('hidden');
+                updateNavActiveState('home');
             };
 
             const showDiscoverPage = () => {
                 homePage.classList.add('hidden');
                 discoverPage.classList.remove('hidden');
                 myListsPage.classList.add('hidden');
+                homeFilterNav.classList.add('hidden');
                 window.scrollTo(0, 0);
+                updateNavActiveState('discover');
             };
 
             const showMyListsPage = () => {
                 homePage.classList.add('hidden');
                 discoverPage.classList.add('hidden');
                 myListsPage.classList.remove('hidden');
-                renderBookmarkList('watchlist'); // Default to watchlist
+                homeFilterNav.classList.add('hidden');
+                renderBookmarkList('watchlist'); 
                 window.scrollTo(0, 0);
+                updateNavActiveState('bookmarks');
             };
             
             // --- DATA MAPPING ---
@@ -803,8 +953,6 @@
                 if (!append) tbody.innerHTML = '';
                 tbody.innerHTML += items.map(renderMovieListItem).join('');
             };
-
-            const renderGrid = (container, items) => { container.innerHTML = items.map(renderMovieGridCard).join(''); };
             
             const renderBookmarkList = (listType) => {
                  document.querySelectorAll('.list-tab-btn').forEach(btn => {
@@ -835,17 +983,26 @@
 
 
             // --- SKELETON RENDER FUNCTIONS ---
-            const renderMovieGridCardSkeleton = () => `
-                <div class="card-grid">
-                    <div class="skeleton w-full aspect-[2/3]"></div>
-                    <div class="p-2">
-                        <div class="skeleton h-5 w-3/4 rounded"></div>
-                        <div class="flex justify-between items-center mt-2">
-                            <div class="skeleton h-4 w-1/3 rounded"></div>
-                            <div class="skeleton h-4 w-1/4 rounded"></div>
+            const renderCarouselSkeleton = (count = 10) => {
+                let skeletonHTML = '';
+                for (let i = 0; i < count; i++) {
+                    skeletonHTML += `
+                    <div class="swiper-slide">
+                        <div class="card-grid">
+                            <div class="skeleton w-full aspect-[2/3]"></div>
+                            <div class="p-2">
+                                <div class="skeleton h-5 w-3/4 rounded"></div>
+                                <div class="flex justify-between items-center mt-2">
+                                    <div class="skeleton h-4 w-1/3 rounded"></div>
+                                    <div class="skeleton h-4 w-1/4 rounded"></div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
+                }
+                featuredContainer.innerHTML = skeletonHTML;
+                if (swiper) swiper.update();
+            };
 
             const renderMovieListItemSkeleton = () => `
                 <tr>
@@ -859,10 +1016,6 @@
                     <td class="p-4 align-middle hidden sm:table-cell"><div class="skeleton h-5 w-1/2 rounded"></div></td>
                     <td class="p-4 align-middle text-center"><div class="skeleton h-7 w-7 rounded-full mx-auto"></div></td>
                 </tr>`;
-
-            const renderSkeletons = (container, renderer, count) => {
-                container.innerHTML = Array(count).fill().map(renderer).join('');
-            };
 
             // --- GENRE PILLS ---
             const renderGenrePills = () => {
@@ -949,11 +1102,10 @@
                                 const usReleases = detailsData.release_dates.results.find(r => r.iso_3166_1 === 'US');
                                 if (usReleases && usReleases.release_dates.length > 0) {
                                     const theatricalRelease = usReleases.release_dates.find(rd => rd.type === 3 && rd.certification !== '');
-                                    if (theatricalRelease) {
-                                        cert = theatricalRelease.certification;
-                                    } else {
+                                    if (theatricalRelease) cert = theatricalRelease.certification;
+                                    else {
                                         const anyRatedRelease = usReleases.release_dates.find(rd => rd.certification && rd.certification !== '');
-                                        if (anyRatedRelease) { cert = anyRatedRelease.certification; }
+                                        if (anyRatedRelease) cert = anyRatedRelease.certification;
                                     }
                                 }
                             }
@@ -966,7 +1118,7 @@
                         if (detailsData) {
                              if (detailsData.content_ratings) {
                                  const usRating = detailsData.content_ratings.results.find(r => r.iso_3166_1 === 'US');
-                                 if(usRating && usRating.rating) { cert = usRating.rating; }
+                                 if(usRating && usRating.rating) cert = usRating.rating;
                              }
                              if (detailsData.keywords && detailsData.keywords.results) {
                                  keywords = detailsData.keywords.results.slice(0, 3).map(k => k.name).join(', ');
@@ -977,20 +1129,13 @@
                     if (row.cells[3]) row.cells[3].textContent = keywords;
                     if (row.cells[7]) row.cells[7].textContent = cert;
                     
-                    await new Promise(resolve => setTimeout(resolve, 200));
-                }
-            };
-
-            const fetchAndDisplayTrending = async () => {
-                renderSkeletons(featuredContainer, renderMovieGridCardSkeleton, 10);
-                const data = await fetchFromTMDb('trending/all/day');
-                if (data && data.results) {
-                    renderGrid(featuredContainer, data.results.slice(0, 10).map(mapApiData));
+                    await new Promise(resolve => setTimeout(resolve, 50));
                 }
             };
 
             const getSurpriseMovie = async () => {
                 gtag('event', 'click', { 'event_category': 'Engagement', 'event_label': 'Surprise Me' });
+                const surpriseBtn = document.querySelector('[data-filter="surprise"]');
                 surpriseBtn.disabled = true;
                 surpriseBtn.innerHTML = `<div class="loader-sm"></div>`;
                 
@@ -1015,7 +1160,146 @@
                     }
                 }
                 surpriseBtn.disabled = false;
-                surpriseBtn.textContent = 'Surprise Me';
+                surpriseBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h1.17C5.06 5.687 5 5.35 5 5zm4 1a1 1 0 10-2 0v1h2V6zM3 9v7h14V9H3z" clip-rule="evenodd"></path><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path></svg><span class="hidden sm:inline">Surprise</span>`;
+            };
+
+            // --- Carousel & Home Section Logic ---
+            function initSwiper() {
+                if (swiper) {
+                    swiper.destroy(true, true);
+                }
+                swiper = new Swiper('.swiper-container', {
+                    slidesPerView: 2,
+                    spaceBetween: 16,
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                    breakpoints: {
+                        640: { slidesPerView: 3, spaceBetween: 20 },
+                        768: { slidesPerView: 4, spaceBetween: 24 },
+                        1024: { slidesPerView: 5, spaceBetween: 24 },
+                    },
+                });
+            }
+
+            const updateHomeCarousel = async (filterType, lang = 'all', mediaType = 'movie') => {
+                renderCarouselSkeleton();
+                initSwiper();
+
+                let data;
+                let title = '';
+                let params = { sort_by: 'popularity.desc' };
+                if (lang !== 'all') {
+                    params.with_original_language = lang;
+                }
+                const today = new Date().toISOString().split('T')[0];
+                const discoverPath = `discover/${mediaType}`;
+
+                switch (filterType) {
+                    case 'trending':
+                        title = 'Trending Today';
+                        data = await fetchFromTMDb(discoverPath, params);
+                        break;
+                    case 'recent':
+                        title = 'Recent Releases';
+                        const threeMonthsAgo = new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split('T')[0];
+                        const dateParam = mediaType === 'movie' ? 'primary_release_date' : 'first_air_date';
+                        params[`${dateParam}.gte`] = threeMonthsAgo;
+                        params[`${dateParam}.lte`] = today;
+                        data = await fetchFromTMDb(discoverPath, params);
+                        break;
+                    case 'upcoming':
+                        if (mediaType === 'tv') {
+                            title = 'Popular New Series';
+                            params['first_air_date.gte'] = today;
+                        } else {
+                            title = 'Upcoming Movies';
+                            const sixMonthsLater = new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0];
+                            params['primary_release_date.gte'] = today;
+                            params['primary_release_date.lte'] = sixMonthsLater;
+                        }
+                        data = await fetchFromTMDb(discoverPath, params);
+                        break;
+                    case 'foryou':
+                        await fetchAndDisplayForYou();
+                        return;
+                }
+                
+                featuredTitle.textContent = title;
+                if (data && data.results) {
+                    const mappedData = data.results.map(mapApiData);
+                    const slidesHTML = mappedData.map(item => `<div class="swiper-slide">${renderMovieGridCard(item)}</div>`).join('');
+                    featuredContainer.innerHTML = slidesHTML;
+                } else {
+                    featuredContainer.innerHTML = `<p class="text-gray-400 col-span-full text-center py-8 w-full">Could not load content.</p>`;
+                }
+                swiper.update();
+            };
+            
+            const fetchAndDisplayForYou = async () => {
+                featuredTitle.textContent = 'For You';
+                renderCarouselSkeleton();
+                initSwiper();
+
+                const likedMovies = Object.values(userBookmarks).filter(m => m.status === 'watched' || m.status === 'favourite');
+                
+                if (likedMovies.length < 5) {
+                    featuredContainer.innerHTML = `<p class="w-full text-center text-gray-400 py-8">Add at least 5 movies to your 'Watched' or 'Favourites' lists to get personalized recommendations.</p>`;
+                    swiper.update();
+                    return;
+                }
+
+                const movieTitles = likedMovies.map(m => m.title).slice(0, 20);
+                const prompt = `Based on a user liking these movies: ${movieTitles.join(', ')}. Recommend a large, diverse list of other movies and TV shows they might enjoy. IMPORTANT: Your response must be ONLY a valid JSON array of strings. Each string must be in the "Title (Year)" format. For example: ["Inception (2010)", "The Boys (2019)"]. Do not include the original movies in the list.`;
+                
+                try {
+                    const rawResponse = await callGemini(prompt);
+                    let jsonString = rawResponse.trim().replace(/```json|```/g, '');
+                    const recommendations = JSON.parse(jsonString);
+
+                    if (Array.isArray(recommendations) && recommendations.length > 0) {
+                        const bookmarkedTitles = new Set(Object.values(userBookmarks).map(m => m.title));
+                        const forYouList = recommendations.filter(rec => {
+                            const titleMatch = rec.match(/(.+)\s\((\d{4})\)/);
+                            return titleMatch ? !bookmarkedTitles.has(titleMatch[1].trim()) : false;
+                        });
+
+                        const searchPromises = forYouList.slice(0, 20).map(recString => {
+                             const match = recString.match(/(.+) \((\d{4})\)/);
+                             if (match) {
+                                 const title = match[1].trim();
+                                 const year = match[2];
+                                 return fetchFromTMDb('search/multi', { query: title, year: year, include_adult: false });
+                             }
+                             return Promise.resolve(null);
+                         });
+
+                        const searchResults = await Promise.all(searchPromises);
+                        const moviesToRender = [];
+                        searchResults.forEach(res => {
+                            if (res && res.results && res.results.length > 0) {
+                                const bestMatch = res.results.find(r => r.media_type !== 'person' && r.poster_path);
+                                if (bestMatch) {
+                                    moviesToRender.push(mapApiData(bestMatch));
+                                }
+                            }
+                        });
+
+                        if (moviesToRender.length > 0) {
+                             const slidesHTML = moviesToRender.map(item => `<div class="swiper-slide">${renderMovieGridCard(item)}</div>`).join('');
+                             featuredContainer.innerHTML = slidesHTML;
+                        } else {
+                            throw new Error("No movies found from AI response");
+                        }
+                    } else {
+                        throw new Error("AI response was not a valid array.");
+                    }
+                } catch (error) {
+                    console.error("Failed to get 'For You' recommendations:", error);
+                    featuredContainer.innerHTML = `<p class="w-full text-center text-gray-400 py-8">Could not load recommendations at this time.</p>`;
+                }
+                swiper.update();
             };
 
 
@@ -1024,13 +1308,10 @@
                 if(!isInitialLoad) showDiscoverPage();
 
                 const searchTerm = searchInput.value.trim();
-                if (searchTerm) {
-                    gtag('event', 'search', { search_term: searchTerm });
-                }
+                if (searchTerm) gtag('event', 'search', { search_term: searchTerm });
                 
-                // --- Log the search activity ---
                 if (!isInitialLoad) {
-                    const searchDetails = {
+                    logUserActivity('search', {
                         searchTerm: searchInput.value.trim(),
                         searchType: searchTypeDropdown.value,
                         directorName: directorSearch.value.trim(),
@@ -1038,8 +1319,7 @@
                         year: yearFilter.value,
                         minRating: minRatingFilter.value,
                         contentType: contentTypeFilter.value
-                    };
-                    logUserActivity('search', searchDetails);
+                    });
                 }
 
                 loader.style.display = 'none';
@@ -1050,7 +1330,7 @@
                 tbody.innerHTML = Array(10).fill().map(renderMovieListItemSkeleton).join('');
 
                 currentPage = 1;
-                canLoadMore = true;
+                canLoadMoreDiscover = true;
 
                 const searchType = searchTypeDropdown.value;
                 const directorName = directorSearch.value.trim();
@@ -1076,7 +1356,7 @@
                 };
                 
                 if (directorName) {
-                    canLoadMore = false; 
+                    canLoadMoreDiscover = false; 
                     gridTitle.textContent = `Searching for "${directorName}"...`;
                     const personData = await fetchFromTMDb('search/person', { query: directorName });
 
@@ -1089,9 +1369,7 @@
                         if (creditsData) {
                             let directedWorks = (creditsData.crew || []).filter(work => work.job === 'Director' || work.job === 'Creator');
                             
-                            if (contentType !== 'both') {
-                                directedWorks = directedWorks.filter(work => work.media_type === contentType);
-                            }
+                            if (contentType !== 'both') directedWorks = directedWorks.filter(work => work.media_type === contentType);
                             if (genreIds) {
                                 const selectedGenreIds = genreIds.split(',').map(id => parseInt(id));
                                 directedWorks = directedWorks.filter(work => work.genre_ids && work.genre_ids.some(id => selectedGenreIds.includes(id)));
@@ -1102,9 +1380,9 @@
                                   return releaseYear == selectedYear;
                               });
                             }
-                            if (minRating > 0) { directedWorks = directedWorks.filter(work => work.vote_average >= minRating); }
-                            if (maxRating < 10) { directedWorks = directedWorks.filter(work => work.vote_average <= maxRating); }
-                            if (selectedLanguage) { directedWorks = directedWorks.filter(work => work.original_language === selectedLanguage); }
+                            if (minRating > 0) directedWorks = directedWorks.filter(work => work.vote_average >= minRating); 
+                            if (maxRating < 10) directedWorks = directedWorks.filter(work => work.vote_average <= maxRating);
+                            if (selectedLanguage) directedWorks = directedWorks.filter(work => work.original_language === selectedLanguage);
                             
                             finalResults = directedWorks;
                         }
@@ -1120,7 +1398,7 @@
                         gridTitle.textContent = `Results for keyword "${searchTerm}"`;
                     } else {
                         gridTitle.textContent = `Keyword "${searchTerm}" not found`;
-                        canLoadMore = false;
+                        canLoadMoreDiscover = false;
                     }
                 }
 
@@ -1131,18 +1409,16 @@
                         queryParams: { query: searchTerm, language: selectedLanguage, year: selectedYear }
                     };
                     let movieData, tvData;
-                    if (contentType === 'movie') {
-                         movieData = await fetchFromTMDb('search/movie', {...paginationParams.queryParams, page: 1});
-                    } else if (contentType === 'tv') {
-                         tvData = await fetchFromTMDb('search/tv', {...paginationParams.queryParams, page: 1});
-                    } else {
+                    if (contentType === 'movie') movieData = await fetchFromTMDb('search/movie', {...paginationParams.queryParams, page: 1});
+                    else if (contentType === 'tv') tvData = await fetchFromTMDb('search/tv', {...paginationParams.queryParams, page: 1});
+                    else {
                         const multiData = await fetchFromTMDb('search/multi', {...paginationParams.queryParams, page: 1});
                         movieData = { results: (multiData.results || []).filter(item => item.media_type === 'movie')};
                         tvData = { results: (multiData.results || []).filter(item => item.media_type === 'tv')};
                     }
                     finalResults = [...(movieData?.results || []), ...(tvData?.results || [])];
                     if(!directorName) gridTitle.textContent = `Results for "${searchTerm}"`;
-                } else if (!directorName) { // Standard Discover or Keyword Discover
+                } else if (!directorName) { // Standard Discover
                     paginationParams.mode = 'discover';
                     const movieParams = { ...baseDiscoverParams, ...(selectedYear && { primary_release_year: selectedYear }) };
                     if (selectedCertCountry && selectedCertification && contentType !== 'tv') {
@@ -1154,12 +1430,9 @@
                     paginationParams = { ...paginationParams, type: contentType, movieParams, tvParams };
 
                     let movieData, tvData;
-                    if (contentType === 'movie' || contentType === 'both') {
-                        movieData = await fetchFromTMDb('discover/movie', { ...movieParams, page: 1 });
-                    }
-                    if (contentType === 'tv' || contentType === 'both') {
-                         tvData = await fetchFromTMDb('discover/tv', { ...tvParams, page: 1 });
-                    }
+                    if (contentType === 'movie' || contentType === 'both') movieData = await fetchFromTMDb('discover/movie', { ...movieParams, page: 1 });
+                    if (contentType === 'tv' || contentType === 'both') tvData = await fetchFromTMDb('discover/tv', { ...tvParams, page: 1 });
+                    
                     finalResults.push(...(movieData?.results || []), ...(tvData?.results || []));
                     if(!searchTerm) gridTitle.textContent = 'Discover Top Rated Movies & Series';
                 }
@@ -1171,7 +1444,7 @@
                     renderTable(movieList, movieData);
                     fetchRowDetails(movieData, movieList.querySelectorAll('tbody tr'));
                 } else { 
-                    canLoadMore = false;
+                    canLoadMoreDiscover = false;
                     movieListContainer.classList.add('hidden');
                     exportCsvBtn.classList.add('hidden');
                     noResults.classList.remove('hidden'); 
@@ -1179,8 +1452,8 @@
             };
 
             const loadMoreMovies = async() => {
-                if (isLoadingMore || !canLoadMore) return;
-                isLoadingMore = true; 
+                if (isLoadingMoreDiscover || !canLoadMoreDiscover) return;
+                isLoadingMoreDiscover = true; 
                 currentPage++; 
                 loaderMore.style.display = 'flex';
 
@@ -1195,12 +1468,9 @@
                     let movieDataPromise = Promise.resolve({results: []});
                     let tvDataPromise = Promise.resolve({results: []});
 
-                    if (type === 'movie' || type === 'both') {
-                        movieDataPromise = fetchFromTMDb('discover/movie', { ...movieParams, page: currentPage });
-                    }
-                    if (type === 'tv' || type === 'both') {
-                        tvDataPromise = fetchFromTMDb('discover/tv', { ...tvParams, page: currentPage });
-                    }
+                    if (type === 'movie' || type === 'both') movieDataPromise = fetchFromTMDb('discover/movie', { ...movieParams, page: currentPage });
+                    if (type === 'tv' || type === 'both') tvDataPromise = fetchFromTMDb('discover/tv', { ...tvParams, page: currentPage });
+                    
                     const [movieData, tvData] = await Promise.all([movieDataPromise, tvDataPromise]);
                     newResults = [...(movieData?.results || []), ...(tvData?.results || [])];
                 }
@@ -1213,32 +1483,13 @@
                     const newRows = Array.from(movieList.querySelectorAll('tbody tr')).slice(initialRowCount);
                     fetchRowDetails(movieData, newRows);
                 } else { 
-                    canLoadMore = false; 
+                    canLoadMoreDiscover = false; 
                     currentPage--; 
                 }
                 loaderMore.style.display = 'none'; 
-                isLoadingMore = false;
+                isLoadingMoreDiscover = false;
             };
             
-            const loadByLang = async (container, type, lang) => {
-                renderSkeletons(container, renderMovieGridCardSkeleton, 7);
-                const today = new Date().toISOString().split('T')[0];
-                let params = { with_original_language: lang, sort_by: 'popularity.desc', include_adult: true };
-
-                if (type === 'recent') {
-                    const threeMonthsAgo = new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split('T')[0];
-                    params['primary_release_date.gte'] = threeMonthsAgo;
-                    params['primary_release_date.lte'] = today;
-                } else { // upcoming
-                    const sixMonthsLater = new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0];
-                    params['primary_release_date.gte'] = today;
-                    params['primary_release_date.lte'] = sixMonthsLater;
-                }
-                const data = await fetchFromTMDb('discover/movie', params);
-                if(data && data.results.length > 0) renderGrid(container, data.results.map(mapApiData));
-                else container.innerHTML = `<p class="col-span-full text-center text-gray-500">No movies found.</p>`;
-            };
-
             const exportTableToCSV = (filename) => {
                 let csv = [];
                 const table = document.getElementById('movie-list');
@@ -1251,19 +1502,12 @@
 
                     for (let i = 0; i < cols.length; i++) {
                         const headerText = headerCells[i] ? headerCells[i].innerText.toUpperCase() : '';
-                        if (headerText === 'TRAILER') {
-                            continue;
-                        }
-
+                        if (headerText === 'TRAILER') continue;
                         let cellText = cols[i].innerText;
-
                         if (i === 0) {
                             const img = cols[i].querySelector('img');
-                            if (img) {
-                                cellText = img.alt;
-                            }
+                            if (img) cellText = img.alt;
                         }
-                        
                         const sanitizedCell = `"${cellText.replace(/"/g, '""')}"`;
                         rowData.push(sanitizedCell);
                     }
@@ -1309,38 +1553,19 @@
             const fetchAndRenderAIRecommendations = async (id, type, title, genreIds) => {
                 const container = document.getElementById('ai-recommendations');
                 const recommendationTitle = document.getElementById('recommendation-title');
-
                 if (!container || !recommendationTitle) return;
 
                 recommendationTitle.textContent = 'AI Recommended';
-
-                renderSkeletons(container, () => `
-                    <div class="recommended-card">
-                         <div class="skeleton w-full aspect-[2/3]"></div>
-                         <div class="p-2"><div class="skeleton h-4 w-3/4 mx-auto rounded"></div></div>
-                    </div>
-                `, 6)
-
+                container.innerHTML = Array(6).fill().map(() => `<div class="recommended-card"><div class="skeleton w-full aspect-[2/3]"></div><div class="p-2"><div class="skeleton h-4 w-3/4 mx-auto rounded"></div></div></div>`).join('');
+                
                 const prompt = `Based on the ${type} '${title}', recommend 6 other movies or TV shows. IMPORTANT: Your response must be ONLY a valid JSON array of strings. Each string must be in the "Title (Year)" format. Do not include any other text, explanations, or markdown formatting.`;
 
                 try {
                     const rawResponse = await callGemini(prompt);
-                    
-                    let jsonString = rawResponse.trim();
-                    const startIndex = jsonString.indexOf('[');
-                    const endIndex = jsonString.lastIndexOf(']');
-
-                    if (startIndex === -1 || endIndex === -1) {
-                        throw new Error("No JSON array found in AI response.");
-                    }
-
-                    jsonString = jsonString.substring(startIndex, endIndex + 1);
-                    
+                    let jsonString = rawResponse.trim().replace(/```json|```/g, '');
                     const recommendations = JSON.parse(jsonString);
 
-                    if (!Array.isArray(recommendations)) {
-                        throw new Error("Parsed data is not an array.");
-                    }
+                    if (!Array.isArray(recommendations)) throw new Error("Parsed data is not an array.");
 
                     const searchPromises = recommendations.map(recString => {
                         const match = recString.match(/(.+) \((\d{4})\)/);
@@ -1353,37 +1578,26 @@
                     });
 
                     const searchResults = await Promise.all(searchPromises);
-
                     const html = searchResults.map(searchData => {
                         if (!searchData || !searchData.results) return '';
                         const movieData = searchData.results.find(r => r.media_type !== 'person');
-                        if (movieData) {
-                            const mapped = mapApiDataForModal(movieData);
-                            return renderSimilarMovieCard(mapped);
-                        }
+                        if (movieData) return renderSimilarMovieCard(mapApiDataForModal(movieData));
                         return '';
                     }).join('');
                     
-                    if (html.trim() === '') {
-                         throw new Error("No movies found from AI response");
-                    }
+                    if (html.trim() === '') throw new Error("No movies found from AI response");
                     container.innerHTML = html;
                 } catch (err) {
                     console.error("AI recs parse error:", err);
                     recommendationTitle.textContent = 'Genre Based Recommendation';
-                    // Fallback to genre-based recommendations
                     if (genreIds && genreIds.length > 0) {
-                        const discoverPath = type === 'movie' ? 'discover/movie' : 'discover/tv';
-                        const recommendationsData = await fetchFromTMDb(discoverPath, {
+                        const recommendationsData = await fetchFromTMDb(`discover/${type}`, {
                             with_genres: genreIds[0],
                             sort_by: 'popularity.desc',
                             page: 1
                         });
                         if (recommendationsData && recommendationsData.results) {
-                            const similarItems = recommendationsData.results
-                                .filter(item => item.id !== id)
-                                .slice(0, 6)
-                                .map(mapApiDataForModal);
+                            const similarItems = recommendationsData.results.filter(item => item.id !== id).slice(0, 6).map(mapApiDataForModal);
                             container.innerHTML = similarItems.map(renderSimilarMovieCard).join('');
                         } else {
                             container.innerHTML = `<p class="text-sm text-gray-400 col-span-full">Could not load recommendations.</p>`;
@@ -1410,53 +1624,32 @@
 
                 const title = type === 'movie' ? data.title : data.name;
 
-                // --- Log the movie view activity ---
                 logUserActivity('view_movie_details', { movieId: id, movieType: type, movieTitle: title });
-
                 gtag('event', 'view_item', { 'event_category': 'Engagement', 'event_label': title });
 
                 const releaseDate = type === 'movie' ? data.release_date : data.first_air_date;
                 const year = releaseDate ? releaseDate.substring(0, 4) : 'N/A';
-
-                const director = type === 'movie'
-                    ? (data.credits.crew.find(c => c.job === 'Director')?.name || 'N/A')
-                    : (data.created_by?.map(c => c.name).join(', ') || 'N/A');
-                
+                const director = type === 'movie' ? (data.credits.crew.find(c => c.job === 'Director')?.name || 'N/A') : (data.created_by?.map(c => c.name).join(', ') || 'N/A');
                 const genres = (data.genres || []).map(g => g.name).join(', ');
                 const cast = data.credits.cast.slice(0, 5).map(c => c.name).join(', ');
-                const ottHtml = (data['watch/providers']?.results.IN?.flatrate || [])
-                    .map(p => `<img src="${imageBaseUrl}${p.logo_path}" alt="${p.provider_name}" title="${p.provider_name}" class="h-10">`)
-                    .join('');
-
                 const trailer = data.videos?.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
-                const trailerBtn = trailer
-                    ? `<a href="https://www.youtube.com/watch?v=${trailer.key}" target="_blank" class="trailer-btn">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-                        <span>Watch Trailer</span>
-                       </a>`
-                    : '';
-                
+                const trailerBtn = trailer ? `<a href="https://www.youtube.com/watch?v=${trailer.key}" target="_blank" class="trailer-btn"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg><span>Watch Trailer</span></a>` : '';
                 const backdropUrl = data.backdrop_path ? `${backdropBaseUrl}${data.backdrop_path}` : '';
                 
                 let certification = 'N/A';
                 if (type === 'movie' && data.release_dates) {
                     const usRelease = data.release_dates.results.find(r => r.iso_3166_1 === 'US');
                     if (usRelease && usRelease.release_dates.length > 0) {
-                        const theatricalRelease = usRelease.release_dates.find(rd => rd.type === 3 && rd.certification);
-                        if (theatricalRelease) {
-                            certification = theatricalRelease.certification;
-                        } else {
-                            const anyRatedRelease = usRelease.release_dates.find(rd => rd.certification);
-                            if (anyRatedRelease) {
-                                certification = anyRatedRelease.certification;
-                            }
+                        const theatrical = usRelease.release_dates.find(rd => rd.type === 3 && rd.certification);
+                        if(theatrical) certification = theatrical.certification;
+                        else {
+                           const anyRated = usRelease.release_dates.find(rd => rd.certification);
+                           if(anyRated) certification = anyRated.certification;
                         }
                     }
                 } else if (type === 'tv' && data.content_ratings) {
                     const usRating = data.content_ratings.results.find(r => r.iso_3166_1 === 'US');
-                    if (usRating && usRating.rating) {
-                        certification = usRating.rating;
-                    }
+                    if (usRating && usRating.rating) certification = usRating.rating;
                 }
 
                 movieModalContent.innerHTML = `
@@ -1465,13 +1658,11 @@
                         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                             <div class="lg:col-span-3">
                                 <div class="grid grid-cols-1 sm:grid-cols-5 gap-6">
-                                    <div class="poster-section sm:col-span-2">
-                                        <img src="${data.poster_path ? imageBaseUrl + data.poster_path : 'https://placehold.co/500x750'}" alt="${title}" class="w-full h-auto shadow-lg">
-                                    </div>
+                                    <div class="poster-section sm:col-span-2"><img src="${data.poster_path ? imageBaseUrl + data.poster_path : 'https://placehold.co/500x750'}" alt="${title}" class="w-full h-auto shadow-lg"></div>
                                     <div class="sm:col-span-3 text-white">
                                         <h1 class="title">${title} <span class="text-2xl font-normal text-gray-300">(${year})</span></h1>
                                         <div class="info space-y-3 text-gray-300">
-                                            <p class="release-date inline-block mb-4">Released: ${formatDate(releaseDate)}</p>
+                                            <p>Released: ${formatDate(releaseDate)}</p>
                                             <p class="max-h-[120px] overflow-y-auto pr-2">${data.overview || 'No overview available.'}</p>
                                             <p><strong>Genre:</strong> ${genres}</p>
                                             <p><strong>${type === 'movie' ? 'Director' : 'Creator'}:</strong> ${director}</p>
@@ -1480,19 +1671,11 @@
                                             <p><strong>Certification:</strong> ${certification}</p>
                                         </div>
                                          <div class="mt-4 flex space-x-2">
-                                            <button data-status="watchlist" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Watchlist">
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7z"></path></svg>
-                                            </button>
-                                            <button data-status="watched" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Mark as Watched">
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                                            </button>
-                                            <button data-status="favourite" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Favourites">
-                                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg>
-                                            </button>
+                                            <button data-status="watchlist" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Watchlist"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7z"></path></svg></button>
+                                            <button data-status="watched" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Mark as Watched"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></button>
+                                            <button data-status="favourite" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Favourites"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg></button>
                                         </div>
-                                        <div class="mt-4">
-                                            ${trailerBtn}
-                                        </div>
+                                        <div class="mt-4">${trailerBtn}</div>
                                     </div>
                                 </div>
                                  <div class="mt-4 p-4 bg-gray-900/50 rounded-lg">
@@ -1504,7 +1687,6 @@
                                     <div id="ai-response" class="text-gray-300 bg-gray-800 p-4 rounded-md min-h-[140px]"></div>
                                 </div>
                             </div>
-
                             <div class="lg:col-span-2">
                                 <section class="recommendations">
                                     <h2 id="recommendation-title">AI Recommended</h2>
@@ -1513,24 +1695,14 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                `;
+                </div>`;
                 
                 updateBookmarkButtons(id);
-
-                document.querySelectorAll('.bookmark-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        updateBookmark(id, title, data.poster_path, type, btn.dataset.status);
-                    });
-                });
-
+                document.querySelectorAll('.bookmark-btn').forEach(btn => btn.addEventListener('click', () => updateBookmark(id, title, data.poster_path, type, btn.dataset.status)));
                 document.getElementById('ai-ask-btn').addEventListener('click', async () => {
                     const query = document.getElementById('ai-query').value.trim();
                     if (!query) return;
-
-                    // --- Log the AI query activity ---
-                    logUserActivity('ask_ai', { query: query, movieId: id, movieTitle: title });
-                    
+                    logUserActivity('ask_ai', { query, movieId: id, movieTitle: title });
                     gtag('event', 'ask_ai', { 'event_category': 'Engagement', 'event_label': query });
                     const respBox = document.getElementById('ai-response');
                     respBox.innerHTML = '<div class="flex items-center gap-2"><div class="loader-sm"></div><span>Thinking...</span></div>';
@@ -1542,93 +1714,110 @@
                 const genreIds = (data.genres || []).map(g => g.id);
                 fetchAndRenderAIRecommendations(id, type, title, genreIds);
             }
-            
+
             // --- EVENT LISTENERS ---
-            applyFiltersBtn.addEventListener('click', () => {
-                saveFiltersToLocalStorage();
-                handleSearchAndDiscover(false);
-            });
-
-            resetFiltersBtn.addEventListener('click', () => {
-                clearFiltersAndStorage();
-                handleSearchAndDiscover(true);
-            });
-
-            exportCsvBtn.addEventListener('click', () => {
-                exportTableToCSV('movie_hub_export.csv');
-            });
-            
+            applyFiltersBtn.addEventListener('click', () => { saveFiltersToLocalStorage(); handleSearchAndDiscover(false); });
+            resetFiltersBtn.addEventListener('click', () => { clearFiltersAndStorage(); handleSearchAndDiscover(true); });
+            exportCsvBtn.addEventListener('click', () => exportTableToCSV('showshelf_export.csv'));
             minRatingFilter.addEventListener('input', (e) => {
-                const minVal = parseFloat(e.target.value);
-                const maxVal = parseFloat(maxRatingFilter.value);
+                const minVal = parseFloat(e.target.value), maxVal = parseFloat(maxRatingFilter.value);
                 minRatingValue.textContent = minVal.toFixed(1);
-                if (minVal > maxVal) {
-                    maxRatingFilter.value = minVal;
-                    maxRatingValue.textContent = minVal.toFixed(1);
-                }
+                if (minVal > maxVal) { maxRatingFilter.value = minVal; maxRatingValue.textContent = minVal.toFixed(1); }
             });
-
             maxRatingFilter.addEventListener('input', (e) => {
-                const maxVal = parseFloat(e.target.value);
-                const minVal = parseFloat(minRatingFilter.value);
+                const maxVal = parseFloat(e.target.value), minVal = parseFloat(minRatingFilter.value);
                 maxRatingValue.textContent = maxVal.toFixed(1);
-                if (maxVal < minVal) {
-                    minRatingFilter.value = maxVal;
-                    minRatingValue.textContent = maxVal.toFixed(1);
-                }
+                if (maxVal < minVal) { minRatingFilter.value = maxVal; minRatingValue.textContent = maxVal.toFixed(1); }
             });
-
             contentTypeFilter.addEventListener('change', (e) => {
                 if (e.target.value === 'tv') {
-                    certCountryFilter.disabled = true;
-                    certificationFilter.disabled = true;
-                    certCountryFilter.value = '';
-                    certificationFilter.value = '';
-                    certificationFilter.innerHTML = '<option value="">Select Rating</option>';
-                } else {
-                    certCountryFilter.disabled = false;
-                }
+                    certCountryFilter.disabled = true; certificationFilter.disabled = true; certCountryFilter.value = ''; certificationFilter.value = ''; certificationFilter.innerHTML = '<option value="">Select Rating</option>';
+                } else { certCountryFilter.disabled = false; }
             });
-
             searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFiltersBtn.click(); });
             directorSearch.addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFiltersBtn.click(); });
-            
-            discoverLinkBtn.addEventListener('click', showDiscoverPage);
-            myListsBtn.addEventListener('click', showMyListsPage);
-            homeBtn.addEventListener('click', showHomePage);
-            homeFromListsBtn.addEventListener('click', showHomePage);
-
-            copyUserIdBtn.addEventListener('click', () => {
-                userIdInput.select();
-                document.execCommand('copy');
-            });
-
+            navHomeBtn.addEventListener('click', showHomePage);
+            navDiscoverBtn.addEventListener('click', showDiscoverPage);
+            navBookmarksBtn.addEventListener('click', showMyListsPage);
+            copyUserIdBtn.addEventListener('click', () => { userIdInput.select(); document.execCommand('copy'); });
             loadUserIdBtn.addEventListener('click', () => {
                 const newUserId = userIdInput.value.trim();
                 if (newUserId) {
                     userId = newUserId;
                     localStorage.setItem('cinebuff_user_id', userId);
                     fetchBookmarks();
-                    if(!myListsPage.classList.contains('hidden')) {
-                        renderBookmarkList('watchlist');
-                    }
+                    if(!myListsPage.classList.contains('hidden')) renderBookmarkList('watchlist');
                     alert('Bookmarks for this ID have been loaded.');
                 }
             });
-            
-            document.querySelector('.list-tab-btn[data-list-type="watchlist"]').parentElement.addEventListener('click', (e) => {
-                if (e.target.matches('.list-tab-btn')) {
-                    renderBookmarkList(e.target.dataset.listType);
+            document.querySelector('.list-tab-btn[data-list-type="watchlist"]').parentElement.addEventListener('click', (e) => { if (e.target.matches('.list-tab-btn')) renderBookmarkList(e.target.dataset.listType); });
+            scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+            homeFilterNav.addEventListener('click', (e) => {
+                const target = e.target.closest('.home-filter-btn');
+                if (!target) return;
+                homeFilterNav.querySelectorAll('.home-filter-btn').forEach(btn => btn.classList.remove('active'));
+                target.classList.add('active');
+                
+                document.querySelectorAll('#language-filter-container .btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary'));
+                document.querySelector('#language-filter-container [data-lang="all"]').classList.replace('btn-secondary', 'btn-primary');
+                currentCarouselLang = 'all';
+
+                const filter = target.dataset.filter;
+                 mediaTypeToggleContainer.classList.toggle('hidden', filter === 'foryou' || filter === 'surprise');
+                if (filter === 'surprise') {
+                    getSurpriseMovie();
+                } else {
+                    languageFilterContainer.classList.toggle('hidden', filter === 'foryou');
+                    updateHomeCarousel(filter, currentCarouselLang, currentMediaType);
                 }
             });
 
-            
-            scrollTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-            trendingBtn.addEventListener('click', fetchAndDisplayTrending);
-            surpriseBtn.addEventListener('click', getSurpriseMovie);
-            recentBtn.addEventListener('click', () => document.getElementById('recent-section').scrollIntoView());
-            upcomingBtn.addEventListener('click', () => document.getElementById('upcoming-section').scrollIntoView());
+             languageFilterContainer.addEventListener('click', (e) => {
+                if (e.target.matches('.lang-filter-btn')) {
+                    languageFilterContainer.querySelectorAll('.btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary'));
+                    e.target.classList.replace('btn-secondary', 'btn-primary');
+                    currentCarouselLang = e.target.dataset.lang;
+                    const activeFilter = document.querySelector('#home-filter-nav .home-filter-btn.active').dataset.filter;
+                    updateHomeCarousel(activeFilter, currentCarouselLang, currentMediaType);
+                }
+            });
 
+            mediaTypeToggleContainer.addEventListener('click', (e) => {
+                const target = e.target.closest('.media-type-btn');
+                if (!target || target.dataset.type === currentMediaType) return;
+
+                currentMediaType = target.dataset.type;
+
+                const toggleBg = document.getElementById('toggle-bg');
+                const movieBtn = mediaTypeToggleContainer.querySelector('[data-type="movie"]');
+                const tvBtn = mediaTypeToggleContainer.querySelector('[data-type="tv"]');
+
+                if (currentMediaType === 'tv') {
+                    toggleBg.classList.add('tv');
+                    tvBtn.classList.replace('text-gray-400', 'text-white');
+                    movieBtn.classList.replace('text-white', 'text-gray-400');
+                } else {
+                    toggleBg.classList.remove('tv');
+                    movieBtn.classList.replace('text-gray-400', 'text-white');
+                    tvBtn.classList.replace('text-white', 'text-gray-400');
+                }
+                
+                const upcomingFilterBtn = homeFilterNav.querySelector('[data-filter="upcoming"]');
+                upcomingFilterBtn.disabled = currentMediaType === 'tv';
+                upcomingFilterBtn.classList.toggle('opacity-50', currentMediaType === 'tv');
+                upcomingFilterBtn.classList.toggle('cursor-not-allowed', currentMediaType === 'tv');
+
+                if (upcomingFilterBtn.classList.contains('active') && currentMediaType === 'tv') {
+                    upcomingFilterBtn.classList.remove('active');
+                    const trendingFilterBtn = homeFilterNav.querySelector('[data-filter="trending"]');
+                    trendingFilterBtn.classList.add('active');
+                    updateHomeCarousel('trending', currentCarouselLang, currentMediaType);
+                } else {
+                    const activeFilter = document.querySelector('#home-filter-nav .home-filter-btn.active').dataset.filter;
+                    updateHomeCarousel(activeFilter, currentCarouselLang, currentMediaType);
+                }
+            });
 
             certCountryFilter.addEventListener('change', (e) => {
                 const countryCode = e.target.value;
@@ -1641,30 +1830,19 @@
                         option.textContent = `${cert.certification} (${cert.meaning})`;
                         certificationFilter.appendChild(option);
                     });
-                } else {
-                    certificationFilter.disabled = true;
-                }
+                } else { certificationFilter.disabled = true; }
             });
             
             document.body.addEventListener('click', (e) => { 
-                const itemElement = e.target.closest('tr[data-id], .card-grid[data-id]');
-                if (itemElement && !e.target.closest('.youtube-link')) {
-                   showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie');
-                }
-
+                const itemElement = e.target.closest('.card-grid[data-id], tr[data-id]');
+                if (itemElement && !e.target.closest('.youtube-link')) showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie');
+                
                 const recommendedItemElement = e.target.closest('#movieModalContent .recommended-card[data-id]');
-                if (recommendedItemElement) {
-                    showMovieModal(recommendedItemElement.dataset.id, recommendedItemElement.dataset.type || 'movie');
-                }
+                if (recommendedItemElement) showMovieModal(recommendedItemElement.dataset.id, recommendedItemElement.dataset.type || 'movie');
             });
             
             genreFilterDisplay.addEventListener('click', () => genreFilterDropdown.classList.toggle('hidden'));
-            genreFilterDropdown.addEventListener('change', (e) => { 
-                if (e.target.type === 'checkbox') {
-                    const type = e.target.dataset.type || 'genre';
-                    updateSelectedGenres(e.target.value, e.target.dataset.name, e.target.checked, type);
-                } 
-            });
+            genreFilterDropdown.addEventListener('change', (e) => { if (e.target.type === 'checkbox') updateSelectedGenres(e.target.value, e.target.dataset.name, e.target.checked, e.target.dataset.type || 'genre'); });
             selectedGenresContainer.addEventListener('click', (e) => { 
                 if(e.target.classList.contains('genre-pill-remove')) { 
                     e.stopPropagation(); 
@@ -1675,45 +1853,28 @@
                 } 
             });
             window.addEventListener('click', (e) => { if (!genreFilterContainer.contains(e.target)) genreFilterDropdown.classList.add('hidden'); });
-
-            document.getElementById('recent-lang-filters').addEventListener('click', (e) => { if(e.target.matches('.lang-filter-btn')) { document.querySelectorAll('#recent-lang-filters .btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary')); e.target.classList.replace('btn-secondary', 'btn-primary'); loadByLang(recentContainer, 'recent', e.target.dataset.lang); } });
-            document.getElementById('upcoming-lang-filters').addEventListener('click', (e) => { if(e.target.matches('.lang-filter-btn')) { document.querySelectorAll('#upcoming-lang-filters .btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary')); e.target.classList.replace('btn-secondary', 'btn-primary'); loadByLang(upcomingContainer, 'upcoming', e.target.dataset.lang); } });
             
-             closeModalBtn.addEventListener('click', () => {
-                movieModal.classList.add('hidden');
-                document.body.style.overflow = 'auto';
-            });
-
-            movieModal.addEventListener('click', (e) => {
-                if (e.target === movieModal) {
-                    movieModal.classList.add('hidden');
-                    document.body.style.overflow = 'auto';
-                }
-            });
+            closeModalBtn.addEventListener('click', () => { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; });
+            movieModal.addEventListener('click', (e) => { if (e.target === movieModal) { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; } });
 
             window.addEventListener('scroll', () => {
-                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !isLoadingMore && canLoadMore) {
-                    loadMoreMovies();
-                }
-                if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-                    scrollTopBtn.classList.remove('hidden');
-                } else {
-                    scrollTopBtn.classList.add('hidden');
-                }
+                const isNearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500;
+                if (isNearBottom && !isLoadingMoreDiscover && canLoadMoreDiscover && !discoverPage.classList.contains('hidden')) loadMoreMovies();
+                if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) scrollTopBtn.classList.remove('hidden');
+                else scrollTopBtn.classList.add('hidden');
             });
 
             // --- INITIALIZATION ---
             const initializeApp = async () => {
                 await setupUserId();
                 await loadStaticData();
+                initSwiper(); 
                 
                 if (loadFiltersFromLocalStorage()) {
                     handleSearchAndDiscover(false);
                 } else {
                     showHomePage();
-                    fetchAndDisplayTrending();
-                    loadByLang(recentContainer, 'recent', 'en');
-                    loadByLang(upcomingContainer, 'upcoming', 'en');
+                    updateHomeCarousel('trending');
                     handleSearchAndDiscover(true);
                 }
             };
@@ -1723,6 +1884,4 @@
     </script>
 </body>
 </html>
-
-
 
