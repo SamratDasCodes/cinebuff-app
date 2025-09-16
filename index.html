@@ -702,6 +702,10 @@
                         <div class="mobile-card p-6 text-center" style="background: linear-gradient(135deg, rgba(129, 140, 248, 0.1) 0%, rgba(168, 184, 250, 0.1) 100%);">
                             <h2 class="text-xl font-bold text-white mb-2">Discover Amazing Movies</h2>
                             <p class="text-gray-300 text-sm">Explore trending films and series</p>
+                            <!-- Test button for mobile interaction -->
+                            <button id="mobile-test-btn" class="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                Test Mobile Click
+                            </button>
                         </div>
                     </div>
 
@@ -959,11 +963,25 @@
         const isMobile = window.innerWidth < 768;
 
         document.addEventListener('DOMContentLoaded', () => {
-             if (isMobile) {
+             // Force mobile UI for testing - use a lower breakpoint
+             const forceMobile = window.innerWidth < 1024; // Use 1024px as breakpoint for testing
+             console.log('Window width:', window.innerWidth, 'Force mobile:', forceMobile);
+
+             if (forceMobile) {
+                console.log('Mobile UI activated');
                 document.getElementById('desktop-ui').classList.add('hidden');
                 document.getElementById('mobile-ui').classList.remove('hidden');
                 document.getElementById('app').classList.remove('container', 'mx-auto');
+
+                // Add a test button to verify mobile UI is working
+                setTimeout(() => {
+                    console.log('Mobile UI elements check:');
+                    console.log('Mobile nav:', document.getElementById('mobile-nav'));
+                    console.log('Mobile home page:', document.getElementById('mobile-home-page'));
+                    console.log('Mobile home container:', document.getElementById('mobile-home-container'));
+                }, 1000);
             } else {
+                console.log('Desktop UI activated');
                 document.getElementById('desktop-ui').classList.remove('hidden');
                 document.getElementById('mobile-ui').classList.add('hidden');
             }
@@ -2347,6 +2365,17 @@
                             console.log('Applying filter:', filter);
                         });
                     });
+
+                    // Test button event listener
+                    const mobileTestBtn = document.getElementById('mobile-test-btn');
+                    if (mobileTestBtn) {
+                        addMobileEventListener(mobileTestBtn, 'click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Mobile test button clicked!');
+                            alert('Mobile interaction working! 🎉');
+                        });
+                    }
 
                     // Mobile movie cards click handling
                     const handleMobileCardClick = (e) => {
