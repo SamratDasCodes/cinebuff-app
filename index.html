@@ -353,7 +353,7 @@
             grid-template-columns: repeat(2, 1fr); /* Mobile default */
             gap: 1rem;
         }
-        @media (min-width: 640px) { /* sm breakpoint */
+        @media (min-width: 768px) { /* md breakpoint for tablets */
             #results-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
@@ -492,34 +492,7 @@
                 <h2 class="text-4xl md:text-5xl font-bold text-white font-nano">Discover & Search</h2>
             </header>
             <div id="search-section" class="p-6 rounded-xl mt-8 space-y-4">
-                <!-- Global Search Bar & AI Toggle -->
-                <div class="flex flex-col sm:flex-row items-center gap-4">
-                    <div class="relative flex-grow w-full">
-                        <input type="text" id="globalSearchInput" placeholder="Search by title..." class="w-full p-3 pl-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <div class="relative w-full sm:w-48">
-                            <select id="searchTypeDropdown" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="title" selected>Title</option>
-                                <option value="keyword">Keyword</option>
-                                <option value="director">Director/Creator</option>
-                                <option value="web_search">Web Search (AI)</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
-                        </div>
-                        <button id="applyFiltersBtn" class="btn-primary font-bold py-3 px-6 rounded-md">Search</button>
-                        <button id="resetFiltersBtn" class="btn-secondary p-3 rounded-md" title="Reset Filters">
-                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHnSURBVEhL7ZVLSwJRFEb/b+9EUTdDUBBdRAdB5yJ8oKGdCCEiJdcl2mQhi2iaJdYSC3sJ14joErpppq2I4p7TXL9w7u7MhX7g4XDu3Pnf/3x3zhkYv3/k/g+gB6iA8qYDTsED4/EH2EvAJ0yBhmwYc4bXQDa8CUl4BK2bV6sAHeA/PAUvQpa8iG2An0A7tAYL4Bq07Z49Ah4CV+Aa7EEHkAEHwBlYg3XQh38A3oEzsAWr4DXYBC7BOFiDBXAE3j2bF2uAXPAVfAcn4EaYhOKxAh6A93AEnoYzcAfeA/C8Ea3DITgGv8KlsP2yLqgDFvB+yA7sghvgGmyDFfBf3wVOwD24BS/BQUgGn6E2VJh8L6gDrpbbgG2wBQpgjvwKzcA7cAV2QTe8BPGU7A98B7fgEHyFNlgrk/1T6A3OQBrSUfBw6A3OQAjsgnvwFNwCF6E0/AJbsA3WYAlshVYYAnvgJ9iB++AmLPg2pT02DDtg1DfgK5gCg6AG1iAJfAanoQT8BPsgA7YBw2ARrIEG2AIdcAC+gjdgBWyB8/B75A5Ygqfghs5G7YE5oE+AB3AMlsAEaMA7cAK+g3Pg8M+gD0yBv2EEXIIf4Bw4AzfgDLwGP8LpSBf0B2NhEG3QeCibAAAAAElFTkSuQmCC" alt="Reset" class="w-5 h-5">
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Advanced Filters Toggle -->
+                 <!-- Advanced Filters Toggle -->
                 <div class="text-center">
                     <button id="toggleFiltersBtn" class="text-indigo-400 hover:text-indigo-300 font-semibold text-sm">
                         <span>Show Advanced Filters</span>
@@ -528,37 +501,27 @@
                 </div>
 
                 <!-- Advanced Filters Section (Initially Hidden) -->
-                <div id="advanced-filters" class="hidden pt-4 space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-center">
-                         <div id="genreFilterContainer" class="relative lg:col-span-2">
+                <div id="advanced-filters" class="hidden pb-4 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+                         <div id="genreFilterContainer" class="relative lg:col-span-1">
                             <label for="genreFilterDisplay" class="sr-only">Genre</label>
                             <div id="genreFilterDisplay" class="w-full p-3 h-[50px] rounded-md bg-gray-800 text-white border border-gray-700 flex items-center cursor-pointer overflow-hidden">
                                 <span id="genreFilterPlaceholder" class="text-gray-400">Filter by Genre</span>
                                 <div id="selectedGenresContainer" class="flex flex-nowrap gap-1"></div>
                             </div>
-                            <div id="genreFilterDropdown" class="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg hidden max-h-60 overflow-y-auto"></div>
+                            <div id="genreFilterDropdown" class="absolute z-20 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg hidden max-h-60 overflow-y-auto"></div>
+                        </div>
+                        <div id="ottFilterContainer" class="relative lg:col-span-1">
+                            <label for="ottFilterDisplay" class="sr-only">Streaming Service</label>
+                            <div id="ottFilterDisplay" class="w-full p-3 h-[50px] rounded-md bg-gray-800 text-white border border-gray-700 flex items-center cursor-pointer overflow-hidden">
+                                <span id="ottFilterPlaceholder" class="text-gray-400">Filter by Service</span>
+                                <div id="selectedOTTsContainer" class="flex flex-nowrap gap-1"></div>
+                            </div>
+                            <div id="ottFilterDropdown" class="absolute z-20 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg hidden max-h-60 overflow-y-auto"></div>
                         </div>
                         <div>
                             <label for="yearFilter" class="sr-only">Year</label>
                             <input type="number" id="yearFilter" placeholder="Year" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                        </div>
-                        <div class="w-full relative">
-                            <label for="certCountryFilter" class="sr-only">Certification Country</label>
-                            <select id="certCountryFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="">Rating Region</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
-                        </div>
-                         <div class="w-full relative">
-                            <label for="certificationFilter" class="sr-only">Certification</label>
-                            <select id="certificationFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none" disabled>
-                                <option value="">Select Rating</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
                         </div>
                         <div class="w-full relative">
                             <label for="languageFilter" class="sr-only">Language</label>
@@ -581,10 +544,39 @@
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                             </div>
                         </div>
+                         <div class="w-full relative">
+                            <label for="certCountryFilter" class="sr-only">Certification Country</label>
+                            <select id="certCountryFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                                <option value="">Rating Region</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
+                         <div class="w-full relative">
+                            <label for="certificationFilter" class="sr-only">Certification</label>
+                            <select id="certificationFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none" disabled>
+                                <option value="">Select Rating</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
+                         <div class="w-full relative">
+                            <label for="contentTypeFilter" class="sr-only">Content Type</label>
+                            <select id="contentTypeFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                                <option value="both" selected>Movies & Series</option>
+                                <option value="movie">Movies Only</option>
+                                <option value="tv">Series Only</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
                     </div>
                 
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 pt-2 items-center">
-                        <div class="w-full md:col-span-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 pt-2 items-center">
+                        <div class="w-full">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label for="minRatingFilter" class="text-sm text-gray-300 mb-1 block">Min. Rating: <span id="minRatingValue">0.0</span></label>
@@ -596,17 +588,31 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="w-full relative pt-5">
-                            <label for="contentTypeFilter" class="sr-only">Content Type</label>
-                            <select id="contentTypeFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="both" selected>Movies & Series</option>
-                                <option value="movie">Movies Only</option>
-                                <option value="tv">Series Only</option>
+                    </div>
+                </div>
+                 <!-- Global Search Bar & AI Toggle -->
+                <div class="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-gray-700/50">
+                    <div class="relative flex-grow w-full">
+                        <input type="text" id="globalSearchInput" placeholder="Search by title..." class="w-full p-3 pl-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <div class="relative w-full sm:w-48">
+                            <select id="searchTypeDropdown" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                                <option value="title" selected>Title</option>
+                                <option value="keyword">Keyword</option>
+                                <option value="web_search">Web Search (AI)</option>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pt-5 px-2 text-gray-400">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                             </div>
                         </div>
+                        <button id="applyFiltersBtn" class="btn-primary font-bold py-3 px-6 rounded-md">Search</button>
+                        <button id="resetFiltersBtn" class="btn-secondary p-3 rounded-md" title="Reset Filters">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHnSURBVEhL7ZVLSwJRFEb/b+9EUTdDUBBdRAdB5yJ8oKGdCCEiJdcl2mQhi2iaJdYSC3sJ14joErpppq2I4p7TXL9w7u7MhX7g4XDu3Pnf/3x3zhkYv3/k/g+gB6iA8qYDTsED4/EH2EvAJ0yBhmwYc4bXQDa8CUl4BK2bV6sAHeA/PAUvQpa8iG2An0A7tAYL4Bq07Z49Ah4CV+Aa7EEHkAEHwBlYg3XQh38A3oEzsAWr4DXYBC7BOFiDBXAE3j2bF2uAXPAVfAcn4EaYhOKxAh6A93AEnoYzcAfeA/C8Ea3DITgGv8KlsP2yLqgDFvB+yA7sghvgGmyDFfBf3wVOwD24BS/BQUgGn6E2VJh8L6gDrpbbgG2wBQpgjvwKzcA7cAV2QTe8BPGU7A98B7fgEHyFNlgrk/1T6A3OQBrSUfBw6A3OQAjsgnvwFNwCF6E0/AJbsA3WYAlshVYYAnvgJ9iB++AmLPg2pT02DDtg1DfgK5gCg6AG1iAJfAanoQT8BPsgA7YBw2ARrIEG2AIdcAC+gjdgBWyB8/B75A5Ygqfghs5G7YE5oE+AB3AMlsAEaMA7cAK+g3Pg8M+gD0yBv2EEXIIf4Bw4AzfgDLwGP8LpSBf0B2NhEG3QeCibAAAAAElFTkSuQmCC" alt="Reset" class="w-5 h-5">
+                        </button>
                     </div>
                 </div>
             </div>
@@ -802,6 +808,7 @@
             let currentCarouselLang = 'all';
             let currentMediaType = 'movie';
             let pageHistory = [];
+            let selectedOTTs = [];
 
 
             // --- DOM ELEMENTS ---
@@ -838,6 +845,11 @@
             const genreFilterPlaceholder = document.getElementById('genreFilterPlaceholder');
             const selectedGenresContainer = document.getElementById('selectedGenresContainer');
             const genreFilterDropdown = document.getElementById('genreFilterDropdown');
+            const ottFilterContainer = document.getElementById('ottFilterContainer');
+            const ottFilterDisplay = document.getElementById('ottFilterDisplay');
+            const ottFilterPlaceholder = document.getElementById('ottFilterPlaceholder');
+            const selectedOTTsContainer = document.getElementById('selectedOTTsContainer');
+            const ottFilterDropdown = document.getElementById('ottFilterDropdown');
             const certCountryFilter = document.getElementById('certCountryFilter');
             const certificationFilter = document.getElementById('certificationFilter');
             const contentTypeFilter = document.getElementById('contentTypeFilter');
@@ -946,6 +958,7 @@
                     searchTerm: globalSearchInput.value.trim(),
                     searchType: searchTypeDropdown.value,
                     selectedGenres: selectedGenres,
+                    selectedOTTs: selectedOTTs,
                     selectedYear: yearFilter.value,
                     minRating: minRatingFilter.value,
                     maxRating: maxRatingFilter.value,
@@ -996,6 +1009,15 @@
                         if (checkbox) checkbox.checked = true;
                     });
                 }
+
+                if (filters.selectedOTTs && filters.selectedOTTs.length > 0) {
+                    selectedOTTs = filters.selectedOTTs;
+                    renderOTTPills();
+                    filters.selectedOTTs.forEach(ott => {
+                        const checkbox = document.querySelector(`#ottFilterDropdown input[value="${ott.id}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
                 
                 if (filters.selectedCertCountry) {
                     certCountryFilter.value = filters.selectedCertCountry;
@@ -1025,6 +1047,9 @@
                 selectedGenres = [];
                 document.querySelectorAll('#genreFilterDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
                 renderGenrePills();
+                selectedOTTs = [];
+                document.querySelectorAll('#ottFilterDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
+                renderOTTPills();
                 document.getElementById('languageFilter').value = '';
                 sortFilter.value = 'popularity';
                 const sortOrderBtn = document.getElementById('sortOrderBtn');
@@ -1276,7 +1301,7 @@
             }
 
 
-            // --- GENRE PILLS ---
+            // --- GENRE & OTT PILLS ---
             const renderGenrePills = () => {
                 selectedGenresContainer.innerHTML = '';
                 if (selectedGenres.length === 0) { genreFilterPlaceholder.classList.remove('hidden'); } 
@@ -1291,10 +1316,10 @@
                 }
             };
             
-            const updateSelectedGenres = (genreId, genreName, isChecked, genreType = 'genre') => {
+            const updateSelectedGenres = (genreId, genreName, isChecked) => {
                 if (isChecked) {
                     if (!selectedGenres.some(g => g.id === genreId)) {
-                        selectedGenres.push({ id: genreId, name: genreName, type: genreType });
+                        selectedGenres.push({ id: genreId, name: genreName });
                     }
                 } else {
                     selectedGenres = selectedGenres.filter(g => g.id !== genreId);
@@ -1302,13 +1327,41 @@
                 renderGenrePills();
             };
 
+            const renderOTTPills = () => {
+                selectedOTTsContainer.innerHTML = '';
+                 if (selectedOTTs.length === 0) { ottFilterPlaceholder.classList.remove('hidden'); } 
+                else {
+                    ottFilterPlaceholder.classList.add('hidden');
+                    selectedOTTs.forEach(ott => {
+                        const pill = document.createElement('div');
+                        pill.className = 'genre-pill';
+                        pill.innerHTML = `<span>${ott.name}</span><span class="genre-pill-remove" data-id="${ott.id}">&times;</span>`;
+                        selectedOTTsContainer.appendChild(pill);
+                    });
+                }
+            };
+            
+            const updateSelectedOTTs = (ottId, ottName, isChecked) => {
+                if (isChecked) {
+                    if (!selectedOTTs.some(o => o.id === ottId)) {
+                        selectedOTTs.push({ id: ottId, name: ottName });
+                    }
+                } else {
+                    selectedOTTs = selectedOTTs.filter(o => o.id !== ottId);
+                }
+                renderOTTPills();
+            };
+
+
             // --- DATA LOADING & AI HELPERS ---
             const loadStaticData = async() => {
-                const [movieGenreData, tvGenreData, certData, countryData] = await Promise.all([
+                const [movieGenreData, tvGenreData, certData, countryData, movieProviders, tvProviders] = await Promise.all([
                     fetchFromTMDb('genre/movie/list'),
                     fetchFromTMDb('genre/tv/list'),
                     fetchFromTMDb('certification/movie/list'),
-                    fetchFromTMDb('configuration/countries')
+                    fetchFromTMDb('configuration/countries'),
+                    fetchFromTMDb('watch/providers/movie', { watch_region: 'IN' }),
+                    fetchFromTMDb('watch/providers/tv', { watch_region: 'IN' })
                 ]);
 
                 if (countryData) {
@@ -1326,6 +1379,14 @@
                     genreFilterDropdown.insertAdjacentHTML('beforeend', genreItemHtml);
                 });
 
+                const allProviders = [...(movieProviders?.results || []), ...(tvProviders?.results || [])];
+                const uniqueProviders = allProviders.filter((provider, index, self) => index === self.findIndex(p => p.provider_id === provider.provider_id))
+                                                   .sort((a,b) => a.provider_name.localeCompare(b.provider_name));
+
+                uniqueProviders.forEach(provider => {
+                    const ottItemHTML = `<label for="ott-${provider.provider_id}" class="flex items-center p-2 hover:bg-gray-700 cursor-pointer"><input type="checkbox" id="ott-${provider.provider_id}" value="${provider.provider_id}" data-name="${provider.provider_name}" class="mr-3 h-4 w-4 rounded border-gray-600 bg-gray-900 text-indigo-600 focus:ring-indigo-500 accent-indigo-500"><img src="${imageBaseUrl}${provider.logo_path}" class="w-6 h-6 rounded-md mr-2"><span>${provider.provider_name}</span></label>`;
+                    ottFilterDropdown.insertAdjacentHTML('beforeend', ottItemHTML);
+                });
 
                 if (certData && certData.certifications) {
                     certificationsData = certData.certifications;
@@ -1561,11 +1622,14 @@
                 const maxRating = maxRatingFilter.value;
                 const selectedLanguage = document.getElementById('languageFilter').value;
                 const manualGenreIds = selectedGenres.map(g => String(g.id));
+                const ottProviderIds = selectedOTTs.map(o => o.id).join('|');
+
 
                 let finalResults = [];
                 paginationParams = {};
                 
                 const applyLocalFilters = (results) => {
+                     // Local filtering is only needed for search results, as discover API handles it
                     return results.filter(item => {
                         if (contentType !== 'both' && item.media_type !== contentType) return false;
                         if (selectedYear && (item.release_date || item.first_air_date || '').substring(0, 4) != selectedYear) return false;
@@ -1573,113 +1637,60 @@
                         if ((item.vote_average || 0) < minRating) return false;
                         if ((item.vote_average || 0) > maxRating) return false;
                         if (selectedLanguage && item.original_language !== selectedLanguage) return false;
+                        // OTT filtering cannot be done locally in a paginated way, so it forces a discover call.
                         return true;
                     });
                 };
 
 
                 try {
-                     if (!searchTerm && (searchType === 'web_search' || searchType === 'director' || searchType === 'keyword')) {
+                     if (!searchTerm && (searchType === 'web_search' || searchType === 'keyword')) {
                         gridTitle.textContent = `Please enter a search term for '${searchType.replace("_", " ")}' search.`;
                         finalResults = [];
                         canLoadMoreDiscover = false;
                     } else {
-                        switch (searchType) {
-                            case 'web_search':
-                                gridTitle.textContent = `Gemini AI suggestions for "${searchTerm}"`;
-                                canLoadMoreDiscover = false;
-                                const prompt = `Based on the user query "${searchTerm}", search the web and suggest a list of 15 relevant movie or TV show titles. Also correct any spelling mistakes in the user query. IMPORTANT: Respond ONLY with a valid JSON array of strings, where each string is "Title (Year)". Example: ["Inception (2010)", "The Matrix (1999)"]`;
-                                const rawResponse = await callGemini(prompt, false, true);
-                                let recommendedTitles = [];
-                                try {
-                                    const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/);
-                                    const jsonString = jsonMatch ? jsonMatch[1] : rawResponse;
-                                    recommendedTitles = JSON.parse(jsonString);
-                                } catch (e) {
-                                    throw new Error("Could not understand the response from the AI.");
-                                }
+                        // If advanced filters are used (genres, OTTs, ratings, etc.), we MUST use the discover endpoint.
+                        const useDiscover = manualGenreIds.length > 0 || ottProviderIds.length > 0 || minRating > 0 || maxRating < 10 || selectedYear || selectedLanguage;
 
-                                if (Array.isArray(recommendedTitles) && recommendedTitles.length > 0) {
-                                    const searchPromises = recommendedTitles.map(rec => {
-                                        const match = rec.match(/(.+) \((\d{4})\)/);
-                                        return match ? fetchFromTMDb('search/multi', { query: match[1].trim(), year: match[2] }) : null;
-                                    }).filter(p => p);
-                                    const searchResults = await Promise.all(searchPromises);
-                                    let rawResults = [];
-                                    searchResults.forEach(res => {
-                                        const bestMatch = res?.results?.find(r => r.media_type !== 'person' && r.poster_path);
-                                        if (bestMatch) rawResults.push(bestMatch);
-                                    });
-                                    finalResults = applyLocalFilters(rawResults);
-                                }
-                                break;
-                            
-                            case 'director':
-                                gridTitle.textContent = `Works by ${searchTerm}`;
-                                canLoadMoreDiscover = false;
-                                const personId = await getPersonId(searchTerm);
-                                if (personId) {
-                                    const creditsData = await fetchFromTMDb(`person/${personId}/combined_credits`);
-                                    let works = (creditsData.crew?.filter(c => c.job === 'Director' || c.job === 'Creator') || []);
-                                    finalResults = applyLocalFilters(works);
-                                }
-                                break;
-                            
-                             case 'keyword':
-                                gridTitle.textContent = `Results for keyword: "${searchTerm}"`;
-                                paginationParams.mode = 'discover_keyword';
-                                const keywordData = await fetchFromTMDb('search/keyword', { query: searchTerm });
-                                if (keywordData?.results?.length > 0) {
-                                    const keywordId = keywordData.results[0].id;
-                                    const baseParams = { sort_by: sortBy, with_keywords: keywordId, 'vote_count.gte': sortBy.includes('vote_average') ? 200 : 5, with_genres: manualGenreIds.join(','), primary_release_year: selectedYear };
-                                    if (minRating > 0) baseParams['vote_average.gte'] = minRating;
-                                    if (maxRating < 10) baseParams['vote_average.lte'] = maxRating;
-                                    if (selectedLanguage) baseParams.with_original_language = selectedLanguage;
+                        if (useDiscover && searchTerm) {
+                            gridTitle.textContent = `Search term "${searchTerm}" ignored due to active filters.`;
+                        } else if (searchTerm) {
+                            gridTitle.textContent = `Results for "${searchTerm}"`;
+                        } else {
+                             gridTitle.textContent = 'Filtered Results';
+                        }
+                        
+                        // Main logic branch
+                        if (useDiscover || !searchTerm) {
+                            paginationParams.mode = 'discover';
+                            const baseParams = { 
+                                sort_by: sortBy, 
+                                'vote_count.gte': sortBy.includes('vote_average') ? 200 : 5, 
+                                with_genres: manualGenreIds.join(','), 
+                                primary_release_year: selectedYear,
+                                with_watch_providers: ottProviderIds,
+                                watch_region: 'IN'
+                            };
+                            if (minRating > 0) baseParams['vote_average.gte'] = minRating;
+                            if (maxRating < 10) baseParams['vote_average.lte'] = maxRating;
+                            if (selectedLanguage) baseParams.with_original_language = selectedLanguage;
 
-                                    paginationParams = { ...paginationParams, type: contentType, movieParams: baseParams, tvParams: baseParams };
-                                    const [movieData, tvData] = await Promise.all([
-                                        (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('discover/movie', { ...baseParams, page: 1 }) : Promise.resolve(null),
-                                        (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('discover/tv', { ...baseParams, page: 1 }) : Promise.resolve(null)
-                                    ]);
-                                    finalResults = [...(movieData?.results || []), ...(tvData?.results || [])];
-                                }
-                                break;
+                            paginationParams = { ...paginationParams, type: contentType, movieParams: baseParams, tvParams: baseParams };
+                            const [movieData, tvData] = await Promise.all([
+                                (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('discover/movie', { ...baseParams, page: 1 }) : Promise.resolve(null),
+                                (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('discover/tv', { ...baseParams, page: 1 }) : Promise.resolve(null)
+                            ]);
+                            finalResults = [...(movieData?.results || []), ...(tvData?.results || [])];
 
-                            case 'title':
-                            default:
-                                if (searchTerm) {
-                                    gridTitle.textContent = `Results for "${searchTerm}"`;
-                                    paginationParams = { mode: 'search', type: contentType, queryParams: { query: searchTerm } };
-                                    
-                                    const moviePromise = (contentType === 'movie' || contentType === 'both') 
-                                        ? fetchFromTMDb('search/movie', { ...paginationParams.queryParams, page: 1 })
-                                        : Promise.resolve({results: []});
-
-                                    const tvPromise = (contentType === 'tv' || contentType === 'both')
-                                        ? fetchFromTMDb('search/tv', { ...paginationParams.queryParams, page: 1 })
-                                        : Promise.resolve({results: []});
-
-                                    const [movieData, tvData] = await Promise.all([moviePromise, tvPromise]);
-                                    
-                                    let combinedResults = [...(movieData?.results || []), ...(tvData?.results || [])];
-                                    finalResults = applyLocalFilters(combinedResults);
-
-                                } else {
-                                     gridTitle.textContent = 'Filtered Results';
-                                    paginationParams.mode = 'discover';
-                                    const baseParams = { sort_by: sortBy, 'vote_count.gte': sortBy.includes('vote_average') ? 200 : 5, with_genres: manualGenreIds.join(','), primary_release_year: selectedYear };
-                                    if (minRating > 0) baseParams['vote_average.gte'] = minRating;
-                                    if (maxRating < 10) baseParams['vote_average.lte'] = maxRating;
-                                    if (selectedLanguage) baseParams.with_original_language = selectedLanguage;
-
-                                    paginationParams = { ...paginationParams, type: contentType, movieParams: baseParams, tvParams: baseParams };
-                                    const [movieData, tvData] = await Promise.all([
-                                        (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('discover/movie', { ...baseParams, page: 1 }) : Promise.resolve(null),
-                                        (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('discover/tv', { ...baseParams, page: 1 }) : Promise.resolve(null)
-                                    ]);
-                                    finalResults = [...(movieData?.results || []), ...(tvData?.results || [])];
-                                }
-                                break;
+                        } else { // This branch is for pure text search without discover-only filters
+                            paginationParams = { mode: 'search', type: contentType, queryParams: { query: searchTerm } };
+                            const [movieData, tvData] = await Promise.all([
+                                (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('search/movie', { ...paginationParams.queryParams, page: 1 }) : Promise.resolve({ results: [] }),
+                                (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('search/tv', { ...paginationParams.queryParams, page: 1 }) : Promise.resolve({ results: [] })
+                            ]);
+                             let combinedResults = [...(movieData?.results || []), ...(tvData?.results || [])];
+                             // Since we are not using discover, we have to apply filters locally
+                            finalResults = applyLocalFilters(combinedResults);
                         }
                     }
                 } catch (e) {
@@ -1688,18 +1699,23 @@
                     gridTitle.textContent = "An error occurred during search";
                 } finally {
                     applyFiltersBtn.disabled = false;
-                    applyFiltersBtn.textContent = 'Search';
+                    applyFiltersBtn.innerHTML = 'Search';
                 }
 
                 // --- Final Processing & Rendering ---
                 const mappedResults = finalResults
-                    .filter(r => r.media_type !== 'person' && r.poster_path)
+                    .filter(r => r.poster_path)
                     .map(mapApiData);
 
-                mappedResults.sort((a, b) => {
-                    if (sortBy.includes('release_date')) return new Date(b.releaseDate || '1900-01-01') - new Date(a.releaseDate || '1900-01-01');
-                    if (sortBy.includes('vote_average')) return (b.rating || 0) - (a.rating || 0);
-                    return (b.popularity || 0) - (a.popularity || 0);
+                // Sort again locally because results are merged from two sources
+                 mappedResults.sort((a, b) => {
+                    if (sortBy.includes('release_date')) {
+                       return sortOrder === 'desc' ? new Date(b.releaseDate || '1900-01-01') - new Date(a.releaseDate || '1900-01-01') : new Date(a.releaseDate || '1900-01-01') - new Date(b.releaseDate || '1900-01-01');
+                    }
+                    if (sortBy.includes('vote_average')) {
+                        return sortOrder === 'desc' ? (b.rating || 0) - (a.rating || 0) : (a.rating || 0) - (b.rating || 0);
+                    }
+                     return sortOrder === 'desc' ? (b.popularity || 0) - (a.popularity || 0) : (a.popularity || 0) - (b.popularity || 0);
                 });
 
                 if (mappedResults.length > 0) {
@@ -1707,9 +1723,8 @@
                     renderResults(resultsGrid, mappedResults);
                 } else {
                     canLoadMoreDiscover = false;
-                    movieListContainer.classList.add('hidden');
-                    noResults.classList.remove('hidden');
                     resultsGrid.innerHTML = '';
+                    noResults.classList.remove('hidden');
                 }
             };
             
@@ -1758,6 +1773,13 @@
                     if (apiResults.length === 0) {
                         canLoadMoreDiscover = false; // No more results from API
                     } else {
+                        const applyLocalFilters = (results) => {
+                            return results.filter(item => {
+                                if (contentType !== 'both' && item.media_type !== contentType) return false;
+                                return true; // Most filtering is done on the API side for discover
+                            });
+                        };
+                        
                         const mappedAndFiltered = applyLocalFilters(apiResults)
                             .filter(r => r.poster_path)
                             .map(mapApiData);
@@ -2121,9 +2143,8 @@
             searchTypeDropdown.addEventListener('change', () => {
                 const selectedType = searchTypeDropdown.value;
                 const placeholderMap = {
-                    title: "Search by movie or TV show title...",
-                    keyword: "Search by keyword (e.g., 'heist', 'dystopia')...",
-                    director: "Search by director or creator's name...",
+                    title: "Search by title...",
+                    keyword: "Search by keyword (e.g., 'heist')...",
                     web_search: "Ask AI... (e.g., 'Sci-fi movies with a twist')"
                 };
                 globalSearchInput.placeholder = placeholderMap[selectedType] || "Enter search term...";
@@ -2292,7 +2313,7 @@
             });
             
             genreFilterDisplay.addEventListener('click', () => genreFilterDropdown.classList.toggle('hidden'));
-            genreFilterDropdown.addEventListener('change', (e) => { if (e.target.type === 'checkbox') updateSelectedGenres(e.target.value, e.target.dataset.name, e.target.checked, e.target.dataset.type || 'genre'); });
+            genreFilterDropdown.addEventListener('change', (e) => { if (e.target.type === 'checkbox') updateSelectedGenres(e.target.value, e.target.dataset.name); });
             selectedGenresContainer.addEventListener('click', (e) => { 
                 if(e.target.classList.contains('genre-pill-remove')) { 
                     e.stopPropagation(); 
@@ -2303,6 +2324,19 @@
                 } 
             });
             window.addEventListener('click', (e) => { if (!genreFilterContainer.contains(e.target)) genreFilterDropdown.classList.add('hidden'); });
+
+            ottFilterDisplay.addEventListener('click', () => ottFilterDropdown.classList.toggle('hidden'));
+            ottFilterDropdown.addEventListener('change', (e) => { if (e.target.type === 'checkbox') updateSelectedOTTs(e.target.value, e.target.dataset.name, e.target.checked); });
+            selectedOTTsContainer.addEventListener('click', (e) => { 
+                if(e.target.classList.contains('genre-pill-remove')) { 
+                    e.stopPropagation(); 
+                    const id = e.target.dataset.id;
+                    const checkbox = document.querySelector(`#ottFilterDropdown input[value="${id}"]`);
+                    if (checkbox) checkbox.checked = false;
+                    updateSelectedOTTs(id, '', false); 
+                } 
+            });
+            window.addEventListener('click', (e) => { if (!ottFilterContainer.contains(e.target)) ottFilterDropdown.classList.add('hidden'); });
             
             const closeModal = () => {
                 movieModal.classList.add('hidden');
@@ -2355,5 +2389,4 @@
     </script>
 </body>
 </html>
-
 
