@@ -36,14 +36,16 @@
             background-image: var(--bg-image);
             background-size: cover;
             background-position: center;
-            filter: blur(8px) brightness(10%);
+            /* Updated filter for more visibility and frosted glass effect */
+            filter: blur(4px) brightness(20%);
             z-index: -1;
             transition: background-image 1s ease-in-out;
         }
         #app {
             position: relative;
             z-index: 1;
-            background-color: rgba(17, 24, 39, 0.5);
+            /* Removed solid background to let the frosted glass elements pop */
+            background-color: transparent;
         }
         .font-nano {
             font-family: 'Orbitron', sans-serif;
@@ -56,14 +58,33 @@
         .btn-primary:disabled { background-color: #312e81; cursor: not-allowed; opacity: 0.7; }
         .btn-secondary { background-color: #374151; color: white; transition: background-color 0.3s; }
         .btn-secondary:hover { background-color: #4b5563; }
+
+        /* --- Frosted Glass Effect for Containers --- */
+        #featured-section, 
+        #search-section {
+            background-color: rgba(31, 41, 55, 0.6) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #modal-content-wrapper {
+            background-color: rgba(17, 24, 39, 0.75) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .card-grid { 
-            background-color: #1f2937; 
+            background-color: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 0.75rem; 
             overflow: hidden; 
             transition: transform 0.3s ease, box-shadow 0.3s ease; 
-            border: 1px solid #374151;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .card-grid:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #1f2937; }
@@ -175,7 +196,10 @@
             }
         }
         .recommended-card {
-            background-color: #1f2937;
+            background-color: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 0.5rem;
             overflow: hidden;
             transition: transform 0.2s ease-in-out;
@@ -317,12 +341,14 @@
             gap: 1rem;
         }
         .result-card {
-            background-color: #1f2937;
+            background-color: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 0.75rem;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            border: 1px solid #374151;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             cursor: pointer;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
@@ -360,7 +386,7 @@
                 display: block; /* Change to block to act like a table body */
                  border-radius: 0.5rem;
                 overflow: hidden;
-                border: 1px solid #374151;
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
             .results-grid .result-card {
                 display: grid;
@@ -368,7 +394,7 @@
                 gap: 1rem;
                 border-radius: 0;
                 border: 0;
-                border-bottom: 1px solid #374151;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
                 align-items: center;
                 padding: 0.75rem;
             }
@@ -376,10 +402,10 @@
                 border-bottom: 0;
             }
             .results-grid .result-card:nth-child(even) {
-                background-color: #111827;
+                background-color: rgba(17, 24, 39, 0.6);
             }
              .results-grid .result-card:hover {
-                background-color: #374151;
+                background-color: rgba(55, 65, 81, 0.7);
                 transform: none;
                 box-shadow: none;
             }
@@ -448,7 +474,7 @@
                 </div>
             </div>
     
-            <section id="featured-section" class="mb-12 bg-gray-900/50 p-6 rounded-xl relative">
+            <section id="featured-section" class="mb-12 p-6 rounded-xl relative">
                 <div class="flex flex-col md:flex-row flex-wrap justify-center items-center gap-4 mb-6">
                     <div id="language-filter-container" class="flex justify-center items-center gap-2">
                         <button data-lang="all" class="lang-filter-btn btn-primary text-sm py-1 px-3 rounded-md">All</button>
@@ -477,7 +503,7 @@
             <header class="relative text-center mb-4">
                 <h2 class="text-4xl md:text-5xl font-bold text-white font-nano">Discover & Search</h2>
             </header>
-            <div id="search-section" class="bg-gray-900/50 p-6 rounded-xl mt-8 space-y-4">
+            <div id="search-section" class="p-6 rounded-xl mt-8 space-y-4">
                 <!-- Global Search Bar & AI Toggle -->
                 <div class="flex flex-col sm:flex-row items-center gap-4">
                     <div class="relative flex-grow w-full">
@@ -702,7 +728,7 @@
     </button>
 
     <div id="movieModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-        <div id="modal-content-wrapper" class="bg-gray-900 rounded-lg max-w-screen-xl w-full max-h-[90vh] relative shadow-2xl overflow-y-auto">
+        <div id="modal-content-wrapper" class="rounded-lg max-w-screen-xl w-full max-h-[90vh] relative shadow-2xl overflow-y-auto">
             <button id="closeModal" class="absolute top-2 right-2 z-20 text-white bg-black/50 hover:bg-red-600 rounded-full p-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
