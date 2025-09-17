@@ -32,6 +32,10 @@
         body.modal-open {
             overflow: hidden;
         }
+        body.home-view {
+            height: 100vh;
+            overflow-y: hidden;
+        }
         body::before {
             content: '';
             position: fixed;
@@ -1041,6 +1045,7 @@
                 myListsPage.classList.add('hidden');
                 castDetailsPage.classList.add('hidden');
                 directorDetailsPage.classList.add('hidden');
+                document.body.classList.add('home-view');
                 updateNavActiveState('home');
                 if (addToHistory) {
                     pageHistory = [() => showHomePage(false)];
@@ -1053,6 +1058,7 @@
                 myListsPage.classList.add('hidden');
                 castDetailsPage.classList.add('hidden');
                 directorDetailsPage.classList.add('hidden');
+                document.body.classList.remove('home-view');
                 window.scrollTo(0, 0);
                 updateNavActiveState('discover');
                  if (addToHistory) {
@@ -1066,6 +1072,7 @@
                 myListsPage.classList.remove('hidden');
                 castDetailsPage.classList.add('hidden');
                 directorDetailsPage.classList.add('hidden');
+                document.body.classList.remove('home-view');
                 renderBookmarkList('watchlist'); 
                 window.scrollTo(0, 0);
                 updateNavActiveState('bookmarks');
@@ -1922,12 +1929,12 @@
                 <div class="movie-detail-page rounded-lg" style="background-image: url('${backdropUrl}')">
                     <div class="overlay p-4 md:p-6 rounded-lg">
                         ${freeBannerHTML}
-                        <div class="grid grid-cols-1 sm:grid-cols-5 gap-6 mb-6">
-                            <div class="poster-section sm:col-span-2">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="poster-section md:col-span-1">
                                 <img src="${data.poster_path ? imageBaseUrl + data.poster_path : 'https://placehold.co/500x750'}" alt="${title}" class="w-full h-auto shadow-lg">
                                 ${trailerBtn}
                             </div>
-                            <div class="sm:col-span-3 text-white">
+                            <div class="md:col-span-2 text-white">
                                 <h1 class="title">${title} <span class="text-2xl font-normal text-gray-300">(${year})</span></h1>
                                 <div class="info space-y-3 text-gray-300">
                                     <p>Released: ${formatDate(releaseDate)}</p>
@@ -1998,10 +2005,7 @@
 
                 castDetailsContent.innerHTML = '<div class="flex justify-center items-center p-16"><div class="loader"></div></div>';
 
-                const [personData, taggedImagesData] = await Promise.all([
-                    fetchFromTMDb(`person/${personId}`, { append_to_response: 'combined_credits' }),
-                    fetchFromTMDb(`person/${personId}/tagged_images`)
-                ]);
+                const personData = await fetchFromTMDb(`person/${personId}`, { append_to_response: 'combined_credits' });
 
                 const age = personData.birthday ? new Date().getFullYear() - new Date(personData.birthday).getFullYear() : 'N/A';
                 
@@ -2011,22 +2015,12 @@
                     .slice(0, 40) // limit to 40 most popular
                     .map(item => renderMovieGridCard(mapApiData(item))).join('');
                 
-                const galleryImages = taggedImagesData.results.slice(0, 9).map(img => `
-                    <img src="${imageBaseUrl}${img.file_path}" alt="Tagged image of ${personData.name}" class="gallery-image">
-                `).join('');
-
                 castDetailsContent.innerHTML = `
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-1">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="md:col-span-1">
                             <img src="${personData.profile_path ? imageBaseUrl + personData.profile_path : 'https://placehold.co/500x750'}" alt="${personData.name}" class="rounded-lg shadow-lg w-full">
-                            <div class="mt-4">
-                                <h3 class="text-xl font-semibold mb-2">Gallery</h3>
-                                <div class="gallery-grid">
-                                    ${galleryImages || '<p>No images found.</p>'}
-                                </div>
-                            </div>
                         </div>
-                        <div class="lg:col-span-2">
+                        <div class="md:col-span-2">
                             <h2 class="text-4xl font-bold text-white font-nano">${personData.name}</h2>
                             <div class="space-y-2 mt-4 text-gray-300">
                                 <p><strong>Known For:</strong> ${personData.known_for_department}</p>
@@ -2034,7 +2028,7 @@
                                 <p><strong>Nationality:</strong> ${personData.place_of_birth || 'N/A'}</p>
                             </div>
                             <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] sm:max-h-[60vh] overflow-y-auto pr-2">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto pr-2">
                                 ${filmography}
                             </div>
                         </div>
@@ -2080,7 +2074,7 @@
                                 <p><strong>Nationality:</strong> ${data.place_of_birth || 'N/A'}</p>
                             </div>
                             <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] sm:max-h-[60vh] overflow-y-auto pr-2">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto pr-2">
                                 ${filmography || '<p class="col-span-full">No directed works found.</p>'}
                             </div>
                         </div>
@@ -2316,9 +2310,9 @@
                 await setRandomBackgroundImage();
                 await setupUserId();
                 await loadStaticData();
-                initSwiper(); 
                 
                 if (loadFiltersFromLocalStorage()) {
+                    showDiscoverPage();
                     await handleSearchAndDiscover(true);
                 } else {
                     showHomePage();
