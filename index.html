@@ -338,92 +338,10 @@
         }
         
         /* New Discover Page Styles */
-        .results-grid {
+        #results-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 1rem;
-        }
-        .result-card {
-            background-color: rgba(31, 41, 55, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 0.75rem;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        .result-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
-        }
-        .result-card img {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 2/3;
-            object-fit: cover;
-        }
-        .result-card-content {
-            padding: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-        .result-card-title {
-            font-weight: 700;
-            color: #f3f4f6;
-            font-size: 1rem;
-            line-height: 1.2;
-        }
-        .result-card-info {
-            font-size: 0.8rem;
-            color: #9ca3af;
-            margin-top: 0.25rem;
-        }
-        
-        /* Desktop Table-like view */
-        @media (min-width: 768px) {
-            .results-grid {
-                display: block; /* Change to block to act like a table body */
-                 border-radius: 0.5rem;
-                overflow: hidden;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            .results-grid .result-card {
-                display: grid;
-                grid-template-columns: 80px 1fr 1fr 120px 80px 80px 50px;
-                gap: 1rem;
-                border-radius: 0;
-                border: 0;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                align-items: center;
-                padding: 0.75rem;
-            }
-            .results-grid .result-card:last-child {
-                border-bottom: 0;
-            }
-            .results-grid .result-card:nth-child(even) {
-                background-color: rgba(17, 24, 39, 0.6);
-            }
-             .results-grid .result-card:hover {
-                background-color: rgba(55, 65, 81, 0.7);
-                transform: none;
-                box-shadow: none;
-            }
-            .results-grid .result-card img {
-                width: 64px;
-                height: 96px;
-                border-radius: 0.375rem;
-            }
-            .result-card-content {
-                padding: 0;
-                grid-column: 2 / span 2;
-            }
-            .result-card-info-desktop {
-                display: block !important;
-            }
         }
         
         /* Cast & Director Details Page */
@@ -695,18 +613,8 @@
                    <h3 class="text-xl font-semibold text-gray-400">No Results Found</h3><p class="text-gray-500 mt-2">Try adjusting your search or filters.</p>
                </div>
                
-               <div id="movie-list-container" class="hidden">
-                    <!-- Desktop Headers -->
-                    <div class="hidden md:grid grid-cols-[80px_1fr_1fr_120px_80px_80px_50px] gap-4 p-4 bg-gray-800 rounded-t-lg text-xs font-medium text-gray-300 uppercase tracking-wider">
-                       <span>Poster</span>
-                       <span class="col-span-2">Title & Genre</span>
-                       <span class="text-center">Available On</span>
-                       <span>Rating</span>
-                       <span>Year</span>
-                       <span class="text-center">Trailer</span>
-                    </div>
-                    <!-- Results Grid for Mobile and Desktop -->
-                    <div id="results-grid" class="results-grid"></div>
+               <div id="movie-list-container">
+                    <div id="results-grid"></div>
                </div>
 
                <div id="loader-more" class="hidden justify-center items-center py-8"><div class="loader"></div></div>
@@ -1140,36 +1048,71 @@
             };
 
             // --- RENDER FUNCTIONS (MAIN PAGE) ---
-             const renderMovieResultItem = (item) => {
-                const genreNames = item.genre_ids.map(id => genresMap[id]).filter(name => name).join(', ');
+             const renderDiscoverCard = (item) => {
+                const languageMap = {
+                    'en': 'English', 'hi': 'Hindi', 'es': 'Spanish', 'fr': 'French', 'de': 'German', 'ja': 'Japanese', 'ko': 'Korean', 'te': 'Telugu', 'ta': 'Tamil', 'cn': 'Chinese'
+                };
+                const language = languageMap[item.language] || item.language.toUpperCase();
+
                 return `
-                <div class="result-card" data-id="${item.id}" data-type="${item.type}">
-                    <img src="${item.thumbnail}" alt="${item.title}" onerror="this.onerror=null;this.src='https://placehold.co/100x150/1f2937/ffffff?text=Error';">
-                    
-                    <div class="result-card-content">
-                        <h3 class="result-card-title">${item.title}</h3>
-                        <p class="result-card-info">${genreNames}</p>
-                        <div class="flex flex-wrap gap-2 mt-2 md:hidden" id="ott-mobile-${item.id}-${item.type}"></div>
+                <div class="card-grid cursor-pointer" data-id="${item.id}" data-type="${item.type}">
+                    <img src="${item.thumbnail}" alt="${item.title}" onerror="this.onerror=null;this.src='https://placehold.co/500x750/1f2937/ffffff?text=Error';" class="w-full object-cover aspect-[2/3]">
+                    <div class="p-3 text-white">
+                        <h3 class="font-bold text-md leading-tight truncate" title="${item.title}">${item.title}</h3>
+                        <div class="grid grid-cols-2 gap-2 mt-2 text-xs text-gray-300">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-1.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.368-2.447a1 1 0 00-1.175 0l-3.368 2.447c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.072 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"></path></svg>
+                                <span>${item.rating ? item.rating.toFixed(1) : 'N/A'}</span>
+                            </div>
+                            <div class="flex items-center justify-end">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span>${item.year}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.06 11.06l-1.06-1.06a2 2 0 010-2.83 2 2 0 012.83 0l1.06 1.06M12 21a9 9 0 110-18 9 9 0 010 18z"></path></svg>
+                                <span>${language}</span>
+                            </div>
+                            <div class="flex items-center justify-end" data-cert-id="${item.id}" data-type="${item.type}">
+                                <div class="loader-sm"></div>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="result-card-info-desktop hidden md:flex items-center justify-center flex-wrap gap-2" id="ott-${item.id}-${item.type}">
-                        <div class="loader-sm"></div>
-                    </div>
-
-                    <div class="result-card-info-desktop hidden md:block text-gray-200 font-semibold">
-                         <span class="flex items-center">
-                            <svg class="w-4 h-4 text-yellow-400 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.368-2.447a1 1 0 00-1.175 0l-3.368 2.447c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.072 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"></path></svg>
-                            ${item.rating ? item.rating.toFixed(1) : 'N/A'}
-                        </span>
-                    </div>
-
-                    <div class="result-card-info-desktop hidden md:block">${item.year}</div>
-
-                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(item.title + ' ' + item.year + ' trailer')}" target="_blank" rel="noopener noreferrer" class="youtube-link inline-block text-gray-400 hover:text-red-500 transition-colors text-center" title="Search Trailer on YouTube" onclick="event.stopPropagation()">
-                        <svg class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418C3.326,4.648,2.648,5.326,2.418,6.186C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.86-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"></path></svg>
-                    </a>
-                </div>`;
+                </div>
+                `;
             }
+
+            const fetchAndRenderExtraCardData = async (items) => {
+                for (const item of items) {
+                    try {
+                        let certification = 'N/A';
+                        if (item.type === 'movie') {
+                            const releaseData = await fetchFromTMDb(`movie/${item.id}/release_dates`);
+                            const usRelease = releaseData?.results.find(r => r.iso_3166_1 === 'US');
+                            if (usRelease && usRelease.release_dates.length > 0) {
+                                certification = usRelease.release_dates.find(rd => rd.certification !== "")?.certification || 'NR';
+                            }
+                        } else if (item.type === 'tv') {
+                            const ratingData = await fetchFromTMDb(`tv/${item.id}/content_ratings`);
+                            const usRating = ratingData?.results.find(r => r.iso_3166_1 === 'US');
+                            if (usRating) {
+                                certification = usRating.rating || 'NR';
+                            }
+                        }
+                        
+                        const certContainer = document.querySelector(`[data-cert-id='${item.id}'][data-type='${item.type}']`);
+                        if (certContainer) {
+                            certContainer.innerHTML = `<span class="border border-gray-500 rounded px-1.5 py-0.5 text-gray-300 font-semibold">${certification}</span>`;
+                        }
+                    } catch (error) {
+                        console.error(`Failed to fetch extra data for ${item.id}:`, error);
+                        const certContainer = document.querySelector(`[data-cert-id='${item.id}'][data-type='${item.type}']`);
+                        if (certContainer) {
+                             certContainer.innerHTML = `<span class="border border-gray-500 rounded px-1.5 py-0.5 text-gray-300 font-semibold">N/A</span>`;
+                        }
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 50)); // Rate limit
+                }
+            };
             
             const formatDate = (dateString) => {
                 if (!dateString) return 'TBD';
@@ -1196,7 +1139,9 @@
 
             const renderResults = (container, items, append = false) => {
                 if (!append) container.innerHTML = '';
-                container.innerHTML += items.map(renderMovieResultItem).join('');
+                const itemsHTML = items.map(renderDiscoverCard).join('');
+                container.insertAdjacentHTML('beforeend', itemsHTML);
+                fetchAndRenderExtraCardData(items);
             };
             
             const renderBookmarkList = (listType) => {
@@ -1249,18 +1194,22 @@
                 if (swiper) swiper.update();
             };
             
-            const renderResultSkeleton = () => `
-                <div class="result-card">
-                    <div class="skeleton w-full md:w-16 md:h-24 aspect-[2/3] md:aspect-auto rounded-t-lg md:rounded-lg"></div>
-                    <div class="result-card-content">
-                        <div class="skeleton h-5 w-3/4 rounded"></div>
-                        <div class="skeleton h-4 w-1/2 mt-2 rounded"></div>
+            const renderDiscoverSkeleton = (count = 20) => {
+                let skeletonHTML = '';
+                for(let i=0; i<count; i++){
+                    skeletonHTML += `
+                    <div class="card-grid">
+                        <div class="skeleton w-full aspect-[2/3]"></div>
+                        <div class="p-3">
+                            <div class="skeleton h-5 w-3/4 rounded mb-2"></div>
+                            <div class="skeleton h-4 w-1/2 rounded"></div>
+                        </div>
                     </div>
-                    <div class="result-card-info-desktop hidden md:flex items-center"> <div class="skeleton h-7 w-12 rounded"></div></div>
-                    <div class="result-card-info-desktop hidden md:flex items-center"> <div class="skeleton h-5 w-1/2 rounded"></div></div>
-                    <div class="result-card-info-desktop hidden md:flex items-center"> <div class="skeleton h-5 w-1/2 rounded"></div></div>
-                    <div class="hidden md:flex items-center justify-center"> <div class="skeleton h-7 w-7 rounded-full"></div></div>
-                </div>`;
+                    `;
+                }
+                resultsGrid.innerHTML = skeletonHTML;
+            }
+
 
             // --- GENRE PILLS ---
             const renderGenrePills = () => {
@@ -1531,7 +1480,7 @@
                 noResults.classList.add('hidden');
                 movieListContainer.classList.remove('hidden');
                 exportCsvBtn.classList.add('hidden');
-                resultsGrid.innerHTML = Array(10).fill().map(renderResultSkeleton).join('');
+                renderDiscoverSkeleton();
                 applyFiltersBtn.disabled = true;
                 applyFiltersBtn.innerHTML = `<div class="loader-sm"></div>`;
 
@@ -1633,12 +1582,23 @@
                             default:
                                 if (searchTerm) {
                                     gridTitle.textContent = `Results for "${searchTerm}"`;
-                                    paginationParams = { mode: 'search', type: contentType, queryParams: { query: searchTerm }};
-                                    const path = `search/${contentType === 'both' ? 'multi' : contentType}`;
-                                    const data = await fetchFromTMDb(path, { ...paginationParams.queryParams, page: 1 });
-                                    finalResults = applyLocalFilters(data?.results || []);
+                                    paginationParams = { mode: 'search', type: contentType, queryParams: { query: searchTerm } };
+                                    
+                                    const moviePromise = (contentType === 'movie' || contentType === 'both') 
+                                        ? fetchFromTMDb('search/movie', { ...paginationParams.queryParams, page: 1 })
+                                        : Promise.resolve({results: []});
+
+                                    const tvPromise = (contentType === 'tv' || contentType === 'both')
+                                        ? fetchFromTMDb('search/tv', { ...paginationParams.queryParams, page: 1 })
+                                        : Promise.resolve({results: []});
+
+                                    const [movieData, tvData] = await Promise.all([moviePromise, tvPromise]);
+                                    
+                                    let combinedResults = [...(movieData?.results || []), ...(tvData?.results || [])];
+                                    finalResults = applyLocalFilters(combinedResults);
+
                                 } else {
-                                    gridTitle.textContent = 'Filtered Results';
+                                     gridTitle.textContent = 'Filtered Results';
                                     paginationParams.mode = 'discover';
                                     const baseParams = { sort_by: sortBy, 'vote_count.gte': sortBy.includes('vote_average') ? 200 : 5, with_genres: manualGenreIds.join(','), primary_release_year: selectedYear };
                                     if (minRating > 0) baseParams['vote_average.gte'] = minRating;
@@ -1678,7 +1638,6 @@
                 if (mappedResults.length > 0) {
                     exportCsvBtn.classList.remove('hidden');
                     renderResults(resultsGrid, mappedResults);
-                    fetchAndRenderWatchProviders(mappedResults);
                 } else {
                     canLoadMoreDiscover = false;
                     movieListContainer.classList.add('hidden');
@@ -1686,62 +1645,68 @@
                     resultsGrid.innerHTML = '';
                 }
             };
-
-            const fetchAndRenderWatchProviders = async (items) => {
-                for (const item of items) {
-                    const data = await fetchFromTMDb(`${item.type}/${item.id}/watch/providers`);
-                    const providers = data?.results?.IN?.flatrate; // Hardcoded to India for this example
-                    
-                    let ottHTML = `<span class="text-xs text-gray-500">N/A</span>`;
-                    if(providers && providers.length > 0) {
-                         ottHTML = providers.slice(0, 3).map(p => 
-                            `<img src="${imageBaseUrl}${p.logo_path}" alt="${p.provider_name}" class="ott-logo" title="${p.provider_name}">`
-                        ).join('');
-                    }
-
-                    const ottContainerDesktop = document.getElementById(`ott-${item.id}-${item.type}`);
-                    const ottContainerMobile = document.getElementById(`ott-mobile-${item.id}-${item.type}`);
-                    
-                    if(ottContainerDesktop) ottContainerDesktop.innerHTML = ottHTML;
-                    if(ottContainerMobile) ottContainerMobile.innerHTML = ottHTML;
-
-                    await new Promise(resolve => setTimeout(resolve, 50)); // Rate limiting
-                }
-            };
-
-
-            const loadMoreMovies = async() => {
+            
+            const loadMoreMovies = async () => {
                 if (isLoadingMoreDiscover || !canLoadMoreDiscover) return;
-                isLoadingMoreDiscover = true; 
-                currentPage++; 
+                isLoadingMoreDiscover = true;
                 loaderMore.style.display = 'flex';
 
-                let newResults = [];
-                const {mode, type, queryParams, movieParams, tvParams} = paginationParams;
-                
-                 if (mode === 'search') {
-                    let path = `search/${type === 'both' ? 'multi' : type}`;
-                    const data = await fetchFromTMDb(path, { ...queryParams, page: currentPage });
-                    newResults = (data?.results || []).filter(item => item.media_type !== 'person');
-                } else if (mode === 'discover' || mode === 'discover_keyword') {
-                    let movieDataPromise = (type === 'movie' || type === 'both') ? fetchFromTMDb('discover/movie', { ...movieParams, page: currentPage }) : Promise.resolve({results: []});
-                    let tvDataPromise = (type === 'tv' || type === 'both') ? fetchFromTMDb('discover/tv', { ...tvParams, page: currentPage }) : Promise.resolve({results: []});
-                    
-                    const [movieData, tvData] = await Promise.all([movieDataPromise, tvDataPromise]);
-                    newResults = [...(movieData?.results || []), ...(tvData?.results || [])];
+                let newFilteredResults = [];
+                let attempts = 0;
+
+                // Loop until we have a full page of results or we've tried too many times/run out of pages.
+                while (newFilteredResults.length < 20 && canLoadMoreDiscover && attempts < 5) {
+                    currentPage++;
+                    attempts++;
+
+                    let apiResults = [];
+                    const { mode, type, queryParams, movieParams, tvParams } = paginationParams;
+
+                    if (mode === 'search') {
+                        let movieDataPromise = (type === 'movie' || type === 'both') ? fetchFromTMDb('search/movie', { ...queryParams, page: currentPage }) : Promise.resolve({ results: [], total_pages: 0 });
+                        let tvDataPromise = (type === 'tv' || type === 'both') ? fetchFromTMDb('search/tv', { ...queryParams, page: currentPage }) : Promise.resolve({ results: [], total_pages: 0 });
+                        
+                        const [movieData, tvData] = await Promise.all([movieDataPromise, tvDataPromise]);
+                        const movieResults = movieData?.results.map(r => ({...r, media_type: 'movie'})) || [];
+                        const tvResults = tvData?.results.map(r => ({...r, media_type: 'tv'})) || [];
+                        apiResults = [...movieResults, ...tvResults];
+
+                        if (currentPage >= (movieData?.total_pages || 0) && currentPage >= (tvData?.total_pages || 0)) {
+                            canLoadMoreDiscover = false;
+                        }
+                    } else if (mode === 'discover' || mode === 'discover_keyword') {
+                        let movieDataPromise = (type === 'movie' || type === 'both') ? fetchFromTMDb('discover/movie', { ...movieParams, page: currentPage }) : Promise.resolve({ results: [], total_pages: 0 });
+                        let tvDataPromise = (type === 'tv' || type === 'both') ? fetchFromTMDb('discover/tv', { ...tvParams, page: currentPage }) : Promise.resolve({ results: [], total_pages: 0 });
+
+                        const [movieData, tvData] = await Promise.all([movieDataPromise, tvDataPromise]);
+                        const movieResults = movieData?.results.map(r => ({...r, media_type: 'movie'})) || [];
+                        const tvResults = tvData?.results.map(r => ({...r, media_type: 'tv'})) || [];
+                        apiResults = [...movieResults, ...tvResults];
+                        
+                        if (currentPage >= (movieData?.total_pages || 0) && currentPage >= (tvData?.total_pages || 0)) {
+                            canLoadMoreDiscover = false;
+                        }
+                    }
+
+                    if (apiResults.length === 0) {
+                        canLoadMoreDiscover = false; // No more results from API
+                    } else {
+                        const mappedAndFiltered = applyLocalFilters(apiResults)
+                            .filter(r => r.poster_path)
+                            .map(mapApiData);
+                        
+                        newFilteredResults.push(...mappedAndFiltered);
+                    }
                 }
 
-                if (newResults.length > 0) {
-                    const movieData = newResults.map(mapApiData);
-                    renderResults(resultsGrid, movieData, true);
-                    fetchAndRenderWatchProviders(movieData);
-                } else { 
-                    canLoadMoreDiscover = false; 
-                    currentPage--; 
+                if (newFilteredResults.length > 0) {
+                    renderResults(resultsGrid, newFilteredResults, true);
                 }
-                loaderMore.style.display = 'none'; 
+
+                loaderMore.style.display = 'none';
                 isLoadingMoreDiscover = false;
             };
+
             
             const exportTableToCSV = (filename) => {
                 let csv = ['"Poster","Title","Genre","Year","Rating"'];
@@ -2212,7 +2177,7 @@
             });
             
             document.body.addEventListener('click', (e) => { 
-                const link = e.target.closest('a, .result-card, .card-grid, .recommended-card, .back-btn');
+                const link = e.target.closest('a, .card-grid, .recommended-card, .back-btn');
                 if (link) e.preventDefault();
                 
                 const backBtn = e.target.closest('.back-btn');
@@ -2221,7 +2186,7 @@
                     return;
                 }
                 
-                const itemElement = e.target.closest('.result-card[data-id], .card-grid[data-id], .recommended-card[data-id]');
+                const itemElement = e.target.closest('.card-grid[data-id], .recommended-card[data-id]');
                 if (itemElement) {
                      window.history.pushState({movieId: itemElement.dataset.id, movieType: itemElement.dataset.type}, '');
                     showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie');
