@@ -61,11 +61,14 @@
 
         /* --- Frosted Glass Effect for Containers --- */
         #featured-section, 
-        #search-section {
+        #search-section,
+        #cast-details-page,
+        #director-details-page {
             background-color: rgba(31, 41, 55, 0.6) !important;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
         }
         #modal-content-wrapper {
             background-color: rgba(17, 24, 39, 0.75) !important;
@@ -184,7 +187,7 @@
         }
         .recommended-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+            grid-template-columns: repeat(3, 1fr); /* 3 columns on mobile */
             gap: 0.75rem; /* Reduced gap */
             flex-grow: 1;
             overflow-y: auto;
@@ -192,7 +195,7 @@
         }
          @media (min-width: 640px) { /* sm breakpoint */
             .recommended-grid {
-                grid-template-columns: repeat(3, 1fr); /* 3 columns on tablet and up */
+                grid-template-columns: repeat(5, 1fr); /* 5 columns on desktop for smaller cards */
             }
         }
         .recommended-card {
@@ -215,9 +218,9 @@
             object-fit: cover;
         }
         .recommended-card h3 {
-            padding: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 700;
+            padding: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
             color: #f3f4f6;
             text-align: center;
         }
@@ -421,6 +424,27 @@
             .result-card-info-desktop {
                 display: block !important;
             }
+        }
+        
+        /* Cast & Director Details Page */
+        #cast-details-page, #director-details-page {
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 20;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 9999px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .back-btn:hover {
+            background-color: rgba(0,0,0,0.8);
         }
     </style>
 </head>
@@ -708,6 +732,16 @@
                     </div>
             </div>
         </div>
+
+        <div id="cast-details-page" class="hidden p-4 md:p-6 lg:p-8">
+            <button class="back-btn">← Back</button>
+            <div id="cast-details-content"></div>
+        </div>
+
+        <div id="director-details-page" class="hidden p-4 md:p-6 lg:p-8">
+            <button class="back-btn">← Back</button>
+            <div id="director-details-content"></div>
+        </div>
     </div>
 
     <!-- Floating Navigation Bar -->
@@ -729,6 +763,7 @@
 
     <div id="movieModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div id="modal-content-wrapper" class="rounded-lg max-w-screen-xl w-full max-h-[90vh] relative shadow-2xl overflow-y-auto">
+            <button class="back-btn hidden">← Back</button>
             <button id="closeModal" class="absolute top-2 right-2 z-20 text-white bg-black/50 hover:bg-red-600 rounded-full p-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -798,12 +833,17 @@
             let swiper;
             let currentCarouselLang = 'all';
             let currentMediaType = 'movie';
+            let pageHistory = [];
 
 
             // --- DOM ELEMENTS ---
             const homePage = document.getElementById('home-page');
             const discoverPage = document.getElementById('discover-page');
             const myListsPage = document.getElementById('my-lists-page');
+            const castDetailsPage = document.getElementById('cast-details-page');
+            const castDetailsContent = document.getElementById('cast-details-content');
+            const directorDetailsPage = document.getElementById('director-details-page');
+            const directorDetailsContent = document.getElementById('director-details-content');
             const featuredContainer = document.getElementById('featured-container');
             const featuredTitle = document.getElementById('featured-title');
             const listsContainer = document.getElementById('lists-container');
@@ -1007,17 +1047,28 @@
             }
 
             // --- PAGE NAVIGATION ---
+            const goBack = () => {
+                if (pageHistory.length > 0) {
+                    const previousPage = pageHistory.pop();
+                    previousPage();
+                } else {
+                    // Default fallback
+                    showHomePage();
+                }
+            };
+
             const updateNavActiveState = (activePage) => {
                 navHomeBtn.classList.toggle('active', activePage === 'home');
                 navDiscoverBtn.classList.toggle('active', activePage === 'discover');
                 navBookmarksBtn.classList.toggle('active', activePage === 'bookmarks');
             };
 
-            const showHomePage = () => {
+            const showHomePage = (addToHistory = true) => {
                 homePage.classList.remove('hidden');
                 discoverPage.classList.add('hidden');
                 myListsPage.classList.add('hidden');
-                homeFilterNav.parentElement.parentElement.classList.remove('hidden');
+                castDetailsPage.classList.add('hidden');
+                directorDetailsPage.classList.add('hidden');
                 updateNavActiveState('home');
             };
 
@@ -1025,7 +1076,8 @@
                 homePage.classList.add('hidden');
                 discoverPage.classList.remove('hidden');
                 myListsPage.classList.add('hidden');
-                homeFilterNav.parentElement.parentElement.classList.add('hidden');
+                castDetailsPage.classList.add('hidden');
+                directorDetailsPage.classList.add('hidden');
                 window.scrollTo(0, 0);
                 updateNavActiveState('discover');
             };
@@ -1034,7 +1086,8 @@
                 homePage.classList.add('hidden');
                 discoverPage.classList.add('hidden');
                 myListsPage.classList.remove('hidden');
-                homeFilterNav.parentElement.parentElement.classList.add('hidden');
+                castDetailsPage.classList.add('hidden');
+                directorDetailsPage.classList.add('hidden');
                 renderBookmarkList('watchlist'); 
                 window.scrollTo(0, 0);
                 updateNavActiveState('bookmarks');
@@ -1780,6 +1833,13 @@
                 movieModal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
 
+                movieModal.querySelector('.back-btn').classList.toggle('hidden', pageHistory.length === 0);
+                
+                if (pageHistory.length === 0) {
+                    pageHistory.push(discoverPage.classList.contains('hidden') ? showHomePage : showDiscoverPage);
+                }
+
+
                 const data = await fetchFromTMDb(`${type}/${id}`, {
                     append_to_response: 'credits,watch/providers,videos,keywords,release_dates,content_ratings',
                 });
@@ -1796,13 +1856,19 @@
 
                 const releaseDate = type === 'movie' ? data.release_date : data.first_air_date;
                 const year = releaseDate ? releaseDate.substring(0, 4) : 'N/A';
-                const director = type === 'movie' ? (data.credits.crew.find(c => c.job === 'Director')?.name || 'N/A') : (data.created_by?.map(c => c.name).join(', ') || 'N/A');
-                const genres = (data.genres || []).map(g => g.name).join(', ');
-                const cast = data.credits.cast.slice(0, 5).map(c => c.name).join(', ');
+                
+                const directors = data.credits.crew.filter(c => c.job === 'Director').map(d => `<a href="#" class="person-link director-link" data-person-id="${d.id}">${d.name}</a>`).join(', ');
+                const creators = (data.created_by || []).map(c => `<a href="#" class="person-link director-link" data-person-id="${c.id}">${c.name}</a>`).join(', ');
+                const directorOrCreatorHTML = type === 'movie' ? directors : creators;
+
+                const cast = data.credits.cast.slice(0, 5).map(c => `<a href="#" class="person-link cast-link" data-person-id="${c.id}">${c.name}</a>`).join(', ');
                 const trailer = data.videos?.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
-                const trailerBtn = trailer ? `<a href="https://www.youtube.com/watch?v=${trailer.key}" target="_blank" class="trailer-btn"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg><span>Watch Trailer</span></a>` : '';
+                const trailerBtn = trailer ? `<a href="https://www.youtube.com/watch?v=${trailer.key}" target="_blank" rel="noopener noreferrer" class="trailer-btn"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg><span>Watch Trailer</span></a>` : '';
                 const backdropUrl = data.backdrop_path ? `${backdropBaseUrl}${data.backdrop_path}` : '';
                 
+                const providers = data['watch/providers']?.results?.IN?.flatrate || [];
+                const providersHTML = providers.length > 0 ? providers.map(p => `<span class="text-xs bg-gray-700 px-2 py-1 rounded-md whitespace-nowrap">${p.provider_name}</span>`).join('') : 'Not available on streaming.';
+
                 let certification = 'N/A';
                 if (type === 'movie' && data.release_dates) {
                     const usRelease = data.release_dates.results.find(r => r.iso_3166_1 === 'US');
@@ -1831,11 +1897,12 @@
                                         <div class="info space-y-3 text-gray-300">
                                             <p>Released: ${formatDate(releaseDate)}</p>
                                             <p class="max-h-[120px] overflow-y-auto pr-2">${data.overview || 'No overview available.'}</p>
-                                            <p><strong>Genre:</strong> ${genres}</p>
-                                            <p><strong>${type === 'movie' ? 'Director' : 'Creator'}:</strong> ${director}</p>
-                                            <p><strong>Cast:</strong> ${cast}</p>
+                                            <p><strong>Genre:</strong> ${data.genres.map(g => g.name).join(', ')}</p>
+                                            <p><strong>${type === 'movie' ? 'Director' : 'Creator'}:</strong> ${directorOrCreatorHTML || 'N/A'}</p>
+                                            <p><strong>Cast:</strong> ${cast || 'N/A'}</p>
                                             <p><strong>Rating:</strong> ⭐ ${data.vote_average.toFixed(1)}/10</p>
                                             <p><strong>Certification:</strong> ${certification}</p>
+                                            <p><strong>Available On:</strong> <span class="flex flex-wrap gap-2 mt-1">${providersHTML}</span></p>
                                         </div>
                                          <div class="mt-4 flex space-x-2">
                                             <button data-status="watchlist" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Watchlist"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7z"></path></svg></button>
@@ -1845,20 +1912,20 @@
                                         <div class="mt-4">${trailerBtn}</div>
                                     </div>
                                 </div>
-                                 <div class="mt-4 p-4 bg-gray-900/50 rounded-lg">
+                            </div>
+                            <div class="lg:col-span-2 flex flex-col">
+                                <section class="recommendations mb-4 flex-grow">
+                                    <h2 id="recommendation-title">AI Recommended</h2>
+                                    <div class="recommended-grid" id="ai-recommendations"></div>
+                                </section>
+                                <div class="p-4 bg-gray-900/50 rounded-lg">
                                      <div class="flex items-center gap-4 mb-3">
                                         <h3 class="text-xl font-bold text-red-500 whitespace-nowrap">Ask AI:</h3>
                                         <input type="text" id="ai-query" placeholder="e.g., Explain the ending..." class="w-full p-2 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-red-500">
                                         <button id="ai-ask-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md">Ask</button>
                                     </div>
-                                    <div id="ai-response" class="text-gray-300 bg-gray-800 p-4 rounded-md min-h-[140px]"></div>
+                                    <div id="ai-response" class="text-gray-300 bg-gray-800 p-4 rounded-md min-h-[100px]"></div>
                                 </div>
-                            </div>
-                            <div class="lg:col-span-2">
-                                <section class="recommendations">
-                                    <h2 id="recommendation-title">AI Recommended</h2>
-                                    <div class="recommended-grid" id="ai-recommendations"></div>
-                                </section>
                             </div>
                         </div>
                     </div>
@@ -1880,6 +1947,96 @@
 
                 const genreIds = (data.genres || []).map(g => g.id);
                 fetchAndRenderAIRecommendations(id, type, title, genreIds);
+            }
+
+            async function showCastDetailsPage(personId) {
+                homePage.classList.add('hidden');
+                discoverPage.classList.add('hidden');
+                myListsPage.classList.add('hidden');
+                directorDetailsPage.classList.add('hidden');
+                castDetailsPage.classList.remove('hidden');
+                movieModal.classList.add('hidden');
+
+                pageHistory.push(() => showMovieModal(window.history.state.movieId, window.history.state.movieType));
+
+                castDetailsContent.innerHTML = '<div class="flex justify-center items-center p-16"><div class="loader"></div></div>';
+
+                const data = await fetchFromTMDb(`person/${personId}`, {
+                    append_to_response: 'combined_credits'
+                });
+
+                const age = data.birthday ? new Date().getFullYear() - new Date(data.birthday).getFullYear() : 'N/A';
+                
+                const filmography = data.combined_credits.cast
+                    .filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && item.poster_path)
+                    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+                    .slice(0, 40) // limit to 40 most popular
+                    .map(item => renderMovieGridCard(mapApiData(item))).join('');
+
+                castDetailsContent.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="md:col-span-1">
+                            <img src="${data.profile_path ? imageBaseUrl + data.profile_path : 'https://placehold.co/500x750'}" alt="${data.name}" class="rounded-lg shadow-lg w-full">
+                        </div>
+                        <div class="md:col-span-2">
+                            <h2 class="text-4xl font-bold text-white font-nano">${data.name}</h2>
+                            <div class="space-y-2 mt-4 text-gray-300">
+                                <p><strong>Known For:</strong> ${data.known_for_department}</p>
+                                <p><strong>Age:</strong> ${age}</p>
+                                <p><strong>Nationality:</strong> ${data.place_of_birth || 'N/A'}</p>
+                            </div>
+                            <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto pr-2">
+                                ${filmography}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            async function showDirectorDetailsPage(personId) {
+                homePage.classList.add('hidden');
+                discoverPage.classList.add('hidden');
+                myListsPage.classList.add('hidden');
+                castDetailsPage.classList.add('hidden');
+                directorDetailsPage.classList.remove('hidden');
+                movieModal.classList.add('hidden');
+
+                pageHistory.push(() => showMovieModal(window.history.state.movieId, window.history.state.movieType));
+
+                directorDetailsContent.innerHTML = '<div class="flex justify-center items-center p-16"><div class="loader"></div></div>';
+
+                const data = await fetchFromTMDb(`person/${personId}`, {
+                    append_to_response: 'combined_credits'
+                });
+
+                const age = data.birthday ? new Date().getFullYear() - new Date(data.birthday).getFullYear() : 'N/A';
+                
+                const filmography = data.combined_credits.crew
+                    .filter(item => (item.job === 'Director' || item.job === 'Creator') && item.poster_path)
+                    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+                    .slice(0, 40)
+                    .map(item => renderMovieGridCard(mapApiData(item))).join('');
+
+                directorDetailsContent.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="md:col-span-1">
+                            <img src="${data.profile_path ? imageBaseUrl + data.profile_path : 'https://placehold.co/500x750'}" alt="${data.name}" class="rounded-lg shadow-lg w-full">
+                        </div>
+                        <div class="md:col-span-2">
+                            <h2 class="text-4xl font-bold text-white font-nano">${data.name}</h2>
+                            <div class="space-y-2 mt-4 text-gray-300">
+                                <p><strong>Known For:</strong> ${data.known_for_department}</p>
+                                <p><strong>Age:</strong> ${age}</p>
+                                <p><strong>Nationality:</strong> ${data.place_of_birth || 'N/A'}</p>
+                            </div>
+                            <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto pr-2">
+                                ${filmography || '<p class="col-span-full">No directed works found.</p>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
 
             // --- EVENT LISTENERS ---
@@ -2024,14 +2181,33 @@
             });
             
             document.body.addEventListener('click', (e) => { 
-                const itemElement = e.target.closest('.result-card[data-id]');
-                if (itemElement) showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie');
-
-                const homeCardElement = e.target.closest('.card-grid[data-id]');
-                if(homeCardElement) showMovieModal(homeCardElement.dataset.id, homeCardElement.dataset.type || 'movie');
+                const link = e.target.closest('a, .result-card, .card-grid, .recommended-card, .back-btn');
+                if (link) e.preventDefault();
                 
-                const recommendedItemElement = e.target.closest('#movieModalContent .recommended-card[data-id]');
-                if (recommendedItemElement) showMovieModal(recommendedItemElement.dataset.id, recommendedItemElement.dataset.type || 'movie');
+                const backBtn = e.target.closest('.back-btn');
+                if (backBtn) {
+                    goBack();
+                    return;
+                }
+                
+                const itemElement = e.target.closest('.result-card[data-id], .card-grid[data-id], .recommended-card[data-id]');
+                if (itemElement) {
+                     window.history.pushState({movieId: itemElement.dataset.id, movieType: itemElement.dataset.type}, '');
+                    showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie');
+                    return;
+                }
+
+                const directorLink = e.target.closest('.director-link');
+                if(directorLink) {
+                    showDirectorDetailsPage(directorLink.dataset.personId);
+                    return;
+                }
+                
+                const castLink = e.target.closest('.cast-link');
+                if(castLink) {
+                    showCastDetailsPage(castLink.dataset.personId);
+                    return;
+                }
             });
             
             genreFilterDisplay.addEventListener('click', () => genreFilterDropdown.classList.toggle('hidden'));
@@ -2047,8 +2223,8 @@
             });
             window.addEventListener('click', (e) => { if (!genreFilterContainer.contains(e.target)) genreFilterDropdown.classList.add('hidden'); });
             
-            closeModalBtn.addEventListener('click', () => { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; });
-            movieModal.addEventListener('click', (e) => { if (e.target === movieModal) { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; } });
+            closeModalBtn.addEventListener('click', () => { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; goBack(); });
+            movieModal.addEventListener('click', (e) => { if (e.target === movieModal) { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; goBack(); } });
 
             window.addEventListener('scroll', () => {
                 const isNearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500;
@@ -2079,3 +2255,4 @@
     </script>
 </body>
 </html>
+
