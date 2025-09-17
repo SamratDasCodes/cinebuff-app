@@ -18,13 +18,19 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
-        html { scroll-behavior: smooth; }
+        html { 
+            scroll-behavior: smooth; 
+        }
         body { 
             font-family: 'Inter', sans-serif; 
             color: #f3f4f6; 
             position: relative;
             min-height: 100vh;
             padding-bottom: 100px; /* Added padding for floating nav */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+        body.modal-open {
+            overflow: hidden;
         }
         body::before {
             content: '';
@@ -390,6 +396,24 @@
             margin: 2px;
             background-color: rgba(255,255,255,0.1);
         }
+        /* Cast Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        .gallery-grid img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+         .gallery-grid img:hover {
+            transform: scale(1.05);
+        }
+
     </style>
 </head>
 <body>
@@ -706,6 +730,16 @@
             <div id="movieModalContent"></div>
         </div>
     </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="relative">
+            <button id="closeImageModal" class="absolute -top-4 -right-4 z-20 text-white bg-black/50 hover:bg-red-600 rounded-full p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <img id="modalImage" src="" alt="Full size image" class="max-w-[90vw] max-h-[90vh] rounded-lg">
+        </div>
+    </div>
     
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="api.js"></script>
@@ -811,6 +845,9 @@
             const exportCsvBtn = document.getElementById('exportCsvBtn');
             const closeModalBtn = document.getElementById('closeModal');
             const movieModalContent = document.getElementById('movieModalContent');
+            const imageModal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const closeImageModalBtn = document.getElementById('closeImageModal');
             const userIdInput = document.getElementById('userIdInput');
             const copyUserIdBtn = document.getElementById('copyUserIdBtn');
             const loadUserIdBtn = document.getElementById('loadUserIdBtn');
@@ -982,14 +1019,15 @@
 
             // --- PAGE NAVIGATION ---
             const goBack = () => {
-                if (pageHistory.length > 0) {
-                    const previousPage = pageHistory.pop();
-                    previousPage();
+                if (pageHistory.length > 1) { // Need to have more than the base page
+                    pageHistory.pop(); // Remove current page
+                    const previousPage = pageHistory[pageHistory.length - 1]; // Get the new last page
+                    previousPage(); // Execute it
                 } else {
-                    // Default fallback
-                    showHomePage();
+                    showHomePage(); // Fallback to home
                 }
             };
+
 
             const updateNavActiveState = (activePage) => {
                 navHomeBtn.classList.toggle('active', activePage === 'home');
@@ -1004,9 +1042,12 @@
                 castDetailsPage.classList.add('hidden');
                 directorDetailsPage.classList.add('hidden');
                 updateNavActiveState('home');
+                if (addToHistory) {
+                    pageHistory = [() => showHomePage(false)];
+                }
             };
 
-            const showDiscoverPage = () => {
+            const showDiscoverPage = (addToHistory = true) => {
                 homePage.classList.add('hidden');
                 discoverPage.classList.remove('hidden');
                 myListsPage.classList.add('hidden');
@@ -1014,6 +1055,9 @@
                 directorDetailsPage.classList.add('hidden');
                 window.scrollTo(0, 0);
                 updateNavActiveState('discover');
+                 if (addToHistory) {
+                    pageHistory = [() => showDiscoverPage(false)];
+                }
             };
 
             const showMyListsPage = () => {
@@ -1025,6 +1069,7 @@
                 renderBookmarkList('watchlist'); 
                 window.scrollTo(0, 0);
                 updateNavActiveState('bookmarks');
+                pageHistory = [showMyListsPage];
             };
             
             // --- DATA MAPPING ---
@@ -1459,7 +1504,7 @@
 
             // --- CORE SEARCH LOGIC ---
             const handleSearchAndDiscover = async (isInitialLoad = false) => {
-                if (!isInitialLoad) showDiscoverPage();
+                if (!isInitialLoad) showDiscoverPage(true);
                 
                 loader.style.display = 'none';
 
@@ -1820,14 +1865,9 @@
             async function showMovieModal(id, type) {
                 movieModalContent.innerHTML = '<div class="flex justify-center items-center p-16"><div class="loader"></div></div>';
                 movieModal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
+                document.body.classList.add('modal-open');
 
-                movieModal.querySelector('.back-btn').classList.toggle('hidden', pageHistory.length === 0);
-                
-                if (pageHistory.length === 0) {
-                     pageHistory.push(discoverPage.classList.contains('hidden') ? showHomePage : showDiscoverPage);
-                }
-
+                movieModal.querySelector('.back-btn').classList.toggle('hidden', pageHistory.length <= 1);
 
                 const data = await fetchFromTMDb(`${type}/${id}`, {
                     append_to_response: 'credits,watch/providers,videos,keywords,release_dates,content_ratings',
@@ -1952,37 +1992,49 @@
                 directorDetailsPage.classList.add('hidden');
                 castDetailsPage.classList.remove('hidden');
                 movieModal.classList.add('hidden');
+                document.body.classList.remove('modal-open');
 
-                pageHistory.push(() => showMovieModal(window.history.state.movieId, window.history.state.movieType));
+                pageHistory.push(() => showCastDetailsPage(personId));
 
                 castDetailsContent.innerHTML = '<div class="flex justify-center items-center p-16"><div class="loader"></div></div>';
 
-                const data = await fetchFromTMDb(`person/${personId}`, {
-                    append_to_response: 'combined_credits'
-                });
+                const [personData, taggedImagesData] = await Promise.all([
+                    fetchFromTMDb(`person/${personId}`, { append_to_response: 'combined_credits' }),
+                    fetchFromTMDb(`person/${personId}/tagged_images`)
+                ]);
 
-                const age = data.birthday ? new Date().getFullYear() - new Date(data.birthday).getFullYear() : 'N/A';
+                const age = personData.birthday ? new Date().getFullYear() - new Date(personData.birthday).getFullYear() : 'N/A';
                 
-                const filmography = data.combined_credits.cast
+                const filmography = personData.combined_credits.cast
                     .filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && item.poster_path)
                     .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
                     .slice(0, 40) // limit to 40 most popular
                     .map(item => renderMovieGridCard(mapApiData(item))).join('');
+                
+                const galleryImages = taggedImagesData.results.slice(0, 9).map(img => `
+                    <img src="${imageBaseUrl}${img.file_path}" alt="Tagged image of ${personData.name}" class="gallery-image">
+                `).join('');
 
                 castDetailsContent.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="md:col-span-1">
-                            <img src="${data.profile_path ? imageBaseUrl + data.profile_path : 'https://placehold.co/500x750'}" alt="${data.name}" class="rounded-lg shadow-lg w-full">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1">
+                            <img src="${personData.profile_path ? imageBaseUrl + personData.profile_path : 'https://placehold.co/500x750'}" alt="${personData.name}" class="rounded-lg shadow-lg w-full">
+                            <div class="mt-4">
+                                <h3 class="text-xl font-semibold mb-2">Gallery</h3>
+                                <div class="gallery-grid">
+                                    ${galleryImages || '<p>No images found.</p>'}
+                                </div>
+                            </div>
                         </div>
-                        <div class="md:col-span-2">
-                            <h2 class="text-4xl font-bold text-white font-nano">${data.name}</h2>
+                        <div class="lg:col-span-2">
+                            <h2 class="text-4xl font-bold text-white font-nano">${personData.name}</h2>
                             <div class="space-y-2 mt-4 text-gray-300">
-                                <p><strong>Known For:</strong> ${data.known_for_department}</p>
+                                <p><strong>Known For:</strong> ${personData.known_for_department}</p>
                                 <p><strong>Age:</strong> ${age}</p>
-                                <p><strong>Nationality:</strong> ${data.place_of_birth || 'N/A'}</p>
+                                <p><strong>Nationality:</strong> ${personData.place_of_birth || 'N/A'}</p>
                             </div>
                             <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto pr-2">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] sm:max-h-[60vh] overflow-y-auto pr-2">
                                 ${filmography}
                             </div>
                         </div>
@@ -1997,8 +2049,9 @@
                 castDetailsPage.classList.add('hidden');
                 directorDetailsPage.classList.remove('hidden');
                 movieModal.classList.add('hidden');
+                 document.body.classList.remove('modal-open');
 
-                pageHistory.push(() => showMovieModal(window.history.state.movieId, window.history.state.movieType));
+                pageHistory.push(() => showDirectorDetailsPage(personId));
 
                 directorDetailsContent.innerHTML = '<div class="flex justify-center items-center p-16"><div class="loader"></div></div>';
 
@@ -2027,7 +2080,7 @@
                                 <p><strong>Nationality:</strong> ${data.place_of_birth || 'N/A'}</p>
                             </div>
                             <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto pr-2">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] sm:max-h-[60vh] overflow-y-auto pr-2">
                                 ${filmography || '<p class="col-span-full">No directed works found.</p>'}
                             </div>
                         </div>
@@ -2177,8 +2230,10 @@
             });
             
             document.body.addEventListener('click', (e) => { 
-                const link = e.target.closest('a, .card-grid, .recommended-card, .back-btn');
-                if (link) e.preventDefault();
+                const interactiveElement = e.target.closest('a, button, .card-grid, .recommended-card, .gallery-image');
+                if (interactiveElement && !interactiveElement.classList.contains('trailer-btn')) {
+                     e.preventDefault();
+                }
                 
                 const backBtn = e.target.closest('.back-btn');
                 if (backBtn) {
@@ -2188,7 +2243,8 @@
                 
                 const itemElement = e.target.closest('.card-grid[data-id], .recommended-card[data-id]');
                 if (itemElement) {
-                     window.history.pushState({movieId: itemElement.dataset.id, movieType: itemElement.dataset.type}, '');
+                    window.history.pushState({movieId: itemElement.dataset.id, movieType: itemElement.dataset.type}, '');
+                    pageHistory.push(() => showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie'));
                     showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie');
                     return;
                 }
@@ -2203,6 +2259,13 @@
                 if(castLink) {
                     showCastDetailsPage(castLink.dataset.personId);
                     return;
+                }
+
+                const galleryImg = e.target.closest('.gallery-image');
+                if (galleryImg) {
+                    modalImage.src = galleryImg.src.replace('/w500/', '/original/');
+                    imageModal.classList.remove('hidden');
+                    document.body.classList.add('modal-open');
                 }
             });
             
@@ -2219,8 +2282,26 @@
             });
             window.addEventListener('click', (e) => { if (!genreFilterContainer.contains(e.target)) genreFilterDropdown.classList.add('hidden'); });
             
-            closeModalBtn.addEventListener('click', () => { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; pageHistory = []; });
-            movieModal.addEventListener('click', (e) => { if (e.target === movieModal) { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; pageHistory = []; } });
+            const closeModal = () => {
+                movieModal.classList.add('hidden');
+                document.body.classList.remove('modal-open');
+                pageHistory = [];
+                const basePage = discoverPage.classList.contains('hidden') ? showHomePage : showDiscoverPage;
+                basePage();
+            };
+
+            const closeImage = () => {
+                imageModal.classList.add('hidden');
+                if(movieModal.classList.contains('hidden')) {
+                    document.body.classList.remove('modal-open');
+                }
+            };
+
+            closeModalBtn.addEventListener('click', closeModal);
+            movieModal.addEventListener('click', (e) => { if (e.target === movieModal) closeModal(); });
+
+            closeImageModalBtn.addEventListener('click', closeImage);
+            imageModal.addEventListener('click', (e) => { if (e.target === imageModal) closeImage(); });
 
             window.addEventListener('scroll', () => {
                 const isNearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500;
