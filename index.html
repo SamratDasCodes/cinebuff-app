@@ -16,6 +16,8 @@
       gtag('config', 'G-85SRQX986E');
     </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
         html { scroll-behavior: smooth; }
         body { 
             font-family: 'Inter', sans-serif; 
@@ -34,7 +36,7 @@
             background-image: var(--bg-image);
             background-size: cover;
             background-position: center;
-            filter: blur(4px) brightness(20%);
+            filter: blur(8px) brightness(10%);
             z-index: -1;
             transition: background-image 1s ease-in-out;
         }
@@ -42,6 +44,10 @@
             position: relative;
             z-index: 1;
             background-color: rgba(17, 24, 39, 0.5);
+        }
+        .font-nano {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 8px rgba(167, 139, 250, 0.4);
         }
         .modal-backdrop { background-color: rgba(0, 0, 0, 0.8); }
         .modal-content { background-color: #1f2937; color: #d1d5db; }
@@ -221,7 +227,7 @@
             color: #d1d5db; /* gray-300 */
             padding: 0.75rem;
             border-radius: 9999px;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease-in-out;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -233,6 +239,8 @@
         .nav-btn.active {
             background-color: #4f46e5; /* indigo-600 */
             color: #fff;
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
         }
 
         /* Home Filter Navigation Pill */
@@ -260,7 +268,7 @@
             background-color: transparent;
             color: #d1d5db;
             border-radius: 9999px;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease-in-out;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -277,6 +285,8 @@
         .home-filter-btn.active {
             background-color: #4f46e5;
             color: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
         }
         .home-filter-btn svg {
             width: 1.5rem;
@@ -285,6 +295,11 @@
         .home-filter-btn span {
             font-size: 0.65rem;
             margin-top: 0.25rem;
+        }
+
+        /* List tabs animation */
+        .list-tab-btn {
+            transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out;
         }
 
         /* Media Type Toggle */
@@ -387,29 +402,26 @@
     <div id="app" class="container mx-auto p-4 md:p-6 lg:p-8">
 
         <div id="home-page">
-             <header class="mb-6 relative flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="w-full md:w-1/3">
+             <!-- Header: Mobile top-left, Desktop centered -->
+             <header class="mb-4 relative flex flex-col md:flex-row items-center justify-between gap-y-2 md:gap-4">
+                <!-- Empty div for spacing on desktop -->
+                <div class="w-full md:w-1/3"></div>
+
+                <!-- Title and Subtitle Block -->
+                <div class="w-full md:w-1/3 text-left md:text-center">
+                    <div class="flex justify-start md:justify-center items-center">
+                        <!-- SVG Logo Removed -->
+                        <h1 class="text-3xl md:text-5xl font-bold text-white font-nano">ShowShelf</h1>
                     </div>
-                <div class="w-full md:w-1/3 text-center">
-                    <div class="flex justify-center items-center gap-3">
-                        <!-- SVG Logo -->
-                        <svg class="w-14 h-14 text-indigo-400" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="2" y="48" width="56" height="6" fill="currentColor" rx="2"></rect>
-                            <rect x="6" y="18" width="10" height="30" fill="currentColor" rx="1"></rect>
-                            <rect x="44" y="18" width="10" height="30" fill="currentColor" rx="1"></rect>
-                            <rect x="18" y="24" width="24" height="24" fill="currentColor" rx="2"></rect>
-                            <path d="M27 31L36 36L27 41V31Z" fill="#f3f4f6"></path>
-                        </svg>
-                        <h1 class="text-4xl md:text-5xl font-bold text-white">ShowShelf</h1>
-                    </div>
-                    <p class="text-lg text-gray-400">Your cinematic universe, beautifully organized.</p>
+                    <p class="text-sm md:text-lg text-gray-400 pl-1 md:pl-0">Your cinematic universe, beautifully organized.</p>
                 </div>
-                <div class="w-full md:w-1/3 flex justify-center md:justify-end gap-2">
-                     <!-- Old buttons are removed from here for the new nav bar -->
-                </div>
+
+                <!-- Empty div for spacing on desktop -->
+                <div class="w-full md:w-1/3"></div>
             </header>
             
-            <div class="sticky top-4 z-30 mb-10 w-full flex justify-center">
+            <!-- Navigation: Space below reduced -->
+            <div class="sticky top-4 z-30 mb-6 w-full flex justify-center">
                 <div class="flex justify-center px-4 w-full max-w-lg">
                     <nav id="home-filter-nav" class="home-filter-nav">
                         <button data-filter="trending" class="home-filter-btn active">
@@ -463,7 +475,7 @@
 
         <div id="discover-page" class="hidden">
             <header class="relative text-center mb-4">
-                <h2 class="text-4xl md:text-5xl font-bold text-white">Discover & Search</h2>
+                <h2 class="text-4xl md:text-5xl font-bold text-white font-nano">Discover & Search</h2>
             </header>
             <div id="search-section" class="bg-gray-900/50 p-6 rounded-xl mt-8 space-y-4">
                 <!-- Global Search Bar & AI Toggle -->
@@ -626,8 +638,10 @@
         </div>
 
         <div id="my-lists-page" class="hidden">
+             <!-- Header: Mobile top-left, Desktop centered with flex order -->
              <header class="relative flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
-                <div class="w-full md:w-1/3 text-center md:text-left">
+                <!-- User ID Input: On mobile, takes full width. On desktop, 1/3 width -->
+                <div class="w-full md:w-1/3 flex justify-start">
                      <div class="bg-gray-800/50 p-2 rounded-lg inline-block">
                         <label for="userIdInput" class="text-xs text-gray-400">Your User ID (for syncing):</label>
                         <div class="flex items-center gap-2 mt-1">
@@ -641,12 +655,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="w-full md:w-1/3 text-center">
-                    <h2 class="text-4xl md:text-5xl font-bold text-white">My Lists</h2>
+                
+                <!-- Title: On mobile, order-first to appear at the top, full-width, text-left. On desktop, centered -->
+                <div class="w-full md:w-1/3 text-left md:text-center order-first md:order-none">
+                    <h2 class="text-3xl md:text-5xl font-bold text-white font-nano">My Lists</h2>
                 </div>
-                <div class="w-full md:w-1/3 flex justify-center md:justify-end">
-                     <!-- Old home button removed -->
-                </div>
+            
+                <!-- Spacer div for desktop -->
+                <div class="w-full md:w-1/3"></div>
             </header>
             <div class="mt-8">
                 <div class="border-b border-gray-700">
@@ -2037,5 +2053,3 @@
     </script>
 </body>
 </html>
-
-
