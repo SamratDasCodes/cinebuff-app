@@ -153,17 +153,20 @@
 
         /* Trailer Button */
         .trailer-btn {
-          background: #dc2626; /* Tailwind red-600 */
-          color: #fff;
-          padding: 12px 20px;
-          border-radius: 8px;
-          font-size: 16px;
-          font-weight: bold;
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
+            background: #dc2626; /* Tailwind red-600 */
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 0.75rem;
         }
 
         .trailer-btn:hover {
@@ -189,9 +192,6 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr); /* 3 columns on mobile */
             gap: 0.75rem; /* Reduced gap */
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 0.5rem;
         }
          @media (min-width: 640px) { /* sm breakpoint */
             .recommended-grid {
@@ -445,6 +445,32 @@
         }
         .back-btn:hover {
             background-color: rgba(0,0,0,0.8);
+        }
+
+        /* Free to Watch Banner */
+        .free-banner {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+        }
+
+        /* OTT Logo */
+        .ott-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            margin: 2px;
+            background-color: rgba(255,255,255,0.1);
         }
     </style>
 </head>
@@ -1370,37 +1396,35 @@
 
                 let data;
                 let title = '';
-                let params = { sort_by: 'popularity.desc' };
-                if (lang !== 'all') {
+                let params = {};
+                 if (lang !== 'all') {
                     params.with_original_language = lang;
                 }
-                const today = new Date().toISOString().split('T')[0];
-                const discoverPath = `discover/${mediaType}`;
 
                 switch (filterType) {
                     case 'trending':
                         title = 'Trending Today';
-                        data = await fetchFromTMDb(discoverPath, params);
+                        data = await fetchFromTMDb(`trending/${mediaType}/day`, params);
                         break;
                     case 'recent':
-                        title = 'Recent Releases';
-                        const threeMonthsAgo = new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split('T')[0];
-                        const dateParam = mediaType === 'movie' ? 'primary_release_date' : 'first_air_date';
-                        params[`${dateParam}.gte`] = threeMonthsAgo;
-                        params[`${dateParam}.lte`] = today;
-                        data = await fetchFromTMDb(discoverPath, params);
+                        title = 'Currently In Theatres';
+                         if (mediaType === 'movie') {
+                            data = await fetchFromTMDb('movie/now_playing', params);
+                        } else {
+                            title = 'Airing Now';
+                            data = await fetchFromTMDb('tv/on_the_air', params);
+                        }
                         break;
                     case 'upcoming':
-                        if (mediaType === 'tv') {
-                            title = 'Popular New Series';
-                            params['first_air_date.gte'] = today;
+                        title = 'Upcoming';
+                         if (mediaType === 'movie') {
+                            data = await fetchFromTMDb('movie/upcoming', params);
                         } else {
-                            title = 'Upcoming Movies';
-                            const sixMonthsLater = new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0];
-                            params['primary_release_date.gte'] = today;
-                            params['primary_release_date.lte'] = sixMonthsLater;
+                            title = 'Popular New Series';
+                             const today = new Date().toISOString().split('T')[0];
+                            params['first_air_date.gte'] = today;
+                            data = await fetchFromTMDb(`discover/tv`, params);
                         }
-                        data = await fetchFromTMDb(discoverPath, params);
                         break;
                     case 'foryou':
                         await fetchAndDisplayForYou();
@@ -1671,7 +1695,7 @@
                     let ottHTML = `<span class="text-xs text-gray-500">N/A</span>`;
                     if(providers && providers.length > 0) {
                          ottHTML = providers.slice(0, 3).map(p => 
-                            `<span class="text-xs bg-gray-700 px-2 py-1 rounded-md whitespace-nowrap">${p.provider_name}</span>`
+                            `<img src="${imageBaseUrl}${p.logo_path}" alt="${p.provider_name}" class="ott-logo" title="${p.provider_name}">`
                         ).join('');
                     }
 
@@ -1776,9 +1800,9 @@
                 if (!container || !recommendationTitle) return;
 
                 recommendationTitle.textContent = 'AI Recommended';
-                container.innerHTML = Array(6).fill().map(() => `<div class="recommended-card"><div class="skeleton w-full aspect-[2/3]"></div><div class="p-2"><div class="skeleton h-4 w-3/4 mx-auto rounded"></div></div></div>`).join('');
+                container.innerHTML = Array(5).fill().map(() => `<div class="recommended-card"><div class="skeleton w-full aspect-[2/3]"></div><div class="p-2"><div class="skeleton h-4 w-3/4 mx-auto rounded"></div></div></div>`).join('');
                 
-                const prompt = `Based on the ${type} '${title}', recommend 6 other movies or TV shows. IMPORTANT: Your response must be ONLY a valid JSON array of strings. Each string must be in the "Title (Year)" format. Do not include any other text, explanations, or markdown formatting.`;
+                const prompt = `Based on the ${type} '${title}', recommend 5 other movies or TV shows. IMPORTANT: Your response must be ONLY a valid JSON array of strings. Each string must be in the "Title (Year)" format. Do not include any other text, explanations, or markdown formatting.`;
 
                 try {
                     const rawResponse = await callGemini(prompt);
@@ -1787,7 +1811,7 @@
 
                     if (!Array.isArray(recommendations)) throw new Error("Parsed data is not an array.");
 
-                    const searchPromises = recommendations.map(recString => {
+                    const searchPromises = recommendations.slice(0, 5).map(recString => {
                         const match = recString.match(/(.+) \((\d{4})\)/);
                         if (match) {
                             const recTitle = match[1].trim();
@@ -1817,7 +1841,7 @@
                             page: 1
                         });
                         if (recommendationsData && recommendationsData.results) {
-                            const similarItems = recommendationsData.results.filter(item => item.id !== id).slice(0, 6).map(mapApiDataForModal);
+                            const similarItems = recommendationsData.results.filter(item => item.id !== id).slice(0, 5).map(mapApiDataForModal);
                             container.innerHTML = similarItems.map(renderSimilarMovieCard).join('');
                         } else {
                             container.innerHTML = `<p class="text-sm text-gray-400 col-span-full">Could not load recommendations.</p>`;
@@ -1836,7 +1860,7 @@
                 movieModal.querySelector('.back-btn').classList.toggle('hidden', pageHistory.length === 0);
                 
                 if (pageHistory.length === 0) {
-                    pageHistory.push(discoverPage.classList.contains('hidden') ? showHomePage : showDiscoverPage);
+                     pageHistory.push(discoverPage.classList.contains('hidden') ? showHomePage : showDiscoverPage);
                 }
 
 
@@ -1867,7 +1891,11 @@
                 const backdropUrl = data.backdrop_path ? `${backdropBaseUrl}${data.backdrop_path}` : '';
                 
                 const providers = data['watch/providers']?.results?.IN?.flatrate || [];
-                const providersHTML = providers.length > 0 ? providers.map(p => `<span class="text-xs bg-gray-700 px-2 py-1 rounded-md whitespace-nowrap">${p.provider_name}</span>`).join('') : 'Not available on streaming.';
+                 const freeProviders = data['watch/providers']?.results?.IN?.free || [];
+                const providersHTML = providers.length > 0 ? providers.map(p => `<img src="${imageBaseUrl}${p.logo_path}" alt="${p.provider_name}" class="ott-logo" title="${p.provider_name}">`).join('') : '<span class="text-sm text-gray-400">Not on streaming services.</span>';
+
+                const freeBannerHTML = freeProviders.length > 0 ? `<div class="free-banner">Available to Watch for Free!</div>` : '';
+
 
                 let certification = 'N/A';
                 if (type === 'movie' && data.release_dates) {
@@ -1888,44 +1916,47 @@
                 movieModalContent.innerHTML = `
                 <div class="movie-detail-page rounded-lg" style="background-image: url('${backdropUrl}')">
                     <div class="overlay p-4 md:p-6 rounded-lg">
-                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                            <div class="lg:col-span-3">
-                                <div class="grid grid-cols-1 sm:grid-cols-5 gap-6">
-                                    <div class="poster-section sm:col-span-2"><img src="${data.poster_path ? imageBaseUrl + data.poster_path : 'https://placehold.co/500x750'}" alt="${title}" class="w-full h-auto shadow-lg"></div>
-                                    <div class="sm:col-span-3 text-white">
-                                        <h1 class="title">${title} <span class="text-2xl font-normal text-gray-300">(${year})</span></h1>
-                                        <div class="info space-y-3 text-gray-300">
-                                            <p>Released: ${formatDate(releaseDate)}</p>
-                                            <p class="max-h-[120px] overflow-y-auto pr-2">${data.overview || 'No overview available.'}</p>
-                                            <p><strong>Genre:</strong> ${data.genres.map(g => g.name).join(', ')}</p>
-                                            <p><strong>${type === 'movie' ? 'Director' : 'Creator'}:</strong> ${directorOrCreatorHTML || 'N/A'}</p>
-                                            <p><strong>Cast:</strong> ${cast || 'N/A'}</p>
-                                            <p><strong>Rating:</strong> ⭐ ${data.vote_average.toFixed(1)}/10</p>
-                                            <p><strong>Certification:</strong> ${certification}</p>
-                                            <p><strong>Available On:</strong> <span class="flex flex-wrap gap-2 mt-1">${providersHTML}</span></p>
-                                        </div>
-                                         <div class="mt-4 flex space-x-2">
-                                            <button data-status="watchlist" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Watchlist"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7z"></path></svg></button>
-                                            <button data-status="watched" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Mark as Watched"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></button>
-                                            <button data-status="favourite" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Favourites"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg></button>
-                                        </div>
-                                        <div class="mt-4">${trailerBtn}</div>
+                        ${freeBannerHTML}
+                        <div class="grid grid-cols-1 sm:grid-cols-5 gap-6 mb-6">
+                            <div class="poster-section sm:col-span-2">
+                                <img src="${data.poster_path ? imageBaseUrl + data.poster_path : 'https://placehold.co/500x750'}" alt="${title}" class="w-full h-auto shadow-lg">
+                                ${trailerBtn}
+                            </div>
+                            <div class="sm:col-span-3 text-white">
+                                <h1 class="title">${title} <span class="text-2xl font-normal text-gray-300">(${year})</span></h1>
+                                <div class="info space-y-3 text-gray-300">
+                                    <p>Released: ${formatDate(releaseDate)}</p>
+                                    <p class="max-h-[120px] overflow-y-auto pr-2">${data.overview || 'No overview available.'}</p>
+                                    <p><strong>Genre:</strong> ${data.genres.map(g => g.name).join(', ')}</p>
+                                    <p><strong>${type === 'movie' ? 'Director' : 'Creator'}:</strong> ${directorOrCreatorHTML || 'N/A'}</p>
+                                    <p><strong>Cast:</strong> ${cast || 'N/A'}</p>
+                                    <p><strong>Rating:</strong> ⭐ ${data.vote_average.toFixed(1)}/10</p>
+                                    <p><strong>Certification:</strong> ${certification}</p>
+                                    <div class="flex items-start">
+                                        <strong class="mr-2 mt-1.5">Available On:</strong>
+                                        <div class="flex flex-wrap items-center">${providersHTML}</div>
                                     </div>
+                                </div>
+                                <div class="mt-4 flex space-x-2">
+                                    <button data-status="watchlist" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Watchlist"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7z"></path></svg></button>
+                                    <button data-status="watched" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Mark as Watched"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></button>
+                                    <button data-status="favourite" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Favourites"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg></button>
                                 </div>
                             </div>
-                            <div class="lg:col-span-2 flex flex-col">
-                                <section class="recommendations mb-4 flex-grow">
-                                    <h2 id="recommendation-title">AI Recommended</h2>
-                                    <div class="recommended-grid" id="ai-recommendations"></div>
-                                </section>
-                                <div class="p-4 bg-gray-900/50 rounded-lg">
-                                     <div class="flex items-center gap-4 mb-3">
-                                        <h3 class="text-xl font-bold text-red-500 whitespace-nowrap">Ask AI:</h3>
-                                        <input type="text" id="ai-query" placeholder="e.g., Explain the ending..." class="w-full p-2 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-red-500">
-                                        <button id="ai-ask-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md">Ask</button>
-                                    </div>
-                                    <div id="ai-response" class="text-gray-300 bg-gray-800 p-4 rounded-md min-h-[100px]"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <section class="recommendations">
+                                <h2 id="recommendation-title">AI Recommended</h2>
+                                <div class="recommended-grid" id="ai-recommendations"></div>
+                            </section>
+                            <div class="p-4 bg-gray-900/50 rounded-lg">
+                                <div class="flex items-center gap-4 mb-3">
+                                <h3 class="text-xl font-bold text-red-500 whitespace-nowrap">Ask AI:</h3>
+                                <input type="text" id="ai-query" placeholder="e.g., Explain the ending..." class="w-full p-2 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-red-500">
+                                <button id="ai-ask-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md">Ask</button>
                                 </div>
+                                <div id="ai-response" class="text-gray-300 bg-gray-800 p-4 rounded-md min-h-[100px]"></div>
                             </div>
                         </div>
                     </div>
@@ -2223,8 +2254,8 @@
             });
             window.addEventListener('click', (e) => { if (!genreFilterContainer.contains(e.target)) genreFilterDropdown.classList.add('hidden'); });
             
-            closeModalBtn.addEventListener('click', () => { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; goBack(); });
-            movieModal.addEventListener('click', (e) => { if (e.target === movieModal) { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; goBack(); } });
+            closeModalBtn.addEventListener('click', () => { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; pageHistory = []; });
+            movieModal.addEventListener('click', (e) => { if (e.target === movieModal) { movieModal.classList.add('hidden'); document.body.style.overflow = 'auto'; pageHistory = []; } });
 
             window.addEventListener('scroll', () => {
                 const isNearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500;
