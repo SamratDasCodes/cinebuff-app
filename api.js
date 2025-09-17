@@ -38,7 +38,8 @@ async function fetchFromTMDb(endpoint, params = {}) {
  */
 async function callGemini(prompt) {
     try {
-        // This makes a request to the gemini.py serverless function
+        // FIX: Corrected comment to reference the correct serverless function file.
+        // This makes a request to the gemini.js serverless function
         const response = await fetch('/api/gemini', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
