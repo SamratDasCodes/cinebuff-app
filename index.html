@@ -31,11 +31,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('backdrop.jpg');
+            background-image: var(--bg-image);
             background-size: cover;
             background-position: center;
             filter: blur(8px) brightness(10%);
             z-index: -1;
+            transition: background-image 1s ease-in-out;
         }
         #app {
             position: relative;
@@ -83,6 +84,11 @@
         .skeleton { position: relative; overflow: hidden; background-color: #374151; }
         .skeleton::after { position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.3) 60%, rgba(255, 255, 255, 0)); animation: shimmer 2s infinite; content: ''; }
         
+        .swiper-container {
+            overflow: hidden;
+            width: 100%;
+        }
+
         /* ===== Movie Detail Page Custom CSS ===== */
         .movie-detail-page {
           background-size: cover;
@@ -262,6 +268,7 @@
             font-weight: 600;
             width: 5.5rem;
             height: 3.5rem;
+            flex-shrink: 0;
         }
         .home-filter-btn:hover {
             background-color: rgba(75, 85, 99, 0.5);
@@ -279,92 +286,6 @@
             font-size: 0.65rem;
             margin-top: 0.25rem;
         }
-
-        /* Carousel Styles */
-        #home-carousel-nav {
-            display: none;
-        }
-        .swiper-button-next, .swiper-button-prev {
-            position: fixed;
-            bottom: 1.5rem;
-            background: rgba(55, 65, 81, 0.8);
-            backdrop-filter: blur(4px);
-            color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 9999px;
-            transition: background-color 0.2s;
-            font-size: 1.5rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 40;
-            border: 1px solid rgba(75, 85, 99, 0.6);
-        }
-         .swiper-button-prev {
-            left: calc(50% - 110px);
-            transform: translateX(-100%);
-        }
-        .swiper-button-next {
-            right: calc(50% - 110px);
-            transform: translateX(100%);
-        }
-        .swiper-button-next:hover, .swiper-button-prev:hover {
-            background-color: #4f46e5;
-            color: white !important;
-        }
-        .swiper-button-next::after, .swiper-button-prev::after {
-            display: none;
-        }
-        .swiper-button-disabled {
-            opacity: 0.3 !important;
-            cursor: not-allowed;
-            pointer-events: auto !important;
-        }
-        
-        @media (min-width: 768px) {
-            #home-carousel-nav {
-                display: block;
-            }
-        }
-
-        /* Mobile Swiper Grid Hint */
-        @media (max-width: 767px) {
-            #featured-section .swiper-container {
-                overflow: hidden;
-                position: relative;
-            }
-             #featured-section .swiper-container::before,
-             #featured-section .swiper-container::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                width: 40px;
-                pointer-events: none;
-                z-index: 2;
-                transition: opacity 0.3s ease;
-            }
-            #featured-section .swiper-container::before {
-                left: 0;
-                background: linear-gradient(to left, rgba(17, 24, 39, 0), rgba(17, 24, 39, 0.7));
-            }
-            #featured-section .swiper-container::after {
-                right: 0;
-                background: linear-gradient(to right, rgba(17, 24, 39, 0), rgba(17, 24, 39, 0.7));
-            }
-             #featured-section .swiper-container.swiper-is-beginning::before {
-                opacity: 0;
-            }
-             #featured-section .swiper-container.swiper-is-end::after {
-                opacity: 0;
-            }
-            #home-carousel-nav {
-                display: none !important;
-            }
-        }
-
 
         /* Media Type Toggle */
         .media-type-btn {
@@ -428,7 +349,7 @@
             }
             .results-grid .result-card {
                 display: grid;
-                grid-template-columns: 80px 1fr 1fr 100px 100px 140px 50px;
+                grid-template-columns: 80px 1fr 1fr 120px 80px 80px 50px;
                 gap: 1rem;
                 border-radius: 0;
                 border: 0;
@@ -488,11 +409,11 @@
                 </div>
             </header>
             
-            <div class="sticky top-4 z-30 mb-10 w-full">
-                <div class="flex justify-center px-4">
+            <div class="sticky top-4 z-30 mb-10 w-full flex justify-center">
+                <div class="flex justify-center px-4 w-full max-w-lg">
                     <nav id="home-filter-nav" class="home-filter-nav">
                         <button data-filter="trending" class="home-filter-btn active">
-                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.934l-6.796 12.08a1 1 0 00.662 1.618h10.944a1 1 0 00.662-1.618L13.24 3.104a1.001 1.001 0 00-.822-.551zM11 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>
+                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 4a1 1 0 000 2 1 1 0 011 1v1a1 1 0 11-2 0V7a3 3 0 015.207-2.293 1 1 0 001.593-1.414A5 5 0 007 4zm4 12a1 1 0 000-2 1 1 0 01-1-1v-1a1 1 0 112 0v1a3 3 0 01-5.207 2.293 1 1 0 00-1.593 1.414A5 5 0 0011 16z" clip-rule="evenodd"></path></svg>
                             <span>Trending</span>
                         </button>
                         <button data-filter="foryou" class="home-filter-btn">
@@ -500,15 +421,15 @@
                             <span>For You</span>
                         </button>
                         <button data-filter="recent" class="home-filter-btn">
-                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
-                            <span>Recent</span>
+                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z"></path></svg>
+                            <span>Released</span>
                         </button>
                         <button data-filter="upcoming" class="home-filter-btn">
-                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z"></path></svg>
+                             <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
                             <span>Upcoming</span>
                         </button>
                         <button data-filter="surprise" class="home-filter-btn" title="Surprise Me">
-                             <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h1.17C5.06 5.687 5 5.35 5 5zm4 1a1 1 0 10-2 0v1h2V6zM3 9v7h14V9H3z" clip-rule="evenodd"></path><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path></svg>
+                             <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3.001 3.001 0 0115 5h.012a2 2 0 011.988 2.304l-1.536 6.144A2 2 0 0113.464 15H6.536a2 2 0 01-1.988-1.552L3.012 7.304A2 2 0 015 5zm5-2a1 1 0 00-1 1v1a1 1 0 102 0V4a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
                              <span>Surprise</span>
                         </button>
                     </nav>
@@ -516,9 +437,6 @@
             </div>
     
             <section id="featured-section" class="mb-12 bg-gray-900/50 p-6 rounded-xl relative">
-                <div class="flex justify-center items-center mb-6">
-                    <h2 id="featured-title" class="text-3xl font-bold text-indigo-300">Trending Today</h2>
-                </div>
                 <div class="flex flex-col md:flex-row flex-wrap justify-center items-center gap-4 mb-6">
                     <div id="language-filter-container" class="flex justify-center items-center gap-2">
                         <button data-lang="all" class="lang-filter-btn btn-primary text-sm py-1 px-3 rounded-md">All</button>
@@ -691,12 +609,12 @@
                
                <div id="movie-list-container" class="hidden">
                     <!-- Desktop Headers -->
-                    <div class="hidden md:grid grid-cols-[80px_1fr_1fr_100px_100px_140px_50px] gap-4 p-4 bg-gray-800 rounded-t-lg text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    <div class="hidden md:grid grid-cols-[80px_1fr_1fr_120px_80px_80px_50px] gap-4 p-4 bg-gray-800 rounded-t-lg text-xs font-medium text-gray-300 uppercase tracking-wider">
                        <span>Poster</span>
                        <span class="col-span-2">Title & Genre</span>
+                       <span class="text-center">Available On</span>
                        <span>Rating</span>
                        <span>Year</span>
-                       <span class="text-center">Available On</span>
                        <span class="text-center">Trailer</span>
                     </div>
                     <!-- Results Grid for Mobile and Desktop -->
@@ -748,12 +666,6 @@
                     </div>
             </div>
         </div>
-    </div>
-
-    <!-- Home Carousel Navigation -->
-    <div id="home-carousel-nav">
-        <button id="home-swiper-prev" class="swiper-button-prev"><b>&larr;</b></button>
-        <button id="home-swiper-next" class="swiper-button-next"><b>&rarr;</b></button>
     </div>
 
     <!-- Floating Navigation Bar -->
@@ -893,6 +805,22 @@
             const languageFilterContainer = document.getElementById('language-filter-container');
             const mediaTypeToggleContainer = document.getElementById('media-type-toggle-container');
             const sortFilter = document.getElementById('sortFilter');
+
+            const setRandomBackgroundImage = async () => {
+                try {
+                    const data = await fetchFromTMDb('discover/movie', { sort_by: 'popularity.desc' });
+                    if (data && data.results) {
+                        const moviesWithBackdrops = data.results.filter(movie => movie.backdrop_path);
+                        if (moviesWithBackdrops.length > 0) {
+                            const randomMovie = moviesWithBackdrops[Math.floor(Math.random() * moviesWithBackdrops.length)];
+                            const backgroundImageUrl = `${backdropBaseUrl}${randomMovie.backdrop_path}`;
+                            document.body.style.setProperty('--bg-image', `url('${backgroundImageUrl}')`);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Failed to set random background image:", error);
+                }
+            };
             
             // --- BOOKMARK LOGIC ---
             const setupUserId = async () => {
@@ -1048,7 +976,6 @@
                 discoverPage.classList.add('hidden');
                 myListsPage.classList.add('hidden');
                 homeFilterNav.parentElement.parentElement.classList.remove('hidden');
-                document.getElementById('home-carousel-nav')?.classList.remove('hidden');
                 updateNavActiveState('home');
             };
 
@@ -1057,7 +984,6 @@
                 discoverPage.classList.remove('hidden');
                 myListsPage.classList.add('hidden');
                 homeFilterNav.parentElement.parentElement.classList.add('hidden');
-                 document.getElementById('home-carousel-nav')?.classList.add('hidden');
                 window.scrollTo(0, 0);
                 updateNavActiveState('discover');
             };
@@ -1067,7 +993,6 @@
                 discoverPage.classList.add('hidden');
                 myListsPage.classList.remove('hidden');
                 homeFilterNav.parentElement.parentElement.classList.add('hidden');
-                document.getElementById('home-carousel-nav')?.classList.add('hidden');
                 renderBookmarkList('watchlist'); 
                 window.scrollTo(0, 0);
                 updateNavActiveState('bookmarks');
@@ -1089,6 +1014,7 @@
                     thumbnail: apiResult.poster_path ? `${imageBaseUrl}${apiResult.poster_path}` : 'https://placehold.co/500x750/1f2937/ffffff?text=No+Image',
                     type: isMovie ? 'movie' : 'tv',
                     genre_ids: apiResult.genre_ids || [],
+                    popularity: apiResult.popularity || 0,
                 };
             };
 
@@ -1105,6 +1031,10 @@
                         <div class="flex flex-wrap gap-2 mt-2 md:hidden" id="ott-mobile-${item.id}-${item.type}"></div>
                     </div>
 
+                    <div class="result-card-info-desktop hidden md:flex items-center justify-center flex-wrap gap-2" id="ott-${item.id}-${item.type}">
+                        <div class="loader-sm"></div>
+                    </div>
+
                     <div class="result-card-info-desktop hidden md:block text-gray-200 font-semibold">
                          <span class="flex items-center">
                             <svg class="w-4 h-4 text-yellow-400 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.368-2.447a1 1 0 00-1.175 0l-3.368 2.447c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.072 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"></path></svg>
@@ -1113,10 +1043,6 @@
                     </div>
 
                     <div class="result-card-info-desktop hidden md:block">${item.year}</div>
-
-                    <div class="result-card-info-desktop hidden md:flex items-center justify-center flex-wrap gap-2" id="ott-${item.id}-${item.type}">
-                        <div class="loader-sm"></div>
-                    </div>
 
                     <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(item.title + ' ' + item.year + ' trailer')}" target="_blank" rel="noopener noreferrer" class="youtube-link inline-block text-gray-400 hover:text-red-500 transition-colors text-center" title="Search Trailer on YouTube" onclick="event.stopPropagation()">
                         <svg class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418C3.326,4.648,2.648,5.326,2.418,6.186C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.86-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"></path></svg>
@@ -1209,9 +1135,9 @@
                         <div class="skeleton h-5 w-3/4 rounded"></div>
                         <div class="skeleton h-4 w-1/2 mt-2 rounded"></div>
                     </div>
-                    <div class="result-card-info-desktop hidden md:flex items-center"> <div class="skeleton h-5 w-1/2 rounded"></div></div>
-                    <div class="result-card-info-desktop hidden md:flex items-center"> <div class="skeleton h-5 w-1/2 rounded"></div></div>
                     <div class="result-card-info-desktop hidden md:flex items-center"> <div class="skeleton h-7 w-12 rounded"></div></div>
+                    <div class="result-card-info-desktop hidden md:flex items-center"> <div class="skeleton h-5 w-1/2 rounded"></div></div>
+                    <div class="result-card-info-desktop hidden md:flex items-center"> <div class="skeleton h-5 w-1/2 rounded"></div></div>
                     <div class="hidden md:flex items-center justify-center"> <div class="skeleton h-7 w-7 rounded-full"></div></div>
                 </div>`;
 
@@ -1315,7 +1241,7 @@
                     }
                 }
                 surpriseBtn.disabled = false;
-                surpriseBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h1.17C5.06 5.687 5 5.35 5 5zm4 1a1 1 0 10-2 0v1h2V6zM3 9v7h14V9H3z" clip-rule="evenodd"></path><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path></svg><span class="hidden sm:inline">Surprise</span>`;
+                surpriseBtn.innerHTML = `<svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3.001 3.001 0 0115 5h.012a2 2 0 011.988 2.304l-1.536 6.144A2 2 0 0113.464 15H6.536a2 2 0 01-1.988-1.552L3.012 7.304A2 2 0 015 5zm5-2a1 1 0 00-1 1v1a1 1 0 102 0V4a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg><span class="hidden sm:inline">Surprise</span>`;
             };
 
             // --- Carousel & Home Section Logic ---
@@ -1324,34 +1250,20 @@
                     swiper.destroy(true, true);
                 }
                 swiper = new Swiper('.swiper-container', {
-                    slidesPerView: 2,
+                    slidesPerView: 2.2,
                     spaceBetween: 16,
-                    navigation: {
-                        nextEl: '#home-swiper-next',
-                        prevEl: '#home-swiper-prev',
-                    },
                     breakpoints: {
                         768: {
-                            slidesPerView: 4,
+                            slidesPerView: 4.5,
                             spaceBetween: 24,
                         },
                         1024: {
-                            slidesPerView: 5,
+                            slidesPerView: 5.5,
                             spaceBetween: 24,
                         },
-                    },
-                     on: {
-                        progress: function () {
-                            const swiperContainer = this.el;
-                            if (!swiperContainer) return;
-                            swiperContainer.classList.toggle('swiper-is-beginning', this.isBeginning);
-                            swiperContainer.classList.toggle('swiper-is-end', this.isEnd);
-                        },
-                        update: function() {
-                           const swiperContainer = this.el;
-                           if (!swiperContainer) return;
-                           swiperContainer.classList.toggle('swiper-is-beginning', this.isBeginning);
-                           swiperContainer.classList.toggle('swiper-is-end', this.isEnd);
+                         1280: {
+                            slidesPerView: 6.5,
+                            spaceBetween: 24,
                         }
                     },
                 });
@@ -1400,7 +1312,7 @@
                         return;
                 }
                 
-                featuredTitle.textContent = title;
+                if (featuredTitle) featuredTitle.textContent = title;
                 if (data && data.results) {
                     const mappedData = data.results.map(mapApiData);
                     const slidesHTML = mappedData.map(item => `<div class="swiper-slide">${renderMovieGridCard(item)}</div>`).join('');
@@ -1412,7 +1324,7 @@
             };
             
             const fetchAndDisplayForYou = async () => {
-                featuredTitle.textContent = 'For You';
+                if (featuredTitle) featuredTitle.textContent = 'For You';
                 renderCarouselSkeleton();
                 initSwiper();
 
@@ -2106,6 +2018,7 @@
             // --- INITIALIZATION ---
             const initializeApp = async () => {
                 loader.style.display = 'flex';
+                await setRandomBackgroundImage();
                 await setupUserId();
                 await loadStaticData();
                 initSwiper(); 
