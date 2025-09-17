@@ -350,8 +350,18 @@
         /* New Discover Page Styles */
         #results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(2, 1fr); /* Mobile default */
             gap: 1rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+            #results-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (min-width: 1024px) { /* lg breakpoint */
+            #results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
         }
         
         /* Cast & Director Details Page */
@@ -400,24 +410,6 @@
             margin: 2px;
             background-color: rgba(255,255,255,0.1);
         }
-        /* Cast Gallery */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-        }
-        .gallery-grid img {
-            width: 100%;
-            aspect-ratio: 16/9;
-            object-fit: cover;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-        }
-         .gallery-grid img:hover {
-            transform: scale(1.05);
-        }
-
     </style>
 </head>
 <body>
@@ -508,7 +500,7 @@
                             <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
                         <div class="relative w-full sm:w-48">
                             <select id="searchTypeDropdown" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
                                 <option value="title" selected>Title</option>
@@ -521,6 +513,9 @@
                             </div>
                         </div>
                         <button id="applyFiltersBtn" class="btn-primary font-bold py-3 px-6 rounded-md">Search</button>
+                        <button id="resetFiltersBtn" class="btn-secondary p-3 rounded-md" title="Reset Filters">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHnSURBVEhL7ZVLSwJRFEb/b+9EUTdDUBBdRAdB5yJ8oKGdCCEiJdcl2mQhi2iaJdYSC3sJ14joErpppq2I4p7TXL9w7u7MhX7g4XDu3Pnf/3x3zhkYv3/k/g+gB6iA8qYDTsED4/EH2EvAJ0yBhmwYc4bXQDa8CUl4BK2bV6sAHeA/PAUvQpa8iG2An0A7tAYL4Bq07Z49Ah4CV+Aa7EEHkAEHwBlYg3XQh38A3oEzsAWr4DXYBC7BOFiDBXAE3j2bF2uAXPAVfAcn4EaYhOKxAh6A93AEnoYzcAfeA/C8Ea3DITgGv8KlsP2yLqgDFvB+yA7sghvgGmyDFfBf3wVOwD24BS/BQUgGn6E2VJh8L6gDrpbbgG2wBQpgjvwKzcA7cAV2QTe8BPGU7A98B7fgEHyFNlgrk/1T6A3OQBrSUfBw6A3OQAjsgnvwFNwCF6E0/AJbsA3WYAlshVYYAnvgJ9iB++AmLPg2pT02DDtg1DfgK5gCg6AG1iAJfAanoQT8BPsgA7YBw2ARrIEG2AIdcAC+gjdgBWyB8/B75A5Ygqfghs5G7YE5oE+AB3AMlsAEaMA7cAK+g3Pg8M+gD0yBv2EEXIIf4Bw4AzfgDLwGP8LpSBf0B2NhEG3QeCibAAAAAElFTkSuQmCC" alt="Reset" class="w-5 h-5">
+                        </button>
                     </div>
                 </div>
                 
@@ -612,9 +607,6 @@
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                             </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-start md:justify-end items-center pt-5">
-                            <button id="resetFiltersBtn" class="btn-secondary font-bold py-2 px-6 rounded-md w-full sm:w-auto">Reset Filters</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -622,17 +614,21 @@
             <section>
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
                     <h2 id="grid-title" class="text-2xl font-semibold text-indigo-400 mb-4 sm:mb-0">Top Rated Movies & Series</h2>
-                    <div class="flex items-center gap-4">
-                         <div class="w-full sm:w-auto relative">
-                            <select id="sortFilter" class="w-full sm:w-48 p-2 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="popularity.desc">Sort by Popularity</option>
-                                <option value="vote_average.desc">Sort by Rating</option>
-                                <option value="primary_release_date.desc">Sort by Release Date</option>
-                            </select>
-                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
-                        </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-full sm:w-auto relative">
+                           <select id="sortFilter" class="w-full sm:w-44 p-2 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none pr-8">
+                               <option value="popularity">Popularity</option>
+                               <option value="vote_average">Rating</option>
+                               <option value="primary_release_date">Release Date</option>
+                           </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                               <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                           </div>
+                       </div>
+                       <button id="sortOrderBtn" class="btn-secondary p-2 rounded-md" data-order="desc" title="Toggle Sort Order">
+                           <svg id="sort-desc-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4 4m0 0l4-4m-4 4v-8"></path></svg>
+                           <svg id="sort-asc-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v8"></path></svg>
+                       </button>
                         <button id="exportCsvBtn" class="btn-secondary font-bold py-2 px-4 rounded-md hidden">Export</button>
                     </div>
                 </div>
@@ -957,7 +953,7 @@
                     selectedCertification: certificationFilter.value,
                     contentType: contentTypeFilter.value,
                     selectedLanguage: document.getElementById('languageFilter').value,
-                    sortBy: sortFilter.value
+                    sortBy: `${sortFilter.value}.${document.getElementById('sortOrderBtn').dataset.order}`
                 };
                 localStorage.setItem('movieHubFilters', JSON.stringify(filters));
             };
@@ -977,7 +973,20 @@
                 maxRatingValue.textContent = parseFloat(maxRatingFilter.value).toFixed(1);
                 contentTypeFilter.value = filters.contentType || 'both';
                 document.getElementById('languageFilter').value = filters.selectedLanguage || '';
-                sortFilter.value = filters.sortBy || 'popularity.desc';
+                
+                if (filters.sortBy) {
+                    const [value, order] = filters.sortBy.split('.');
+                    sortFilter.value = value || 'popularity';
+                    const sortOrderBtn = document.getElementById('sortOrderBtn');
+                    sortOrderBtn.dataset.order = order || 'desc';
+                    document.getElementById('sort-desc-icon').classList.toggle('hidden', order === 'asc');
+                    document.getElementById('sort-asc-icon').classList.toggle('hidden', order === 'desc');
+                } else {
+                    sortFilter.value = 'popularity';
+                    document.getElementById('sortOrderBtn').dataset.order = 'desc';
+                    document.getElementById('sort-desc-icon').classList.remove('hidden');
+                    document.getElementById('sort-asc-icon').classList.add('hidden');
+                }
 
                 if (filters.selectedGenres && filters.selectedGenres.length > 0) {
                     selectedGenres = filters.selectedGenres;
@@ -1017,7 +1026,11 @@
                 document.querySelectorAll('#genreFilterDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
                 renderGenrePills();
                 document.getElementById('languageFilter').value = '';
-                sortFilter.value = 'popularity.desc';
+                sortFilter.value = 'popularity';
+                const sortOrderBtn = document.getElementById('sortOrderBtn');
+                sortOrderBtn.dataset.order = 'desc';
+                document.getElementById('sort-desc-icon').classList.remove('hidden');
+                document.getElementById('sort-asc-icon').classList.add('hidden');
                 localStorage.removeItem('movieHubFilters');
             }
 
@@ -1541,7 +1554,9 @@
                 
                 const contentType = contentTypeFilter.value;
                 const selectedYear = yearFilter.value;
-                const sortBy = sortFilter.value;
+                const sortByValue = sortFilter.value;
+                const sortOrder = document.getElementById('sortOrderBtn').dataset.order;
+                const sortBy = `${sortByValue}.${sortOrder}`;
                 const minRating = minRatingFilter.value;
                 const maxRating = maxRatingFilter.value;
                 const selectedLanguage = document.getElementById('languageFilter').value;
@@ -2120,6 +2135,19 @@
                 toggleFiltersBtn.querySelector('svg').style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
             });
 
+            const sortOrderBtn = document.getElementById('sortOrderBtn');
+            sortOrderBtn.addEventListener('click', (e) => {
+                const btn = e.currentTarget;
+                const newOrder = btn.dataset.order === 'desc' ? 'asc' : 'desc';
+                btn.dataset.order = newOrder;
+                document.getElementById('sort-desc-icon').classList.toggle('hidden', newOrder === 'asc');
+                document.getElementById('sort-asc-icon').classList.toggle('hidden', newOrder === 'desc');
+
+                if (resultsGrid.innerHTML.trim() !== '' && !loader.style.display) {
+                    handleSearchAndDiscover(false);
+                }
+            });
+
             sortFilter.addEventListener('change', () => {
                 if(resultsGrid.innerHTML.trim() !== '' && !loader.style.display) { 
                     handleSearchAndDiscover(false);
@@ -2310,6 +2338,7 @@
                 await setRandomBackgroundImage();
                 await setupUserId();
                 await loadStaticData();
+                initSwiper();
                 
                 if (loadFiltersFromLocalStorage()) {
                     showDiscoverPage();
@@ -2326,4 +2355,5 @@
     </script>
 </body>
 </html>
+
 
