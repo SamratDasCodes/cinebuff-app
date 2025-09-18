@@ -1733,11 +1733,7 @@
                             gridTitle.textContent = 'Filtered Results';
                     }
                     
-                    let movieData = null, tvData = null;
-                    let extraMovieData = null;
-
                     if (useDiscover || !searchTerm) {
-                        // Common parameters for both movies and TV
                         const commonParams = {
                             page: currentPage,
                             with_genres: manualGenreIds.join(','),
@@ -1748,33 +1744,45 @@
                         if (maxRating < 10) commonParams['vote_average.lte'] = maxRating;
                         if (selectedLanguage) commonParams.with_original_language = selectedLanguage;
 
-                        // Movie-specific parameters
-                        const movieParams = { ...commonParams, sort_by: sortBy };
-                        if (selectedYear) movieParams.primary_release_year = selectedYear;
+                        let promises = [];
+                        let moviePages = 0, tvPages = 0;
+
+                        if (contentType === 'movie' || contentType === 'both') {
+                            const movieParams = { ...commonParams, sort_by: sortBy };
+                            if (selectedYear) movieParams.primary_release_year = selectedYear;
+                            promises.push(fetchFromTMDb('discover/movie', movieParams));
+                            promises.push(fetchFromTMDb('discover/movie', { ...movieParams, page: currentPage + 1 }));
+                        }
+
+                        if (contentType === 'tv' || contentType === 'both') {
+                            const tvParams = { ...commonParams, sort_by: sortBy.replace('primary_release_date', 'first_air_date') };
+                            if (selectedYear) tvParams.first_air_date_year = selectedYear;
+                            promises.push(fetchFromTMDb('discover/tv', tvParams));
+                            promises.push(fetchFromTMDb('discover/tv', { ...tvParams, page: currentPage + 1 }));
+                        }
                         
-                        // TV-specific parameters (using correct year and sort keys)
-                        const tvParams = { ...commonParams, sort_by: sortBy.replace('primary_release_date', 'first_air_date') };
-                        if (selectedYear) tvParams.first_air_date_year = selectedYear;
-
-
-                        [movieData, tvData, extraMovieData] = await Promise.all([
-                            (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('discover/movie', movieParams) : Promise.resolve(null),
-                            (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('discover/tv', tvParams) : Promise.resolve(null),
-                            (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('discover/movie', { ...movieParams, page: currentPage + 1}) : Promise.resolve(null)
-                        ]);
-                        finalResults = [...(movieData?.results || []), ...(tvData?.results || []), ...(extraMovieData?.results || [])];
+                        const allResults = await Promise.all(promises);
+                        finalResults = allResults.flatMap(res => res?.results || []);
+                        
+                        // Determine total pages from the first valid response of each type
+                        const movieData = allResults.find(res => res && res.results && (res.results[0]?.release_date || res.results[0]?.media_type === 'movie'));
+                        const tvData = allResults.find(res => res && res.results && (res.results[0]?.first_air_date || res.results[0]?.media_type === 'tv'));
+                        moviePages = movieData?.total_pages || 0;
+                        tvPages = tvData?.total_pages || 0;
+                        totalPages = Math.min(Math.max(moviePages, tvPages), 500);
 
                     } else { 
                         const queryParams = { query: searchTerm, page: currentPage };
                         const extraQueryParams = { query: searchTerm, page: currentPage + 1 };
 
-                        [movieData, tvData, extraMovieData] = await Promise.all([
+                        const [movieData, tvData, extraMovieData, extraTvData] = await Promise.all([
                             (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('search/movie', queryParams) : Promise.resolve(null),
                             (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('search/tv', queryParams) : Promise.resolve(null),
                             (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('search/movie', extraQueryParams) : Promise.resolve(null),
+                             (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('search/tv', extraQueryParams) : Promise.resolve(null)
                         ]);
                         
-                        const combinedResults = [...(movieData?.results || []), ...(tvData?.results || []), ...(extraMovieData?.results || [])];
+                        const combinedResults = [...(movieData?.results || []), ...(tvData?.results || []), ...(extraMovieData?.results || []), ...(extraTvData?.results || [])];
 
                         // Apply local filters for search results since the API doesn't support them
                         finalResults = combinedResults.filter(item => {
@@ -1784,11 +1792,11 @@
                             if (manualGenreIds.length > 0 && !(item.genre_ids || []).some(gid => manualGenreIds.includes(String(gid)))) return false;
                             return true;
                         });
+
+                        const moviePages = movieData?.total_pages || 0;
+                        const tvPages = tvData?.total_pages || 0;
+                        totalPages = Math.min(Math.max(moviePages, tvPages), 500);
                     }
-                    
-                    const moviePages = movieData?.total_pages || 0;
-                    const tvPages = tvData?.total_pages || 0;
-                    totalPages = Math.min(Math.max(moviePages, tvPages), 500); // TMDB caps at page 500
                 } catch (e) {
                     console.error("Search failed", e);
                     finalResults = [];
@@ -2590,6 +2598,7 @@
     </script>
 </body>
 </html>
+
 
 
 
