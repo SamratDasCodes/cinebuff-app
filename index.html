@@ -262,6 +262,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            text-decoration: none; /* For <a> tags */
         }
         .nav-btn:hover {
             background-color: rgba(75, 85, 99, 0.5); /* gray-600 with opacity */
@@ -441,7 +442,7 @@
 <body>
     <div id="app" class="container mx-auto p-4 md:p-6 lg:p-8">
 
-        <div id="home-page">
+        <div id="home-page" class="page-container hidden">
              <!-- Header: Mobile top-left, Desktop centered -->
              <header class="mb-4 relative flex flex-col md:flex-row items-center justify-between gap-y-2 md:gap-4">
                 <!-- Empty div for spacing on desktop -->
@@ -495,7 +496,7 @@
             </section>
         </div>
 
-        <div id="discover-page" class="hidden">
+        <div id="discover-page" class="page-container hidden">
             <header class="relative text-center mb-4">
                 <h2 class="text-4xl md:text-5xl font-bold text-white font-nano">Discover & Search</h2>
             </header>
@@ -666,7 +667,7 @@
            </section>
         </div>
 
-        <div id="my-lists-page" class="hidden">
+        <div id="my-lists-page" class="page-container hidden">
              <!-- Header: Mobile top-left, Desktop centered with flex order -->
              <header class="relative flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
                 <!-- User ID Input: On mobile, takes full width. On desktop, 1/3 width -->
@@ -705,13 +706,13 @@
             <div class="mt-8">
                 <div class="border-b border-gray-700">
                     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                        <button data-list-type="watchlist" class="list-tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-indigo-400 border-indigo-500">
+                        <button data-list-type="watchlist" class="tab-btn whitespace-nowrap py-4 px-1 font-medium text-sm active">
                             Watchlist
                         </button>
-                        <button data-list-type="watched" class="list-tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 hover:text-gray-200 hover:border-gray-500">
+                        <button data-list-type="watched" class="tab-btn whitespace-nowrap py-4 px-1 font-medium text-sm">
                             Watched
                         </button>
-                        <button data-list-type="favourite" class="list-tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-400 hover:text-gray-200 hover:border-gray-500">
+                        <button data-list-type="favourite" class="tab-btn whitespace-nowrap py-4 px-1 font-medium text-sm">
                             Favourites
                         </button>
                     </nav>
@@ -721,26 +722,26 @@
             </div>
         </div>
 
-        <div id="cast-details-page" class="hidden p-4 md:p-6 lg:p-8">
+        <div id="cast-details-page" class="page-container hidden p-4 md:p-6 lg:p-8">
             <div id="cast-details-content"></div>
         </div>
 
-        <div id="director-details-page" class="hidden p-4 md:p-6 lg:p-8">
+        <div id="director-details-page" class="page-container hidden p-4 md:p-6 lg:p-8">
             <div id="director-details-content"></div>
         </div>
     </div>
 
     <!-- Floating Navigation Bar -->
     <nav class="floating-nav">
-        <button id="navHomeBtn" class="nav-btn" title="Home">
+        <a id="navHomeBtn" href="#home" class="nav-btn" title="Home">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-        </button>
-        <button id="navDiscoverBtn" class="nav-btn" title="Discover">
+        </a>
+        <a id="navDiscoverBtn" href="#discover" class="nav-btn" title="Discover">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        </button>
-        <button id="navBookmarksBtn" class="nav-btn" title="My Lists">
+        </a>
+        <a id="navBookmarksBtn" href="#lists" class="nav-btn" title="My Lists">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7zm0 3v1h4v-1H7z"></path></svg>
-        </button>
+        </a>
     </nav>
 
     <button id="scrollTopBtn" class="hidden fixed bottom-24 right-4 md:bottom-8 md:right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 z-50" title="Go to top">
@@ -827,11 +828,11 @@
             let swiper;
             let currentCarouselLang = 'all';
             let currentMediaType = 'movie';
-            let pageHistory = [];
             let selectedOTTs = [];
 
 
             // --- DOM ELEMENTS ---
+            const pageContainers = document.querySelectorAll('.page-container');
             const homePage = document.getElementById('home-page');
             const discoverPage = document.getElementById('discover-page');
             const myListsPage = document.getElementById('my-lists-page');
@@ -1085,62 +1086,48 @@
             }
 
             // --- PAGE NAVIGATION ---
-            const goBack = () => {
-                if (pageHistory.length > 1) { // Need to have more than the base page
-                    pageHistory.pop(); // Remove current page
-                    const previousPage = pageHistory[pageHistory.length - 1]; // Get the new last page
-                    previousPage(); // Execute it
-                } else {
-                    showHomePage(); // Fallback to home
-                }
+            const updateNavActiveState = (page) => {
+                navHomeBtn.classList.toggle('active', page === 'home');
+                navDiscoverBtn.classList.toggle('active', page === 'discover');
+                navBookmarksBtn.classList.toggle('active', page === 'lists');
             };
 
+            const showPage = (pageId) => {
+                pageContainers.forEach(container => {
+                    container.classList.toggle('hidden', container.id !== pageId);
+                });
+                window.scrollTo(0, 0);
+            }
 
-            const updateNavActiveState = (activePage) => {
-                navHomeBtn.classList.toggle('active', activePage === 'home');
-                navDiscoverBtn.classList.toggle('active', activePage === 'discover');
-                navBookmarksBtn.classList.toggle('active', activePage === 'bookmarks');
-            };
-
-            const showHomePage = (addToHistory = true) => {
-                homePage.classList.remove('hidden');
-                discoverPage.classList.add('hidden');
-                myListsPage.classList.add('hidden');
-                castDetailsPage.classList.add('hidden');
-                directorDetailsPage.classList.add('hidden');
+            const showHomePage = () => {
+                showPage('home-page');
                 updateNavActiveState('home');
-
                 const activeFilter = topNav.querySelector('.top-nav-btn.active')?.dataset.filter || 'trending';
                 updateHomeCarousel(activeFilter, currentCarouselLang, currentMediaType);
-
-                if (addToHistory) {
-                    pageHistory = [() => showHomePage(false)];
-                }
             };
 
-            const showDiscoverPage = (addToHistory = true) => {
-                homePage.classList.add('hidden');
-                discoverPage.classList.remove('hidden');
-                myListsPage.classList.add('hidden');
-                castDetailsPage.classList.add('hidden');
-                directorDetailsPage.classList.add('hidden');
-                window.scrollTo(0, 0);
+            const showDiscoverPage = () => {
+                showPage('discover-page');
                 updateNavActiveState('discover');
-                 if (addToHistory) {
-                    pageHistory.push(() => showDiscoverPage(false));
+                if (resultsGrid.innerHTML.trim() === '') {
+                    handleSearchAndDiscover(true, 1);
                 }
             };
 
             const showMyListsPage = () => {
-                homePage.classList.add('hidden');
-                discoverPage.classList.add('hidden');
-                myListsPage.classList.remove('hidden');
-                castDetailsPage.classList.add('hidden');
-                directorDetailsPage.classList.add('hidden');
-                renderBookmarkList('watchlist'); 
-                window.scrollTo(0, 0);
-                updateNavActiveState('bookmarks');
-                pageHistory = [showMyListsPage];
+                showPage('my-lists-page');
+                updateNavActiveState('lists');
+                renderBookmarkList('watchlist');
+            };
+
+            const showCastDetailsPage = (personId) => {
+                showPage('cast-details-page');
+                loadCastDetails(personId);
+            };
+
+            const showDirectorDetailsPage = (personId) => {
+                showPage('director-details-page');
+                loadDirectorDetails(personId);
             };
             
             // --- DATA MAPPING ---
@@ -1261,14 +1248,8 @@
             };
             
             const renderBookmarkList = (listType) => {
-                 document.querySelectorAll('.list-tab-btn').forEach(btn => {
-                    if (btn.dataset.listType === listType) {
-                        btn.classList.add('text-indigo-400', 'border-indigo-500');
-                        btn.classList.remove('text-gray-400', 'hover:text-gray-200', 'hover:border-gray-500');
-                    } else {
-                        btn.classList.remove('text-indigo-400', 'border-indigo-500');
-                        btn.classList.add('text-gray-400', 'hover:text-gray-200', 'hover:border-gray-500');
-                    }
+                 document.querySelectorAll('#my-lists-page .tab-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.listType === listType);
                 });
 
                 const filteredMovies = Object.entries(userBookmarks)
@@ -1573,10 +1554,7 @@
                 listsContainer.innerHTML = '<div class="col-span-full flex justify-center items-center py-16"><div class="loader"></div></div>';
                 
                 // De-activate list tabs
-                document.querySelectorAll('.list-tab-btn').forEach(btn => {
-                    btn.classList.remove('text-indigo-400', 'border-indigo-500');
-                    btn.classList.add('text-gray-400', 'hover:text-gray-200', 'hover:border-gray-500');
-                });
+                document.querySelectorAll('#my-lists-page .tab-btn').forEach(btn => btn.classList.remove('active'));
 
                 const likedMovies = Object.values(userBookmarks).filter(m => m.status === 'watched' || m.status === 'favourite');
                 
@@ -1681,8 +1659,6 @@
 
             // --- CORE SEARCH LOGIC ---
             const handleSearchAndDiscover = async (isInitialLoad = false, page = 1) => {
-                if (!isInitialLoad) showDiscoverPage(true);
-                
                 currentPage = page;
                 loader.style.display = 'none';
 
@@ -2037,11 +2013,11 @@
                 const releaseDate = type === 'movie' ? data.release_date : data.first_air_date;
                 const year = releaseDate ? releaseDate.substring(0, 4) : 'N/A';
                 
-                const directors = data.credits.crew.filter(c => c.job === 'Director').map(d => `<a href="#" class="person-link director-link" data-person-id="${d.id}">${d.name}</a>`).join(', ');
-                const creators = (data.created_by || []).map(c => `<a href="#" class="person-link director-link" data-person-id="${c.id}">${c.name}</a>`).join(', ');
+                const directors = data.credits.crew.filter(c => c.job === 'Director').map(d => `<a href="#person/${d.id}" class="person-link director-link" data-person-id="${d.id}">${d.name}</a>`).join(', ');
+                const creators = (data.created_by || []).map(c => `<a href="#person/${c.id}" class="person-link director-link" data-person-id="${c.id}">${c.name}</a>`).join(', ');
                 const directorOrCreatorHTML = type === 'movie' ? directors : creators;
 
-                const cast = data.credits.cast.slice(0, 5).map(c => `<a href="#" class="person-link cast-link" data-person-id="${c.id}">${c.name}</a>`).join(', ');
+                const cast = data.credits.cast.slice(0, 5).map(c => `<a href="#person/${c.id}" class="person-link cast-link" data-person-id="${c.id}">${c.name}</a>`).join(', ');
                 const trailer = data.videos?.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
                 const trailerBtn = trailer ? `<a href="https://www.youtube.com/watch?v=${trailer.key}" target="_blank" rel="noopener noreferrer" class="trailer-btn"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg><span>Watch Trailer</span></a>` : '';
                 const backdropUrl = data.backdrop_path ? `${backdropBaseUrl}${data.backdrop_path}` : '';
@@ -2185,18 +2161,7 @@
                 });
             }
 
-            async function showCastDetailsPage(personId) {
-                homePage.classList.add('hidden');
-                discoverPage.classList.add('hidden');
-                myListsPage.classList.add('hidden');
-                directorDetailsPage.classList.add('hidden');
-                castDetailsPage.classList.remove('hidden');
-                movieModal.classList.add('hidden');
-                document.body.classList.remove('modal-open');
-                window.scrollTo(0, 0);
-
-                pageHistory.push(() => showCastDetailsPage(personId));
-
+            async function loadCastDetails(personId) {
                 castDetailsContent.innerHTML = '<div class="flex justify-center items-center p-16"><div class="loader"></div></div>';
 
                 const personData = await fetchFromTMDb(`person/${personId}`, { append_to_response: 'combined_credits' });
@@ -2233,21 +2198,10 @@
                         </div>
                     </div>
                 `;
-                document.getElementById('cast-back-btn').addEventListener('click', goBack);
+                document.getElementById('cast-back-btn').addEventListener('click', () => history.back());
             }
 
-            async function showDirectorDetailsPage(personId) {
-                homePage.classList.add('hidden');
-                discoverPage.classList.add('hidden');
-                myListsPage.classList.add('hidden');
-                castDetailsPage.classList.add('hidden');
-                directorDetailsPage.classList.remove('hidden');
-                movieModal.classList.add('hidden');
-                document.body.classList.remove('modal-open');
-                window.scrollTo(0, 0);
-
-                pageHistory.push(() => showDirectorDetailsPage(personId));
-
+            async function loadDirectorDetails(personId) {
                 directorDetailsContent.innerHTML = '<div class="flex justify-center items-center p-16"><div class="loader"></div></div>';
 
                 const data = await fetchFromTMDb(`person/${personId}`, {
@@ -2286,8 +2240,30 @@
                         </div>
                     </div>
                 `;
-                 document.getElementById('director-back-btn').addEventListener('click', goBack);
+                 document.getElementById('director-back-btn').addEventListener('click', () => history.back());
             }
+
+            // --- ROUTER ---
+            const handleRouteChange = () => {
+                const hash = window.location.hash;
+                if (hash.startsWith('#person/')) {
+                    const personId = hash.substring(8);
+                    const personLink = document.querySelector(`.person-link[data-person-id="${personId}"]`);
+                    // A bit of a simplification: we assume director if we can't find a cast link
+                    if (personLink && personLink.classList.contains('cast-link')) {
+                        showCastDetailsPage(personId);
+                    } else {
+                        showDirectorDetailsPage(personId);
+                    }
+                } else if (hash === '#discover') {
+                    showDiscoverPage();
+                } else if (hash === '#lists') {
+                    showMyListsPage();
+                } else {
+                    showHomePage();
+                }
+            };
+
 
             // --- EVENT LISTENERS ---
             applyFiltersBtn.addEventListener('click', () => { saveFiltersToLocalStorage(); handleSearchAndDiscover(false, 1); });
@@ -2337,14 +2313,6 @@
                 }
             });
 
-            navHomeBtn.addEventListener('click', () => showHomePage());
-            navDiscoverBtn.addEventListener('click', () => {
-                showDiscoverPage();
-                if(resultsGrid.innerHTML.trim() === '') {
-                    handleSearchAndDiscover(true, 1);
-                }
-            });
-            navBookmarksBtn.addEventListener('click', showMyListsPage);
             copyUserIdBtn.addEventListener('click', () => { userIdInput.select(); document.execCommand('copy'); });
             loadUserIdBtn.addEventListener('click', () => {
                 const newUserId = userIdInput.value.trim();
@@ -2356,7 +2324,11 @@
                     alert('Bookmarks for this ID have been loaded.');
                 }
             });
-            document.querySelector('.list-tab-btn[data-list-type="watchlist"]').parentElement.addEventListener('click', (e) => { if (e.target.matches('.list-tab-btn')) renderBookmarkList(e.target.dataset.listType); });
+            document.querySelector('#my-lists-page .tab-btn').parentElement.addEventListener('click', (e) => {
+                if (e.target.matches('.tab-btn')) {
+                    renderBookmarkList(e.target.dataset.listType)
+                }
+            });
             scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
             exportCsvBtn.addEventListener('click', () => {
@@ -2472,37 +2444,23 @@
             surpriseBtn.addEventListener('click', getSurpriseMovie);
 
             document.body.addEventListener('click', (e) => { 
-                const interactiveElement = e.target.closest('a, button, .card-grid, .recommended-card, .gallery-image');
-                if (interactiveElement && !interactiveElement.classList.contains('trailer-btn')) {
-                     e.preventDefault();
-                }
-                
                 const itemElement = e.target.closest('.card-grid[data-id], .recommended-card[data-id]');
                 if (itemElement) {
+                    e.preventDefault();
                     showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie');
                     return;
                 }
 
                 const aiRecLink = e.target.closest('.ai-rec-link[data-id]');
                  if (aiRecLink) {
+                    e.preventDefault();
                     showMovieModal(aiRecLink.dataset.id, aiRecLink.dataset.type);
-                    return;
-                }
-
-                const directorLink = e.target.closest('.director-link');
-                if(directorLink) {
-                    showDirectorDetailsPage(directorLink.dataset.personId);
-                    return;
-                }
-                
-                const castLink = e.target.closest('.cast-link');
-                if(castLink) {
-                    showCastDetailsPage(castLink.dataset.personId);
                     return;
                 }
 
                 const galleryImg = e.target.closest('.gallery-image');
                 if (galleryImg) {
+                    e.preventDefault();
                     modalImage.src = galleryImg.src.replace('/w500/', '/original/');
                     imageModal.classList.remove('hidden');
                     document.body.classList.add('modal-open');
@@ -2538,16 +2496,6 @@
             const closeModal = () => {
                 movieModal.classList.add('hidden');
                 document.body.classList.remove('modal-open');
-                
-                // Clear page history and reset to the correct base page
-                pageHistory = [];
-                if (!discoverPage.classList.contains('hidden')) {
-                    pageHistory.push(() => showDiscoverPage(false));
-                } else if (!myListsPage.classList.contains('hidden')) {
-                     pageHistory.push(() => showMyListsPage(false));
-                } else {
-                     pageHistory.push(() => showHomePage(false));
-                }
             };
 
             const closeImage = () => {
@@ -2573,19 +2521,15 @@
 
             // --- INITIALIZATION ---
             const initializeApp = async () => {
+                window.addEventListener('hashchange', handleRouteChange);
                 loader.style.display = 'flex';
                 await setRandomBackgroundImage();
                 await setupUserId();
                 await loadStaticData();
                 initSwiper();
                 
-                if (loadFiltersFromLocalStorage()) {
-                    showDiscoverPage();
-                    await handleSearchAndDiscover(true, 1);
-                } else {
-                    showHomePage();
-                    await updateHomeCarousel('trending', currentCarouselLang, currentMediaType);
-                }
+                handleRouteChange(); // Handle initial route
+                
                  const initialActiveNav = topNav.querySelector('.top-nav-btn.active');
                 if (initialActiveNav) {
                     setTimeout(() => updateNavIndicator(initialActiveNav), 100);
@@ -2598,9 +2542,4 @@
     </script>
 </body>
 </html>
-
-
-
-
-
 
