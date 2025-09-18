@@ -2088,12 +2088,12 @@
                 const genreRecsContainer = document.getElementById('genre-recs-content');
                 const aiRecsContainer = document.getElementById('ai-recs-content');
 
-                // Load genre-based recs by default
+                // Load both sets of recommendations when the modal opens
                 fetchAndRenderGenreRecommendations(id, type, genreIds, genreRecsContainer);
+                fetchAndRenderAIRecommendations(title, type, aiRecsContainer);
 
                 // Handle recommendation tab switching
                 const recNavTabs = document.getElementById('rec-nav-tabs');
-                let aiFetched = false;
                 recNavTabs.addEventListener('click', (e) => {
                     const target = e.target.closest('.tab-btn');
                     if (!target) return;
@@ -2104,10 +2104,6 @@
                     if (target.dataset.recTab === 'ai') {
                         genreRecsContainer.classList.add('hidden');
                         aiRecsContainer.classList.remove('hidden');
-                        if (!aiFetched) {
-                            fetchAndRenderAIRecommendations(title, type, aiRecsContainer);
-                            aiFetched = true;
-                        }
                     } else {
                         aiRecsContainer.classList.add('hidden');
                         genreRecsContainer.classList.remove('hidden');
@@ -2124,6 +2120,7 @@
                 movieModal.classList.add('hidden');
                 document.body.classList.remove('modal-open');
                 window.scrollTo(0, 0);
+                updateNavActiveState('details');
 
                 pageHistory.push(() => showCastDetailsPage(personId));
 
@@ -2171,6 +2168,7 @@
                 movieModal.classList.add('hidden');
                 document.body.classList.remove('modal-open');
                 window.scrollTo(0, 0);
+                updateNavActiveState('details');
 
                 pageHistory.push(() => showDirectorDetailsPage(personId));
 
@@ -2511,5 +2509,4 @@
     </script>
 </body>
 </html>
-"
 
