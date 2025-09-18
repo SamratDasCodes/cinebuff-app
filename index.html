@@ -806,31 +806,6 @@
             }
         };
 
-        // --- AI API Caller ---
-        async function callAI(prompt) {
-            try {
-                // This makes a request to the openrouter.js serverless function
-                const response = await fetch('/api/openrouter', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-
-                if (!response.ok) {
-                    const errorBody = await response.text();
-                    console.error(`OpenRouter API Error: ${response.status} ${response.statusText}`, errorBody);
-                    return "Sorry, the AI is currently unavailable.";
-                }
-                
-                const data = await response.json();
-                return data.text;
-
-            } catch (error) {
-                console.error('Failed to call OpenRouter API endpoint:', error);
-                return "Sorry, there was an error connecting to the AI.";
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             // --- CONFIG ---
             const imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
@@ -1889,17 +1864,25 @@
             };
             
             const exportTableToCSV = (filename) => {
-                let csv = ['"Poster","Title","Genre","Year","Rating"'];
-                const items = document.querySelectorAll('#results-grid .result-card');
+                let csv = ['"Title","Year","Rating","Poster URL"'];
+                const items = document.querySelectorAll('#results-grid .card-grid');
                 
                 items.forEach(item => {
-                    const title = item.querySelector('.result-card-title')?.innerText || '';
-                    const genre = item.querySelector('.result-card-info')?.innerText || '';
-                    const ratingText = item.querySelector('.result-card-info-desktop.font-semibold')?.innerText || 'N/A';
-                    const year = item.querySelector('.result-card-info-desktop:not(.font-semibold)')?.innerText || 'N/A';
-                    const poster = item.querySelector('img')?.alt || title;
+                    const title = item.querySelector('h3')?.title || '';
+                    const ratingSpan = item.querySelector('svg.text-yellow-400')?.nextElementSibling;
+                    const rating = ratingSpan ? ratingSpan.innerText : 'N/A';
+
+                    let year = 'N/A';
+                    const spans = item.querySelectorAll('span');
+                    spans.forEach(span => {
+                        if (/^\d{4}$/.test(span.innerText)) {
+                            year = span.innerText;
+                        }
+                    });
+
+                    const poster = item.querySelector('img')?.src || '';
                     
-                    const row = [poster, title, genre, year, ratingText].map(val => `"${val.replace(/"/g, '""')}"`).join(',');
+                    const row = [title, year, rating, poster].map(val => `"${String(val).replace(/"/g, '""')}"`).join(',');
                     csv.push(row);
                 });
                 
@@ -2349,6 +2332,12 @@
             document.querySelector('.list-tab-btn[data-list-type="watchlist"]').parentElement.addEventListener('click', (e) => { if (e.target.matches('.list-tab-btn')) renderBookmarkList(e.target.dataset.listType); });
             scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
+            exportCsvBtn.addEventListener('click', () => {
+                const title = gridTitle.textContent || 'movie-list';
+                const filename = `${title.replace(/ /g, "_").toLowerCase()}.csv`;
+                exportTableToCSV(filename);
+            });
+
             topNav.addEventListener('click', (e) => {
                 const target = e.target.closest('.top-nav-btn');
                 if (!target) return;
@@ -2579,3 +2568,4 @@
     </script>
 </body>
 </html>
+
