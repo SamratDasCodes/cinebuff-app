@@ -32,10 +32,7 @@
         body.modal-open {
             overflow: hidden;
         }
-        body.home-view {
-            height: 100vh;
-            overflow-y: hidden;
-        }
+        /* body.home-view is no longer needed to lock scroll */
         body::before {
             content: '';
             position: fixed;
@@ -108,10 +105,6 @@
         .loader-sm { border: 3px solid #374151; border-top: 3px solid #818cf8; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Tab Styles */
-        .tab-btn { background-color: transparent; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
-        .tab-btn.active { color: #818cf8; border-bottom-color: #818cf8; }
-        .tab-btn:hover:not(.active) { background-color: #374151; }
         /* Genre Pill Styles */
         .genre-pill { display: inline-flex; align-items: center; background-color: #4f46e5; color: white; padding: 2px 8px; border-radius: 9999px; font-size: 0.8rem; line-height: 1.2; white-space: nowrap; }
         .genre-pill-remove { margin-left: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; line-height: 1; }
@@ -280,58 +273,54 @@
             box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
         }
 
-        /* Home Filter Navigation Pill */
-        .home-filter-nav {
-            width: max-content;
-            max-width: 100%;
-            background-color: rgba(31, 41, 55, 0.5);
+        /* --- New Top Tab Navigation --- */
+        #top-nav-container {
+            position: sticky;
+            top: 1rem;
+            z-index: 30;
+            background-color: rgba(17, 24, 39, 0.75);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(75, 85, 99, 0.6);
-            border-radius: 9999px;
+            border-radius: 0.5rem;
             padding: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+            width: 95%;
+            max-width: 500px; /* Max width for larger screens */
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .home-filter-nav::-webkit-scrollbar {
-            display: none;
-        }
-        .home-filter-btn {
-            background-color: transparent;
-            color: #d1d5db;
-            border-radius: 9999px;
-            transition: all 0.3s ease-in-out;
+        #top-nav {
+            position: relative;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            justify-content: space-around;
+        }
+        .top-nav-btn {
+            background: none;
+            border: none;
+            color: #d1d5db; /* gray-300 */
+            padding: 0.75rem 1rem;
             font-weight: 600;
-            width: 5.5rem;
-            height: 3.5rem;
-            flex-shrink: 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 2;
+            flex-grow: 1;
         }
-        .home-filter-btn:hover {
-            background-color: rgba(75, 85, 99, 0.5);
+        .top-nav-btn:hover {
             color: #fff;
         }
-        .home-filter-btn.active {
-            background-color: #4f46e5;
-            color: #fff;
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
+        .top-nav-btn.active {
+            color: #a5b4fc; /* indigo-300 */
         }
-        .home-filter-btn svg {
-            width: 1.5rem;
-            height: 1.5rem;
-        }
-        .home-filter-btn span {
-            font-size: 0.65rem;
-            margin-top: 0.25rem;
+        #nav-indicator {
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            height: 3px;
+            background-color: #6366f1; /* indigo-500 */
+            border-radius: 2px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 1;
         }
 
         /* List tabs animation */
@@ -434,32 +423,14 @@
                 <div class="w-full md:w-1/3"></div>
             </header>
             
-            <!-- Navigation: Space below reduced -->
-            <div class="sticky top-4 z-30 mb-6 w-full flex justify-center">
-                <div class="flex justify-center px-4 w-full max-w-lg">
-                    <nav id="home-filter-nav" class="home-filter-nav">
-                        <button data-filter="trending" class="home-filter-btn active">
-                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 4a1 1 0 000 2 1 1 0 011 1v1a1 1 0 11-2 0V7a3 3 0 015.207-2.293 1 1 0 001.593-1.414A5 5 0 007 4zm4 12a1 1 0 000-2 1 1 0 01-1-1v-1a1 1 0 112 0v1a3 3 0 01-5.207 2.293 1 1 0 00-1.593 1.414A5 5 0 0011 16z" clip-rule="evenodd"></path></svg>
-                            <span>Trending</span>
-                        </button>
-                        <button data-filter="foryou" class="home-filter-btn">
-                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
-                            <span>For You</span>
-                        </button>
-                        <button data-filter="recent" class="home-filter-btn">
-                            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z"></path></svg>
-                            <span>Released</span>
-                        </button>
-                        <button data-filter="upcoming" class="home-filter-btn">
-                             <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
-                            <span>Upcoming</span>
-                        </button>
-                        <button data-filter="surprise" class="home-filter-btn" title="Surprise Me">
-                             <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3.001 3.001 0 0115 5h.012a2 2 0 011.988 2.304l-1.536 6.144A2 2 0 0113.464 15H6.536a2 2 0 01-1.988-1.552L3.012 7.304A2 2 0 015 5zm5-2a1 1 0 00-1 1v1a1 1 0 102 0V4a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                             <span>Surprise</span>
-                        </button>
-                    </nav>
-                </div>
+            <!-- Navigation -->
+            <div id="top-nav-container" class="mb-6">
+                 <nav id="top-nav">
+                    <button data-filter="trending" class="top-nav-btn active">Trending</button>
+                    <button data-filter="recent" class="top-nav-btn">Released</button>
+                    <button data-filter="upcoming" class="top-nav-btn">Upcoming</button>
+                    <div id="nav-indicator"></div>
+                 </nav>
             </div>
     
             <section id="featured-section" class="mb-12 p-6 rounded-xl relative">
@@ -611,7 +582,7 @@
                         </div>
                         <button id="applyFiltersBtn" class="btn-primary font-bold py-3 px-6 rounded-md">Search</button>
                         <button id="resetFiltersBtn" class="btn-secondary p-3 rounded-md" title="Reset Filters">
-                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHnSURBVEhL7ZVLSwJRFEb/b+9EUTdDUBBdRAdB5yJ8oKGdCCEiJdcl2mQhi2iaJdYSC3sJ14joErpppq2I4p7TXL9w7u7MhX7g4XDu3Pnf/3x3zhkYv3/k/g+gB6iA8qYDTsED4/EH2EvAJ0yBhmwYc4bXQDa8CUl4BK2bV6sAHeA/PAUvQpa8iG2An0A7tAYL4Bq07Z49Ah4CV+Aa7EEHkAEHwBlYg3XQh38A3oEzsAWr4DXYBC7BOFiDBXAE3j2bF2uAXPAVfAcn4EaYhOKxAh6A93AEnoYzcAfeA/C8Ea3DITgGv8KlsP2yLqgDFvB+yA7sghvgGmyDFfBf3wVOwD24BS/BQUgGn6E2VJh8L6gDrpbbgG2wBQpgjvwKzcA7cAV2QTe8BPGU7A98B7fgEHyFNlgrk/1T6A3OQBrSUfBw6A3OQAjsgnvwFNwCF6E0/AJbsA3WYAlshVYYAnvgJ9iB++AmLPg2pT02DDtg1DfgK5gCg6AG1iAJfAanoQT8BPsgA7YBw2ARrIEG2AIdcAC+gjdgBWyB8/B75A5Ygqfghs5G7YE5oE+AB3AMlsAEaMA7cAK+g3Pg8M+gD0yBv2EEXIIf4Bw4AzfgDLwGP8LpSBf0B2NhEG3QeCibAAAAAElFTkSuQmCC" alt="Reset" class="w-5 h-5">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHnSURBVEhL7ZVLSwJRFEb/b+9EUTdDUBBdRAdB5yJ8oKGdCCEiJdcl2mQhi2iaJdYSC3sJ14joErpppq2I4p7TXL9w7u7MhX7g4XDu3Pnf/3x3zhkYv3/k/g+gB6iA8qYDTsED4/EH2EvAJ0yBhmwYc4bXQDa8CUl4BK2bV6sAHeA/PAUvQpa8iG2An0A7tAYL4Bq07Z49Ah4CV+Aa7EEHkAEHwBlYg3XQh38A3oEzsAWr4DXYBC7BOFiDBXAE3j2bF2uAXPAVfAcn4EaYhOKxAh6A93AEnoYzcAfeA/C8Ea3DITgGv8KlsP2yLqgDFvB+yA7sghvgGmyDFfBf3wVOwD24BS/BQUgGn6E2VJh8L6gDrpbbgG2wBQpgjvwKzcA7cAV2QTe8BPGU7A98B7fgEHyFNlgrk/1T6A3OQBrSUfBw6A3OQAjsgnvwFNwCF6E0/AJbsA3WYAlshVYYAnvgJ9iB++AmLPg2pT02DDtg1DfgK5gCg6AG1iAJfAanoQT8BPsgA7YBw2ARrIEG2AIdcAC+gjdgBWyB8/B75A5Ygqfghs5G7YE5oE+AB3AMlsAEaMA7cAK+g3Pg8M+gD0yBv2EEXIIf4Bw4AzfgDLwGP8LpSBf0B2NhEG3QeCibAAAAAElFTSuQmCC" alt="Reset" class="w-5 h-5">
                         </button>
                     </div>
                 </div>
@@ -675,8 +646,17 @@
                     <h2 class="text-3xl md:text-5xl font-bold text-white font-nano">My Lists</h2>
                 </div>
             
-                <!-- Spacer div for desktop -->
-                <div class="w-full md:w-1/3"></div>
+                <!-- For You & Surprise Me Buttons -->
+                <div class="w-full md:w-1/3 flex justify-start md:justify-end items-center gap-2">
+                    <button id="forYouBtn" class="btn-secondary font-semibold py-2 px-4 rounded-full flex items-center gap-2 text-sm">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+                        <span>For You</span>
+                    </button>
+                    <button id="surpriseBtn" class="btn-secondary font-semibold py-2 px-4 rounded-full flex items-center gap-2 text-sm" title="Surprise Me">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3.001 3.001 0 0115 5h.012a2 2 0 011.988 2.304l-1.536 6.144A2 2 0 0113.464 15H6.536a2 2 0 01-1.988-1.552L3.012 7.304A2 2 0 015 5zm5-2a1 1 0 00-1 1v1a1 1 0 102 0V4a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                        <span>Surprise Me</span>
+                    </button>
+                </div>
             </header>
             <div class="mt-8">
                 <div class="border-b border-gray-700">
@@ -866,10 +846,13 @@
             const navHomeBtn = document.getElementById('navHomeBtn');
             const navDiscoverBtn = document.getElementById('navDiscoverBtn');
             const navBookmarksBtn = document.getElementById('navBookmarksBtn');
-            const homeFilterNav = document.getElementById('home-filter-nav');
+            const topNav = document.getElementById('top-nav');
+            const navIndicator = document.getElementById('nav-indicator');
             const languageFilterContainer = document.getElementById('language-filter-container');
             const mediaTypeToggleContainer = document.getElementById('media-type-toggle-container');
             const sortFilter = document.getElementById('sortFilter');
+            const forYouBtn = document.getElementById('forYouBtn');
+            const surpriseBtn = document.getElementById('surpriseBtn');
 
             const setRandomBackgroundImage = async () => {
                 try {
@@ -1083,7 +1066,6 @@
                 myListsPage.classList.add('hidden');
                 castDetailsPage.classList.add('hidden');
                 directorDetailsPage.classList.add('hidden');
-                document.body.classList.add('home-view');
                 updateNavActiveState('home');
                 if (addToHistory) {
                     pageHistory = [() => showHomePage(false)];
@@ -1096,7 +1078,6 @@
                 myListsPage.classList.add('hidden');
                 castDetailsPage.classList.add('hidden');
                 directorDetailsPage.classList.add('hidden');
-                document.body.classList.remove('home-view');
                 window.scrollTo(0, 0);
                 updateNavActiveState('discover');
                  if (addToHistory) {
@@ -1110,7 +1091,6 @@
                 myListsPage.classList.remove('hidden');
                 castDetailsPage.classList.add('hidden');
                 directorDetailsPage.classList.add('hidden');
-                document.body.classList.remove('home-view');
                 renderBookmarkList('watchlist'); 
                 window.scrollTo(0, 0);
                 updateNavActiveState('bookmarks');
@@ -1412,7 +1392,6 @@
             
             const getSurpriseMovie = async () => {
                 gtag('event', 'click', { 'event_category': 'Engagement', 'event_label': 'Surprise Me' });
-                const surpriseBtn = document.querySelector('[data-filter="surprise"]');
                 surpriseBtn.disabled = true;
                 surpriseBtn.innerHTML = `<div class="loader-sm"></div>`;
                 
@@ -1437,7 +1416,7 @@
                     }
                 }
                 surpriseBtn.disabled = false;
-                surpriseBtn.innerHTML = `<svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3.001 3.001 0 0115 5h.012a2 2 0 011.988 2.304l-1.536 6.144A2 2 0 0113.464 15H6.536a2 2 0 01-1.988-1.552L3.012 7.304A2 2 0 015 5zm5-2a1 1 0 00-1 1v1a1 1 0 102 0V4a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg><span class="hidden sm:inline">Surprise</span>`;
+                surpriseBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3.001 3.001 0 0115 5h.012a2 2 0 011.988 2.304l-1.536 6.144A2 2 0 0113.464 15H6.536a2 2 0 01-1.988-1.552L3.012 7.304A2 2 0 015 5zm5-2a1 1 0 00-1 1v1a1 1 0 102 0V4a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg><span>Surprise Me</span>`;
             };
 
             // --- Carousel & Home Section Logic ---
@@ -1464,6 +1443,18 @@
                     },
                 });
             }
+
+            const updateNavIndicator = (activeButton) => {
+                if (!activeButton || !navIndicator) return;
+                const navRect = topNav.getBoundingClientRect();
+                const btnRect = activeButton.getBoundingClientRect();
+                
+                const left = btnRect.left - navRect.left;
+                const width = btnRect.width;
+
+                navIndicator.style.width = `${width}px`;
+                navIndicator.style.transform = `translateX(${left}px)`;
+            };
 
             const updateHomeCarousel = async (filterType, lang = 'all', mediaType = 'movie') => {
                 renderCarouselSkeleton();
@@ -1501,9 +1492,6 @@
                             data = await fetchFromTMDb(`discover/tv`, params);
                         }
                         break;
-                    case 'foryou':
-                        await fetchAndDisplayForYou();
-                        return;
                 }
                 
                 if (featuredTitle) featuredTitle.textContent = title;
@@ -1517,16 +1505,20 @@
                 swiper.update();
             };
             
-            const fetchAndDisplayForYou = async () => {
-                if (featuredTitle) featuredTitle.textContent = 'For You';
-                renderCarouselSkeleton();
-                initSwiper();
+            const fetchAndDisplayForYouOnListPage = async () => {
+                // This will replace the content of the lists container with a loader
+                listsContainer.innerHTML = '<div class="col-span-full flex justify-center items-center py-16"><div class="loader"></div></div>';
+                
+                // De-activate list tabs
+                document.querySelectorAll('.list-tab-btn').forEach(btn => {
+                    btn.classList.remove('text-indigo-400', 'border-indigo-500');
+                    btn.classList.add('text-gray-400', 'hover:text-gray-200', 'hover:border-gray-500');
+                });
 
                 const likedMovies = Object.values(userBookmarks).filter(m => m.status === 'watched' || m.status === 'favourite');
                 
                 if (likedMovies.length < 5) {
-                    featuredContainer.innerHTML = `<p class="w-full text-center text-gray-400 py-8">Add at least 5 movies to your 'Watched' or 'Favourites' lists to get personalized recommendations.</p>`;
-                    swiper.update();
+                    listsContainer.innerHTML = `<p class="w-full text-center text-gray-400 col-span-full py-8">Add at least 5 movies to your 'Watched' or 'Favourites' lists to get personalized recommendations.</p>`;
                     return;
                 }
 
@@ -1545,7 +1537,7 @@
                             return titleMatch ? !bookmarkedTitles.has(titleMatch[1].trim()) : false;
                         });
 
-                        const searchPromises = forYouList.slice(0, 20).map(recString => {
+                        const searchPromises = forYouList.slice(0, 40).map(recString => { // more results for a grid
                              const match = recString.match(/(.+) \((\d{4})\)/);
                              if (match) {
                                  const title = match[1].trim();
@@ -1567,8 +1559,8 @@
                         });
 
                         if (moviesToRender.length > 0) {
-                             const slidesHTML = moviesToRender.map(item => `<div class="swiper-slide">${renderMovieGridCard(item)}</div>`).join('');
-                             featuredContainer.innerHTML = slidesHTML;
+                             // Use renderMovieGridCard which is used for bookmark lists
+                             listsContainer.innerHTML = moviesToRender.map(renderMovieGridCard).join('');
                         } else {
                             throw new Error("No movies found from AI response");
                         }
@@ -1577,9 +1569,8 @@
                     }
                 } catch (error) {
                     console.error("Failed to get 'For You' recommendations:", error);
-                    featuredContainer.innerHTML = `<p class="w-full text-center text-gray-400 py-8">Could not load recommendations at this time.</p>`;
+                    listsContainer.innerHTML = `<p class="w-full col-span-full text-center text-gray-400 py-8">Could not load recommendations at this time.</p>`;
                 }
-                swiper.update();
             };
 
 
@@ -2192,24 +2183,20 @@
             document.querySelector('.list-tab-btn[data-list-type="watchlist"]').parentElement.addEventListener('click', (e) => { if (e.target.matches('.list-tab-btn')) renderBookmarkList(e.target.dataset.listType); });
             scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-            homeFilterNav.addEventListener('click', (e) => {
-                const target = e.target.closest('.home-filter-btn');
+            topNav.addEventListener('click', (e) => {
+                const target = e.target.closest('.top-nav-btn');
                 if (!target) return;
-                homeFilterNav.querySelectorAll('.home-filter-btn').forEach(btn => btn.classList.remove('active'));
+                
+                topNav.querySelectorAll('.top-nav-btn').forEach(btn => btn.classList.remove('active'));
                 target.classList.add('active');
+                updateNavIndicator(target);
                 
                 document.querySelectorAll('#language-filter-container .btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary'));
                 document.querySelector('#language-filter-container [data-lang="all"]').classList.replace('btn-secondary', 'btn-primary');
                 currentCarouselLang = 'all';
 
                 const filter = target.dataset.filter;
-                 mediaTypeToggleContainer.classList.toggle('hidden', filter === 'foryou' || filter === 'surprise');
-                if (filter === 'surprise') {
-                    getSurpriseMovie();
-                } else {
-                    languageFilterContainer.classList.toggle('hidden', filter === 'foryou');
-                    updateHomeCarousel(filter, currentCarouselLang, currentMediaType);
-                }
+                updateHomeCarousel(filter, currentCarouselLang, currentMediaType);
             });
 
              languageFilterContainer.addEventListener('click', (e) => {
@@ -2217,7 +2204,7 @@
                     languageFilterContainer.querySelectorAll('.btn-primary').forEach(b => b.classList.replace('btn-primary', 'btn-secondary'));
                     e.target.classList.replace('btn-secondary', 'btn-primary');
                     currentCarouselLang = e.target.dataset.lang;
-                    const activeFilter = document.querySelector('#home-filter-nav .home-filter-btn.active').dataset.filter;
+                    const activeFilter = document.querySelector('#top-nav .top-nav-btn.active').dataset.filter;
                     updateHomeCarousel(activeFilter, currentCarouselLang, currentMediaType);
                 }
             });
@@ -2242,18 +2229,19 @@
                     tvBtn.classList.replace('text-white', 'text-gray-400');
                 }
                 
-                const upcomingFilterBtn = homeFilterNav.querySelector('[data-filter="upcoming"]');
+                const upcomingFilterBtn = topNav.querySelector('[data-filter="upcoming"]');
                 upcomingFilterBtn.disabled = currentMediaType === 'tv';
                 upcomingFilterBtn.classList.toggle('opacity-50', currentMediaType === 'tv');
                 upcomingFilterBtn.classList.toggle('cursor-not-allowed', currentMediaType === 'tv');
 
                 if (upcomingFilterBtn.classList.contains('active') && currentMediaType === 'tv') {
                     upcomingFilterBtn.classList.remove('active');
-                    const trendingFilterBtn = homeFilterNav.querySelector('[data-filter="trending"]');
+                    const trendingFilterBtn = topNav.querySelector('[data-filter="trending"]');
                     trendingFilterBtn.classList.add('active');
+                    updateNavIndicator(trendingFilterBtn);
                     updateHomeCarousel('trending', currentCarouselLang, currentMediaType);
                 } else {
-                    const activeFilter = document.querySelector('#home-filter-nav .home-filter-btn.active').dataset.filter;
+                    const activeFilter = document.querySelector('#top-nav .top-nav-btn.active').dataset.filter;
                     updateHomeCarousel(activeFilter, currentCarouselLang, currentMediaType);
                 }
             });
@@ -2272,6 +2260,10 @@
                 } else { certificationFilter.disabled = true; }
             });
             
+            // New Listeners for moved buttons
+            forYouBtn.addEventListener('click', fetchAndDisplayForYouOnListPage);
+            surpriseBtn.addEventListener('click', getSurpriseMovie);
+
             document.body.addEventListener('click', (e) => { 
                 const interactiveElement = e.target.closest('a, button, .card-grid, .recommended-card, .gallery-image');
                 if (interactiveElement && !interactiveElement.classList.contains('trailer-btn')) {
@@ -2380,6 +2372,10 @@
                 } else {
                     showHomePage();
                     await updateHomeCarousel('trending');
+                }
+                 const initialActiveNav = topNav.querySelector('.top-nav-btn.active');
+                if (initialActiveNav) {
+                    setTimeout(() => updateNavIndicator(initialActiveNav), 100);
                 }
                 loader.style.display = 'none';
             };
