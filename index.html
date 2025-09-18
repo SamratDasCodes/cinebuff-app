@@ -1121,11 +1121,13 @@
             };
 
             const showCastDetailsPage = (personId) => {
+                closeModal();
                 showPage('cast-details-page');
                 loadCastDetails(personId);
             };
 
             const showDirectorDetailsPage = (personId) => {
+                closeModal();
                 showPage('director-details-page');
                 loadDirectorDetails(personId);
             };
@@ -2542,4 +2544,5 @@
     </script>
 </body>
 </html>
+
 
