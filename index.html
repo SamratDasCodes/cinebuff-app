@@ -183,14 +183,7 @@
             flex-direction: column;
             height: 100%;
         }
-        .recommendations h2 {
-          color: #f3f4f6;
-          margin-bottom: 15px;
-          border-bottom: 2px solid #ef4444;
-          padding-bottom: 5px;
-          font-size: 1.5rem;
-          font-weight: bold;
-        }
+       
         .recommended-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr); /* 3 columns on mobile */
@@ -323,10 +316,23 @@
             z-index: 1;
         }
 
-        /* List tabs animation */
-        .list-tab-btn {
+        /* Generic Tab Button Styles */
+        .tab-btn {
             transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            border-bottom: 2px solid transparent;
         }
+        .tab-btn.active {
+            color: #818cf8; /* indigo-400 */
+            border-bottom-color: #818cf8;
+        }
+        .tab-btn:not(.active) {
+            color: #9ca3af; /* gray-400 */
+        }
+         .tab-btn:hover:not(.active) {
+            color: #e5e7eb; /* gray-200 */
+            border-bottom-color: #4b5563; /* gray-600 */
+        }
+
 
         /* Media Type Toggle */
         .media-type-btn {
@@ -472,127 +478,132 @@
                 <h2 class="text-4xl md:text-5xl font-bold text-white font-nano">Discover & Search</h2>
             </header>
             <div id="search-section" class="p-6 rounded-xl mt-8 space-y-4">
-                 <!-- Advanced Filters Toggle -->
-                <div class="text-center">
-                    <button id="toggleFiltersBtn" class="text-indigo-400 hover:text-indigo-300 font-semibold text-sm">
-                        <span>Show Advanced Filters</span>
-                        <svg class="w-4 h-4 inline-block ml-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
+                <!-- New Search Tabs -->
+                <div class="mb-4 border-b border-gray-700">
+                    <nav id="search-nav-tabs" class="-mb-px flex space-x-6" aria-label="Tabs">
+                        <button data-search-tab="standard" class="tab-btn whitespace-nowrap py-3 px-1 font-semibold text-sm active">Standard Search</button>
+                        <button data-search-tab="ai" class="tab-btn whitespace-nowrap py-3 px-1 font-semibold text-sm">AI Helper</button>
+                    </nav>
                 </div>
 
-                <!-- Advanced Filters Section (Initially Hidden) -->
-                <div id="advanced-filters" class="hidden pb-4 space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
-                         <div id="genreFilterContainer" class="relative lg:col-span-1">
-                            <label for="genreFilterDisplay" class="sr-only">Genre</label>
-                            <div id="genreFilterDisplay" class="w-full p-3 h-[50px] rounded-md bg-gray-800 text-white border border-gray-700 flex items-center cursor-pointer overflow-hidden">
-                                <span id="genreFilterPlaceholder" class="text-gray-400">Filter by Genre</span>
-                                <div id="selectedGenresContainer" class="flex flex-nowrap gap-1"></div>
-                            </div>
-                            <div id="genreFilterDropdown" class="absolute z-20 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg hidden max-h-60 overflow-y-auto"></div>
-                        </div>
-                        <div id="ottFilterContainer" class="relative lg:col-span-1">
-                            <label for="ottFilterDisplay" class="sr-only">Streaming Service</label>
-                            <div id="ottFilterDisplay" class="w-full p-3 h-[50px] rounded-md bg-gray-800 text-white border border-gray-700 flex items-center cursor-pointer overflow-hidden">
-                                <span id="ottFilterPlaceholder" class="text-gray-400">Filter by Service</span>
-                                <div id="selectedOTTsContainer" class="flex flex-nowrap gap-1"></div>
-                            </div>
-                            <div id="ottFilterDropdown" class="absolute z-20 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg hidden max-h-60 overflow-y-auto"></div>
-                        </div>
-                        <div>
-                            <label for="yearFilter" class="sr-only">Year</label>
-                            <input type="number" id="yearFilter" placeholder="Year" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                        </div>
-                        <div class="w-full relative">
-                            <label for="languageFilter" class="sr-only">Language</label>
-                            <select id="languageFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="">All Languages</option>
-                                <option value="en">English</option>
-                                <option value="hi">Hindi</option>
-                                <option value="bn">Bengali</option>
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                                <option value="ja">Japanese</option>
-                                <option value="ko">Korean</option>
-                                <option value="zh">Chinese</option>
-                                <option value="ru">Russian</option>
-                                <option value="it">Italian</option>
-                                <option value="pt">Portuguese</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                <!-- Standard Search Content -->
+                <div id="standard-search-content">
+                    <div class="flex flex-col sm:flex-row items-center gap-4">
+                        <div class="relative flex-grow w-full">
+                            <input type="text" id="globalSearchInput" placeholder="Search by title..." class="w-full p-3 pl-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
                             </div>
                         </div>
-                         <div class="w-full relative">
-                            <label for="certCountryFilter" class="sr-only">Certification Country</label>
-                            <select id="certCountryFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="">Rating Region</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        <button id="toggleFiltersBtn" class="btn-secondary font-semibold text-sm w-full sm:w-auto py-3 px-4">
+                            <span>Filters</span>
+                            <svg class="w-4 h-4 inline-block ml-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Advanced Filters Section (Initially Hidden) -->
+                    <div id="advanced-filters" class="hidden pt-4 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+                            <div id="genreFilterContainer" class="relative lg:col-span-1">
+                                <label for="genreFilterDisplay" class="sr-only">Genre</label>
+                                <div id="genreFilterDisplay" class="w-full p-3 h-[50px] rounded-md bg-gray-800 text-white border border-gray-700 flex items-center cursor-pointer overflow-hidden">
+                                    <span id="genreFilterPlaceholder" class="text-gray-400">Filter by Genre</span>
+                                    <div id="selectedGenresContainer" class="flex flex-nowrap gap-1"></div>
+                                </div>
+                                <div id="genreFilterDropdown" class="absolute z-20 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg hidden max-h-60 overflow-y-auto"></div>
                             </div>
-                        </div>
-                         <div class="w-full relative">
-                            <label for="certificationFilter" class="sr-only">Certification</label>
-                            <select id="certificationFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none" disabled>
-                                <option value="">Select Rating</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            <div id="ottFilterContainer" class="relative lg:col-span-1">
+                                <label for="ottFilterDisplay" class="sr-only">Streaming Service</label>
+                                <div id="ottFilterDisplay" class="w-full p-3 h-[50px] rounded-md bg-gray-800 text-white border border-gray-700 flex items-center cursor-pointer overflow-hidden">
+                                    <span id="ottFilterPlaceholder" class="text-gray-400">Filter by Service</span>
+                                    <div id="selectedOTTsContainer" class="flex flex-nowrap gap-1"></div>
+                                </div>
+                                <div id="ottFilterDropdown" class="absolute z-20 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg hidden max-h-60 overflow-y-auto"></div>
                             </div>
-                        </div>
-                         <div class="w-full relative">
-                            <label for="contentTypeFilter" class="sr-only">Content Type</label>
-                            <select id="contentTypeFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="both" selected>Movies & Series</option>
-                                <option value="movie">Movies Only</option>
-                                <option value="tv">Series Only</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            <div>
+                                <label for="yearFilter" class="sr-only">Year</label>
+                                <input type="number" id="yearFilter" placeholder="Year" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                            </div>
+                            <div class="w-full relative">
+                                <label for="languageFilter" class="sr-only">Language</label>
+                                <select id="languageFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                                    <option value="">All Languages</option>
+                                    <option value="en">English</option>
+                                    <option value="hi">Hindi</option>
+                                    <option value="bn">Bengali</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="de">German</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="ko">Korean</option>
+                                    <option value="zh">Chinese</option>
+                                    <option value="ru">Russian</option>
+                                    <option value="it">Italian</option>
+                                    <option value="pt">Portuguese</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+                            <div class="w-full relative">
+                                <label for="certCountryFilter" class="sr-only">Certification Country</label>
+                                <select id="certCountryFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                                    <option value="">Rating Region</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+                            <div class="w-full relative">
+                                <label for="certificationFilter" class="sr-only">Certification</label>
+                                <select id="certificationFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none" disabled>
+                                    <option value="">Select Rating</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+                            <div class="w-full relative">
+                                <label for="contentTypeFilter" class="sr-only">Content Type</label>
+                                <select id="contentTypeFilter" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
+                                    <option value="both" selected>Movies & Series</option>
+                                    <option value="movie">Movies Only</option>
+                                    <option value="tv">Series Only</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="minRatingFilter" class="text-sm text-gray-300 mb-1 block">Min. Rating: <span id="minRatingValue">0.0</span></label>
+                                        <input type="range" id="minRatingFilter" min="0" max="10" step="0.5" value="0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div>
+                                        <label for="maxRatingFilter" class="text-sm text-gray-300 mb-1 block">Max. Rating: <span id="maxRatingValue">10.0</span></label>
+                                        <input type="range" id="maxRatingFilter" min="0" max="10" step="0.5" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 pt-2 items-center">
-                        <div class="w-full">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="minRatingFilter" class="text-sm text-gray-300 mb-1 block">Min. Rating: <span id="minRatingValue">0.0</span></label>
-                                    <input type="range" id="minRatingFilter" min="0" max="10" step="0.5" value="0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
-                                </div>
-                                <div>
-                                    <label for="maxRatingFilter" class="text-sm text-gray-300 mb-1 block">Max. Rating: <span id="maxRatingValue">10.0</span></label>
-                                    <input type="range" id="maxRatingFilter" min="0" max="10" step="0.5" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-center justify-end gap-2 pt-4 border-t border-gray-700/50">
+                        <button id="resetFiltersBtn" class="btn-secondary font-bold py-3 px-6 rounded-md">Reset</button>
+                        <button id="applyFiltersBtn" class="btn-primary font-bold py-3 px-6 rounded-md">Search</button>
                     </div>
                 </div>
-                 <!-- Global Search Bar & AI Toggle -->
-                <div class="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-gray-700/50">
+
+                <!-- AI Search Content (hidden by default) -->
+                <div id="ai-search-content" class="hidden">
                     <div class="relative flex-grow w-full">
-                        <input type="text" id="globalSearchInput" placeholder="Search by title..." class="w-full p-3 pl-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <input type="text" id="aiSearchInput" placeholder="e.g., 'Sci-fi movies with a twist'" class="w-full p-3 pl-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+                             <svg class="w-5 h-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19.49 5.51a.996.996 0 0 0-1.41 0L12 11.59 5.92 5.51a.996.996 0 1 0-1.41 1.41L10.59 13l-6.08 6.08a.996.996 0 1 0 1.41 1.41L12 14.41l6.08 6.08a.996.996 0 1 0 1.41-1.41L13.41 13l6.08-6.08a.996.996 0 0 0 0-1.41z"></path></svg>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <div class="relative w-full sm:w-48">
-                            <select id="searchTypeDropdown" class="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none">
-                                <option value="title" selected>Title</option>
-                                <option value="keyword">Keyword</option>
-                                <option value="web_search">Web Search (AI)</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
-                        </div>
-                        <button id="applyFiltersBtn" class="btn-primary font-bold py-3 px-6 rounded-md">Search</button>
-                        <button id="resetFiltersBtn" class="btn-secondary p-3 rounded-md" title="Reset Filters">
-                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHnSURBVEhL7ZVLSwJRFEb/b+9EUTdDUBBdRAdB5yJ8oKGdCCEiJdcl2mQhi2iaJdYSC3sJ14joErpppq2I4p7TXL9w7u7MhX7g4XDu3Pnf/3x3zhkYv3/k/g+gB6iA8qYDTsED4/EH2EvAJ0yBhmwYc4bXQDa8CUl4BK2bV6sAHeA/PAUvQpa8iG2An0A7tAYL4Bq07Z49Ah4CV+Aa7EEHkAEHwBlYg3XQh38A3oEzsAWr4DXYBC7BOFiDBXAE3j2bF2uAXPAVfAcn4EaYhOKxAh6A93AEnoYzcAfeA/C8Ea3DITgGv8KlsP2yLqgDFvB+yA7sghvgGmyDFfBf3wVOwD24BS/BQUgGn6E2VJh8L6gDrpbbgG2wBQpgjvwKzcA7cAV2QTe8BPGU7A98B7fgEHyFNlgrk/1T6A3OQBrSUfBw6A3OQAjsgnvwFNwCF6E0/AJbsA3WYAlshVYYAnvgJ9iB++AmLPg2pT02DDtg1DfgK5gCg6AG1iAJfAanoQT8BPsgA7YBw2ARrIEG2AIdcAC+gjdgBWyB8/B75A5Ygqfghs5G7YE5oE+AB3AMlsAEaMA7cAK+g3Pg8M+gD0yBv2EEXIIf4Bw4AzfgDLwGP8LpSBf0B2NhEG3QeCibAAAAAElFTSuQmCC" alt="Reset" class="w-5 h-5">
-                        </button>
+                    <div class="flex items-center justify-end gap-2 pt-4">
+                        <button id="aiSearchBtn" class="btn-primary font-bold py-3 px-6 rounded-md">Ask AI</button>
                     </div>
                 </div>
             </div>
@@ -813,7 +824,7 @@
             const loader = document.getElementById('loader');
             const noResults = document.getElementById('no-results');
             const globalSearchInput = document.getElementById('globalSearchInput');
-            const searchTypeDropdown = document.getElementById('searchTypeDropdown');
+            const aiSearchInput = document.getElementById('aiSearchInput');
             const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
             const advancedFilters = document.getElementById('advanced-filters');
             const yearFilter = document.getElementById('yearFilter');
@@ -823,6 +834,7 @@
             const maxRatingValue = document.getElementById('maxRatingValue');
             const applyFiltersBtn = document.getElementById('applyFiltersBtn');
             const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+            const aiSearchBtn = document.getElementById('aiSearchBtn');
             const movieModal = document.getElementById('movieModal');
             const genreFilterContainer = document.getElementById('genreFilterContainer');
             const genreFilterDisplay = document.getElementById('genreFilterDisplay');
@@ -858,6 +870,9 @@
             const forYouBtn = document.getElementById('forYouBtn');
             const surpriseBtn = document.getElementById('surpriseBtn');
             const paginationContainer = document.getElementById('pagination-container');
+            const searchNavTabs = document.getElementById('search-nav-tabs');
+            const standardSearchContent = document.getElementById('standard-search-content');
+            const aiSearchContent = document.getElementById('ai-search-content');
 
             const setRandomBackgroundImage = async () => {
                 try {
@@ -944,7 +959,6 @@
             const saveFiltersToLocalStorage = () => {
                 const filters = {
                     searchTerm: globalSearchInput.value.trim(),
-                    searchType: searchTypeDropdown.value,
                     selectedGenres: selectedGenres,
                     selectedOTTs: selectedOTTs,
                     selectedYear: yearFilter.value,
@@ -966,7 +980,6 @@
                 const filters = JSON.parse(savedFiltersJSON);
 
                 globalSearchInput.value = filters.searchTerm || '';
-                searchTypeDropdown.value = filters.searchType || 'title';
                 yearFilter.value = filters.selectedYear || '';
                 minRatingFilter.value = filters.minRating || 0;
                 minRatingValue.textContent = parseFloat(minRatingFilter.value).toFixed(1);
@@ -1021,7 +1034,6 @@
 
             const clearFiltersAndStorage = () => {
                 globalSearchInput.value = '';
-                searchTypeDropdown.value = 'title';
                 yearFilter.value = '';
                 minRatingFilter.value = 0;
                 maxRatingFilter.value = 10;
@@ -1648,13 +1660,11 @@
                 loader.style.display = 'none';
 
                 const searchTerm = globalSearchInput.value.trim();
-                const searchType = searchTypeDropdown.value;
 
                 if (searchTerm && !isInitialLoad) {
-                    gtag('event', 'search', { search_term: searchTerm, search_type: searchType });
+                    gtag('event', 'search', { search_term: searchTerm });
                     logUserActivity('search', {
                         searchTerm: searchTerm,
-                        searchType: searchType,
                         genres: selectedGenres.map(g => g.name),
                         year: yearFilter.value,
                         contentType: contentTypeFilter.value,
@@ -1685,65 +1695,60 @@
                 let finalResults = [];
                 
                 try {
-                     if (!searchTerm && (searchType === 'web_search' || searchType === 'keyword')) {
-                        gridTitle.textContent = `Please enter a search term for '${searchType.replace("_", " ")}' search.`;
-                        finalResults = [];
+                    const useDiscover = manualGenreIds.length > 0 || ottProviderIds.length > 0 || minRating > 0 || maxRating < 10 || selectedYear || selectedLanguage;
+
+                    if (useDiscover && searchTerm) {
+                        gridTitle.textContent = `Search term "${searchTerm}" ignored due to active filters.`;
+                    } else if (searchTerm) {
+                        gridTitle.textContent = `Results for "${searchTerm}"`;
                     } else {
-                        const useDiscover = manualGenreIds.length > 0 || ottProviderIds.length > 0 || minRating > 0 || maxRating < 10 || selectedYear || selectedLanguage;
-
-                        if (useDiscover && searchTerm) {
-                            gridTitle.textContent = `Search term "${searchTerm}" ignored due to active filters.`;
-                        } else if (searchTerm) {
-                            gridTitle.textContent = `Results for "${searchTerm}"`;
-                        } else {
-                             gridTitle.textContent = 'Filtered Results';
-                        }
-                        
-                        let movieData = null, tvData = null;
-
-                        if (useDiscover || !searchTerm) {
-                            const baseParams = { 
-                                sort_by: sortBy, 
-                                page: currentPage,
-                                'vote_count.gte': sortBy.includes('vote_average') ? 200 : 5, 
-                                with_genres: manualGenreIds.join(','), 
-                                primary_release_year: selectedYear,
-                                with_watch_providers: ottProviderIds,
-                                watch_region: 'IN'
-                            };
-                            if (minRating > 0) baseParams['vote_average.gte'] = minRating;
-                            if (maxRating < 10) baseParams['vote_average.lte'] = maxRating;
-                            if (selectedLanguage) baseParams.with_original_language = selectedLanguage;
-
-                            [movieData, tvData] = await Promise.all([
-                                (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('discover/movie', baseParams) : Promise.resolve(null),
-                                (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('discover/tv', baseParams) : Promise.resolve(null)
-                            ]);
-                             finalResults = [...(movieData?.results || []), ...(tvData?.results || [])];
-
-                        } else { 
-                            const queryParams = { query: searchTerm, page: currentPage };
-                            [movieData, tvData] = await Promise.all([
-                                (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('search/movie', queryParams) : Promise.resolve(null),
-                                (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('search/tv', queryParams) : Promise.resolve(null)
-                            ]);
-                            
-                             const combinedResults = [...(movieData?.results || []), ...(tvData?.results || [])];
-
-                            // Apply local filters for search results since the API doesn't support them
-                            finalResults = combinedResults.filter(item => {
-                                const itemRating = item.vote_average || 0;
-                                if (itemRating < minRating || itemRating > maxRating) return false;
-                                if (selectedLanguage && item.original_language !== selectedLanguage) return false;
-                                if (manualGenreIds.length > 0 && !(item.genre_ids || []).some(gid => manualGenreIds.includes(String(gid)))) return false;
-                                return true;
-                            });
-                        }
-                        
-                        const moviePages = movieData?.total_pages || 0;
-                        const tvPages = tvData?.total_pages || 0;
-                        totalPages = Math.min(Math.max(moviePages, tvPages), 500); // TMDB caps at page 500
+                            gridTitle.textContent = 'Filtered Results';
                     }
+                    
+                    let movieData = null, tvData = null;
+
+                    if (useDiscover || !searchTerm) {
+                        const baseParams = { 
+                            sort_by: sortBy, 
+                            page: currentPage,
+                            'vote_count.gte': sortBy.includes('vote_average') ? 200 : 5, 
+                            with_genres: manualGenreIds.join(','), 
+                            primary_release_year: selectedYear,
+                            with_watch_providers: ottProviderIds,
+                            watch_region: 'IN'
+                        };
+                        if (minRating > 0) baseParams['vote_average.gte'] = minRating;
+                        if (maxRating < 10) baseParams['vote_average.lte'] = maxRating;
+                        if (selectedLanguage) baseParams.with_original_language = selectedLanguage;
+
+                        [movieData, tvData] = await Promise.all([
+                            (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('discover/movie', baseParams) : Promise.resolve(null),
+                            (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('discover/tv', baseParams) : Promise.resolve(null)
+                        ]);
+                            finalResults = [...(movieData?.results || []), ...(tvData?.results || [])];
+
+                    } else { 
+                        const queryParams = { query: searchTerm, page: currentPage };
+                        [movieData, tvData] = await Promise.all([
+                            (contentType === 'movie' || contentType === 'both') ? fetchFromTMDb('search/movie', queryParams) : Promise.resolve(null),
+                            (contentType === 'tv' || contentType === 'both') ? fetchFromTMDb('search/tv', queryParams) : Promise.resolve(null)
+                        ]);
+                        
+                            const combinedResults = [...(movieData?.results || []), ...(tvData?.results || [])];
+
+                        // Apply local filters for search results since the API doesn't support them
+                        finalResults = combinedResults.filter(item => {
+                            const itemRating = item.vote_average || 0;
+                            if (itemRating < minRating || itemRating > maxRating) return false;
+                            if (selectedLanguage && item.original_language !== selectedLanguage) return false;
+                            if (manualGenreIds.length > 0 && !(item.genre_ids || []).some(gid => manualGenreIds.includes(String(gid)))) return false;
+                            return true;
+                        });
+                    }
+                    
+                    const moviePages = movieData?.total_pages || 0;
+                    const tvPages = tvData?.total_pages || 0;
+                    totalPages = Math.min(Math.max(moviePages, tvPages), 500); // TMDB caps at page 500
                 } catch (e) {
                     console.error("Search failed", e);
                     finalResults = [];
@@ -1757,17 +1762,17 @@
                     .filter(r => r.poster_path)
                     .map(mapApiData);
 
-                 mappedResults.sort((a, b) => {
+                    mappedResults.sort((a, b) => {
                     const sortBy = `${sortFilter.value}.${document.getElementById('sortOrderBtn').dataset.order}`;
                     if (sortBy.includes('release_date')) {
-                       const dateA = a.releaseDate ? new Date(a.releaseDate) : new Date(0);
-                       const dateB = b.releaseDate ? new Date(b.releaseDate) : new Date(0);
-                       return sortBy.endsWith('desc') ? dateB - dateA : dateA - dateB;
+                        const dateA = a.releaseDate ? new Date(a.releaseDate) : new Date(0);
+                        const dateB = b.releaseDate ? new Date(b.releaseDate) : new Date(0);
+                        return sortBy.endsWith('desc') ? dateB - dateA : dateA - dateB;
                     }
                     if (sortBy.includes('vote_average')) {
                         return sortBy.endsWith('desc') ? (b.rating || 0) - (a.rating || 0) : (a.rating || 0) - (b.rating || 0);
                     }
-                     return sortBy.endsWith('desc') ? (b.popularity || 0) - (a.popularity || 0) : (a.popularity || 0) - (b.popularity || 0);
+                        return sortBy.endsWith('desc') ? (b.popularity || 0) - (a.popularity || 0) : (a.popularity || 0) - (b.popularity || 0);
                 });
 
                 if (mappedResults.length > 0) {
@@ -1777,6 +1782,63 @@
                 } else {
                     resultsGrid.innerHTML = '';
                     noResults.classList.remove('hidden');
+                }
+            };
+
+            const handleAISearch = async () => {
+                const query = aiSearchInput.value.trim();
+                if (!query) return;
+
+                logUserActivity('ai_search', { query });
+                gtag('event', 'search', { search_term: query, search_type: 'ai' });
+                
+                renderDiscoverSkeleton();
+                gridTitle.textContent = `AI recommendations for "${query}"`;
+                paginationContainer.innerHTML = '';
+                noResults.classList.add('hidden');
+                aiSearchBtn.disabled = true;
+                aiSearchBtn.innerHTML = `<div class="loader-sm"></div>`;
+
+                const prompt = `Based on the query "${query}", recommend a list of relevant movies and TV shows. IMPORTANT: Your response must be ONLY a valid JSON array of strings. Each string must be in the "Title (Year)" format. For example: ["Inception (2010)", "The Boys (2019)"].`;
+
+                try {
+                    const rawResponse = await callAI(prompt);
+                    let jsonString = rawResponse.trim().replace(/```json|```/g, '');
+                    const recommendations = JSON.parse(jsonString);
+
+                    if (!Array.isArray(recommendations)) throw new Error("AI did not return an array.");
+
+                    const searchPromises = recommendations.slice(0, 20).map(recString => {
+                        const match = recString.match(/(.+) \((\d{4})\)/);
+                        if (match) {
+                            return fetchFromTMDb('search/multi', { query: match[1].trim(), year: match[2] });
+                        }
+                        return Promise.resolve(null);
+                    });
+
+                    const searchResults = await Promise.all(searchPromises);
+                    const moviesToRender = [];
+                    searchResults.forEach(res => {
+                        if (res && res.results && res.results.length > 0) {
+                            const bestMatch = res.results.find(r => r.media_type !== 'person' && r.poster_path);
+                            if (bestMatch) moviesToRender.push(mapApiData(bestMatch));
+                        }
+                    });
+
+                    if (moviesToRender.length > 0) {
+                        renderResults(resultsGrid, moviesToRender);
+                    } else {
+                        noResults.classList.remove('hidden');
+                        resultsGrid.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error("AI Search failed:", error);
+                    gridTitle.textContent = "AI Search failed. Please try again.";
+                    noResults.classList.remove('hidden');
+                    resultsGrid.innerHTML = '';
+                } finally {
+                    aiSearchBtn.disabled = false;
+                    aiSearchBtn.textContent = "Ask AI";
                 }
             };
             
@@ -1830,16 +1892,30 @@
                     <img src="${item.thumbnail}" alt="${item.title}" onerror="this.onerror=null;this.src='https://placehold.co/500x750/1f2937/ffffff?text=Error';">
                     <h3>${item.title}</h3>
                 </div>`;
-
-            const fetchAndRenderAIRecommendations = async (id, type, title, genreIds) => {
-                const container = document.getElementById('ai-recommendations');
-                const recommendationTitle = document.getElementById('recommendation-title');
-                if (!container || !recommendationTitle) return;
-
-                recommendationTitle.textContent = 'AI Recommended';
+            
+            const fetchAndRenderGenreRecommendations = async (id, type, genreIds, container) => {
                 container.innerHTML = Array(5).fill().map(() => `<div class="recommended-card"><div class="skeleton w-full aspect-[2/3]"></div><div class="p-2"><div class="skeleton h-4 w-3/4 mx-auto rounded"></div></div></div>`).join('');
+                if (genreIds && genreIds.length > 0) {
+                    const recommendationsData = await fetchFromTMDb(`discover/${type}`, {
+                        with_genres: genreIds[0],
+                        sort_by: 'popularity.desc',
+                        page: 1
+                    });
+                    if (recommendationsData && recommendationsData.results) {
+                        const similarItems = recommendationsData.results.filter(item => item.id !== id).slice(0, 10).map(mapApiDataForModal);
+                        container.innerHTML = similarItems.map(renderSimilarMovieCard).join('');
+                    } else {
+                        container.innerHTML = `<p class="text-sm text-gray-400 col-span-full">Could not load recommendations.</p>`;
+                    }
+                } else {
+                     container.innerHTML = `<p class="text-sm text-gray-400 col-span-full">No genres to find similar content.</p>`;
+                }
+            };
+
+            const fetchAndRenderAIRecommendations = async (title, type, container) => {
+                container.innerHTML = '<div class="flex items-center gap-2"><div class="loader-sm"></div><span>Asking AI for recommendations...</span></div>';
                 
-                const prompt = `Based on the ${type} '${title}', recommend 5 other movies or TV shows. IMPORTANT: Your response must be ONLY a valid JSON array of strings. Each string must be in the "Title (Year)" format. Do not include any other text, explanations, or markdown formatting.`;
+                const prompt = `Based on the ${type} '${title}', recommend 10 other movies or TV shows. IMPORTANT: Your response must be ONLY a valid JSON array of strings. Each string must be in the "Title (Year)" format. Do not include any other text, explanations, or markdown formatting.`;
 
                 try {
                     const rawResponse = await callAI(prompt);
@@ -1848,7 +1924,7 @@
 
                     if (!Array.isArray(recommendations)) throw new Error("Parsed data is not an array.");
 
-                    const searchPromises = recommendations.slice(0, 5).map(recString => {
+                    const searchPromises = recommendations.slice(0, 10).map(recString => {
                         const match = recString.match(/(.+) \((\d{4})\)/);
                         if (match) {
                             const recTitle = match[1].trim();
@@ -1859,33 +1935,27 @@
                     });
 
                     const searchResults = await Promise.all(searchPromises);
-                    const html = searchResults.map(searchData => {
-                        if (!searchData || !searchData.results) return '';
-                        const movieData = searchData.results.find(r => r.media_type !== 'person');
-                        if (movieData) return renderSimilarMovieCard(mapApiDataForModal(movieData));
-                        return '';
-                    }).join('');
+                    const moviesToRender = [];
+                    searchResults.forEach(res => {
+                        if (res && res.results && res.results.length > 0) {
+                            const bestMatch = res.results.find(r => r.media_type !== 'person' && r.poster_path);
+                            if (bestMatch) {
+                                moviesToRender.push(mapApiData(bestMatch));
+                            }
+                        }
+                    });
                     
-                    if (html.trim() === '') throw new Error("No movies found from AI response");
-                    container.innerHTML = html;
+                    if (moviesToRender.length === 0) throw new Error("No movies found from AI response");
+
+                    const linksHTML = moviesToRender.map(movie => 
+                        `<div><a href="#" class="person-link ai-rec-link" data-id="${movie.id}" data-type="${movie.type}">${movie.title} (${movie.year})</a></div>`
+                    ).join('');
+
+                    container.innerHTML = linksHTML;
+
                 } catch (err) {
                     console.error("AI recs parse error:", err);
-                    recommendationTitle.textContent = 'Genre Based Recommendation';
-                    if (genreIds && genreIds.length > 0) {
-                        const recommendationsData = await fetchFromTMDb(`discover/${type}`, {
-                            with_genres: genreIds[0],
-                            sort_by: 'popularity.desc',
-                            page: 1
-                        });
-                        if (recommendationsData && recommendationsData.results) {
-                            const similarItems = recommendationsData.results.filter(item => item.id !== id).slice(0, 5).map(mapApiDataForModal);
-                            container.innerHTML = similarItems.map(renderSimilarMovieCard).join('');
-                        } else {
-                            container.innerHTML = `<p class="text-sm text-gray-400 col-span-full">Could not load recommendations.</p>`;
-                        }
-                    } else {
-                        container.innerHTML = `<p class="text-sm text-gray-400 col-span-full">AI suggestions couldn't be loaded.</p>`;
-                    }
+                    container.innerHTML = `<p class="text-sm text-gray-400">AI suggestions couldn't be loaded at this time.</p>`;
                 }
             };
             
@@ -1977,8 +2047,14 @@
 
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <section class="recommendations">
-                                <h2 id="recommendation-title">AI Recommended</h2>
-                                <div class="recommended-grid" id="ai-recommendations"></div>
+                                <div class="border-b border-gray-700 mb-4">
+                                    <nav id="rec-nav-tabs" class="-mb-px flex space-x-6" aria-label="Tabs">
+                                        <button data-rec-tab="genre" class="tab-btn whitespace-nowrap pb-2 px-1 font-semibold text-sm active">Similar</button>
+                                        <button data-rec-tab="ai" class="tab-btn whitespace-nowrap pb-2 px-1 font-semibold text-sm">AI Recommended</button>
+                                    </nav>
+                                </div>
+                                <div id="genre-recs-content" class="recommended-grid"></div>
+                                <div id="ai-recs-content" class="hidden text-gray-300 space-y-2"></div>
                             </section>
                             <div class="p-4 bg-gray-900/50 rounded-lg">
                                 <div class="flex items-center gap-4 mb-3">
@@ -1994,7 +2070,9 @@
                 
                 updateBookmarkButtons(id);
                 document.querySelectorAll('.bookmark-btn').forEach(btn => btn.addEventListener('click', () => updateBookmark(id, title, data.poster_path, type, btn.dataset.status)));
-                document.getElementById('ai-ask-btn').addEventListener('click', async () => {
+                
+                const aiAskBtn = document.getElementById('ai-ask-btn');
+                aiAskBtn.addEventListener('click', async () => {
                     const query = document.getElementById('ai-query').value.trim();
                     if (!query) return;
                     logUserActivity('ask_ai', { query, movieId: id, movieTitle: title });
@@ -2007,7 +2085,34 @@
                 });
 
                 const genreIds = (data.genres || []).map(g => g.id);
-                fetchAndRenderAIRecommendations(id, type, title, genreIds);
+                const genreRecsContainer = document.getElementById('genre-recs-content');
+                const aiRecsContainer = document.getElementById('ai-recs-content');
+
+                // Load genre-based recs by default
+                fetchAndRenderGenreRecommendations(id, type, genreIds, genreRecsContainer);
+
+                // Handle recommendation tab switching
+                const recNavTabs = document.getElementById('rec-nav-tabs');
+                let aiFetched = false;
+                recNavTabs.addEventListener('click', (e) => {
+                    const target = e.target.closest('.tab-btn');
+                    if (!target) return;
+
+                    recNavTabs.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    target.classList.add('active');
+
+                    if (target.dataset.recTab === 'ai') {
+                        genreRecsContainer.classList.add('hidden');
+                        aiRecsContainer.classList.remove('hidden');
+                        if (!aiFetched) {
+                            fetchAndRenderAIRecommendations(title, type, aiRecsContainer);
+                            aiFetched = true;
+                        }
+                    } else {
+                        aiRecsContainer.classList.add('hidden');
+                        genreRecsContainer.classList.remove('hidden');
+                    }
+                });
             }
 
             async function showCastDetailsPage(personId) {
@@ -2018,6 +2123,7 @@
                 castDetailsPage.classList.remove('hidden');
                 movieModal.classList.add('hidden');
                 document.body.classList.remove('modal-open');
+                window.scrollTo(0, 0);
 
                 pageHistory.push(() => showCastDetailsPage(personId));
 
@@ -2046,8 +2152,10 @@
                                 <p><strong>Nationality:</strong> ${personData.place_of_birth || 'N/A'}</p>
                             </div>
                             <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pr-2">
-                                ${filmography}
+                            <div class="max-h-[60vh] overflow-y-auto pr-2">
+                                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                    ${filmography || '<p class="col-span-full">No works found.</p>'}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2061,7 +2169,8 @@
                 castDetailsPage.classList.add('hidden');
                 directorDetailsPage.classList.remove('hidden');
                 movieModal.classList.add('hidden');
-                 document.body.classList.remove('modal-open');
+                document.body.classList.remove('modal-open');
+                window.scrollTo(0, 0);
 
                 pageHistory.push(() => showDirectorDetailsPage(personId));
 
@@ -2092,8 +2201,10 @@
                                 <p><strong>Nationality:</strong> ${data.place_of_birth || 'N/A'}</p>
                             </div>
                             <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pr-2">
-                                ${filmography || '<p class="col-span-full">No directed works found.</p>'}
+                             <div class="max-h-[60vh] overflow-y-auto pr-2">
+                                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                    ${filmography || '<p class="col-span-full">No directed works found.</p>'}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2102,8 +2213,9 @@
 
             // --- EVENT LISTENERS ---
             applyFiltersBtn.addEventListener('click', () => { saveFiltersToLocalStorage(); handleSearchAndDiscover(false, 1); });
+            aiSearchBtn.addEventListener('click', handleAISearch);
             resetFiltersBtn.addEventListener('click', () => { clearFiltersAndStorage(); handleSearchAndDiscover(true, 1); });
-            exportCsvBtn.addEventListener('click', () => exportTableToCSV('showshelf_export.csv'));
+            
             minRatingFilter.addEventListener('input', (e) => {
                 const minVal = parseFloat(e.target.value), maxVal = parseFloat(maxRatingFilter.value);
                 minRatingValue.textContent = minVal.toFixed(1);
@@ -2120,20 +2232,11 @@
                 } else { certCountryFilter.disabled = false; }
             });
             globalSearchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFiltersBtn.click(); });
+            aiSearchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') aiSearchBtn.click(); });
             
-            searchTypeDropdown.addEventListener('change', () => {
-                const selectedType = searchTypeDropdown.value;
-                const placeholderMap = {
-                    title: "Search by title...",
-                    keyword: "Search by keyword (e.g., 'heist')...",
-                    web_search: "Ask AI... (e.g., 'Sci-fi movies with a twist')"
-                };
-                globalSearchInput.placeholder = placeholderMap[selectedType] || "Enter search term...";
-            });
 
             toggleFiltersBtn.addEventListener('click', () => {
                 const isHidden = advancedFilters.classList.toggle('hidden');
-                toggleFiltersBtn.querySelector('span').textContent = isHidden ? 'Show Advanced Filters' : 'Hide Advanced Filters';
                 toggleFiltersBtn.querySelector('svg').style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
             });
 
@@ -2197,6 +2300,22 @@
                     currentCarouselLang = e.target.dataset.lang;
                     const activeFilter = document.querySelector('#top-nav .top-nav-btn.active').dataset.filter;
                     updateHomeCarousel(activeFilter, currentCarouselLang, currentMediaType);
+                }
+            });
+            
+            searchNavTabs.addEventListener('click', (e) => {
+                const target = e.target.closest('.tab-btn');
+                if(!target) return;
+
+                searchNavTabs.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                target.classList.add('active');
+
+                if (target.dataset.searchTab === 'ai') {
+                    standardSearchContent.classList.add('hidden');
+                    aiSearchContent.classList.remove('hidden');
+                } else {
+                    aiSearchContent.classList.add('hidden');
+                    standardSearchContent.classList.remove('hidden');
                 }
             });
 
@@ -2273,9 +2392,13 @@
                 
                 const itemElement = e.target.closest('.card-grid[data-id], .recommended-card[data-id]');
                 if (itemElement) {
-                    window.history.pushState({movieId: itemElement.dataset.id, movieType: itemElement.dataset.type}, '');
-                    pageHistory.push(() => showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie'));
                     showMovieModal(itemElement.dataset.id, itemElement.dataset.type || 'movie');
+                    return;
+                }
+
+                const aiRecLink = e.target.closest('.ai-rec-link[data-id]');
+                 if (aiRecLink) {
+                    showMovieModal(aiRecLink.dataset.id, aiRecLink.dataset.type);
                     return;
                 }
 
@@ -2388,4 +2511,5 @@
     </script>
 </body>
 </html>
+"
 
