@@ -30,17 +30,16 @@ async function fetchFromTMDb(endpoint, params = {}) {
 
 
 /**
- * Calls a serverless function to get a response from the Gemini API.
- * This function sends a prompt to a backend endpoint (/api/gemini),
- * which then securely calls the Gemini API.
- * @param {string} prompt - The prompt to send to the Gemini model.
+ * Calls a serverless function to get a response from an AI API provider.
+ * This function sends a prompt to a backend endpoint (/api/openrouter),
+ * which then securely calls the OpenRouter API.
+ * @param {string} prompt - The prompt to send to the AI model.
  * @returns {Promise<string>} The text response from the model.
  */
-async function callGemini(prompt) {
+async function callAI(prompt) {
     try {
-        // FIX: Corrected comment to reference the correct serverless function file.
-        // This makes a request to the gemini.js serverless function
-        const response = await fetch('/api/gemini', {
+        // This makes a request to the openrouter.js serverless function
+        const response = await fetch('/api/openrouter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt })
@@ -48,7 +47,7 @@ async function callGemini(prompt) {
 
         if (!response.ok) {
             const errorBody = await response.text();
-            console.error(`Gemini API Error: ${response.status} ${response.statusText}`, errorBody);
+            console.error(`AI API Error: ${response.status} ${response.statusText}`, errorBody);
             return "Sorry, the AI is currently unavailable.";
         }
         
@@ -56,7 +55,7 @@ async function callGemini(prompt) {
         return data.text;
 
     } catch (error) {
-        console.error('Failed to call Gemini API endpoint:', error);
+        console.error('Failed to call AI API endpoint:', error);
         return "Sorry, there was an error connecting to the AI.";
     }
 }
