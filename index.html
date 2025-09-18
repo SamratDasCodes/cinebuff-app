@@ -357,22 +357,6 @@
         #cast-details-page, #director-details-page {
             position: relative;
         }
-        .back-btn {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            z-index: 20;
-            background-color: rgba(0,0,0,0.5);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 9999px;
-            padding: 0.5rem 1rem;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-        .back-btn:hover {
-            background-color: rgba(0,0,0,0.8);
-        }
 
         /* Free to Watch Banner */
         .free-banner {
@@ -703,12 +687,10 @@
         </div>
 
         <div id="cast-details-page" class="hidden p-4 md:p-6 lg:p-8">
-            <button class="back-btn">← Back</button>
             <div id="cast-details-content"></div>
         </div>
 
         <div id="director-details-page" class="hidden p-4 md:p-6 lg:p-8">
-            <button class="back-btn">← Back</button>
             <div id="director-details-content"></div>
         </div>
     </div>
@@ -732,7 +714,6 @@
 
     <div id="movieModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div id="modal-content-wrapper" class="rounded-lg max-w-screen-xl w-full max-h-[90vh] relative shadow-2xl overflow-y-auto">
-            <button class="back-btn hidden">← Back</button>
             <button id="closeModal" class="absolute top-2 right-2 z-20 text-white bg-black/50 hover:bg-red-600 rounded-full p-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -1516,7 +1497,11 @@
                 switch (filterType) {
                     case 'trending':
                         title = 'Trending Today';
-                        params['vote_count.gte'] = 50; // Keep for trending to get relevant stuff
+                        // Only apply a high vote count filter if looking at all languages.
+                        // This prevents popular regional content from being filtered out.
+                        if (lang === 'all') {
+                            params['vote_count.gte'] = 50; 
+                        }
                         break;
                     case 'recent':
                         title = mediaType === 'movie' ? 'Recently Released' : 'Airing Now';
@@ -1909,8 +1894,6 @@
                 movieModal.classList.remove('hidden');
                 document.body.classList.add('modal-open');
 
-                movieModal.querySelector('.back-btn').classList.toggle('hidden', pageHistory.length <= 1);
-
                 const data = await fetchFromTMDb(`${type}/${id}`, {
                     append_to_response: 'credits,watch/providers,videos,keywords,release_dates,content_ratings',
                 });
@@ -2063,7 +2046,7 @@
                                 <p><strong>Nationality:</strong> ${personData.place_of_birth || 'N/A'}</p>
                             </div>
                             <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto pr-2">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pr-2">
                                 ${filmography}
                             </div>
                         </div>
@@ -2109,7 +2092,7 @@
                                 <p><strong>Nationality:</strong> ${data.place_of_birth || 'N/A'}</p>
                             </div>
                             <h3 class="text-2xl font-semibold mt-8 mb-4 border-b-2 border-indigo-500 pb-2">Filmography</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto pr-2">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pr-2">
                                 ${filmography || '<p class="col-span-full">No directed works found.</p>'}
                             </div>
                         </div>
@@ -2288,12 +2271,6 @@
                      e.preventDefault();
                 }
                 
-                const backBtn = e.target.closest('.back-btn');
-                if (backBtn) {
-                    goBack();
-                    return;
-                }
-                
                 const itemElement = e.target.closest('.card-grid[data-id], .recommended-card[data-id]');
                 if (itemElement) {
                     window.history.pushState({movieId: itemElement.dataset.id, movieType: itemElement.dataset.type}, '');
@@ -2351,9 +2328,16 @@
             const closeModal = () => {
                 movieModal.classList.add('hidden');
                 document.body.classList.remove('modal-open');
+                
+                // Clear page history and reset to the correct base page
                 pageHistory = [];
-                const basePage = discoverPage.classList.contains('hidden') ? showHomePage : showDiscoverPage;
-                basePage();
+                if (!discoverPage.classList.contains('hidden')) {
+                    showDiscoverPage();
+                } else if (!myListsPage.classList.contains('hidden')) {
+                    showMyListsPage();
+                } else {
+                    showHomePage();
+                }
             };
 
             const closeImage = () => {
@@ -2404,9 +2388,4 @@
     </script>
 </body>
 </html>
-
-
-
-
-
 
