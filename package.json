@@ -1,14 +1,6 @@
 {
-  "name": "showshelf-app",
+  "name": "cinebuff-project",
   "version": "1.0.0",
-  "description": "Serverless functions for ShowShelf",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@google/generative-ai": "^0.14.0"
-  }
+  "private": true,
+  "dependencies": {}
 }
