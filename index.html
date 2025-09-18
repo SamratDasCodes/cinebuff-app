@@ -122,41 +122,54 @@
             width: 100%;
         }
 
-        /* ===== Movie Detail Page Custom CSS ===== */
+        /* ===== New Redesigned Movie Detail Page ===== */
         .movie-detail-page {
-          background-size: cover;
-          background-position: center;
-          position: relative;
+            background-size: cover;
+            background-position: top center;
+            position: relative;
         }
 
         .movie-detail-page .overlay {
-            background: rgba(17, 24, 39, 0.85); /* dark background overlay from body */
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
+             background: linear-gradient(to top, rgba(17, 24, 39, 1) 20%, rgba(17, 24, 39, 0.7) 100%);
         }
 
-        .poster-section img {
-          border-radius: 0.75rem;
-          object-fit: cover;
+        .detail-header {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
         }
 
-        /* Title */
-        .title {
-          font-size: 2.75rem;
-          font-weight: bold;
-          color: #ef4444; /* Tailwind red-500 */
-          margin-bottom: 1rem;
+        .detail-poster {
+            border-radius: 0.75rem;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
         }
 
-        /* Info section */
-        .info p {
-          font-size: 15px; /* Reduced font size */
-          line-height: 1.5; /* Reduced line height */
+        .detail-title {
+            font-size: 2.5rem;
+            font-weight: 800; /* Extra bold */
+            text-shadow: 0 2px 15px rgba(0,0,0,0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .detail-title {
+                font-size: 1.75rem;
+            }
         }
 
-        /* Trailer Button */
+        .detail-meta span {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
         .trailer-btn {
-            background: #dc2626; /* Tailwind red-600 */
+            background: #e50914;
             color: #fff;
             padding: 10px 16px;
             border-radius: 8px;
@@ -169,21 +182,12 @@
             justify-content: center;
             gap: 0.5rem;
             width: 100%;
-            margin-top: 0.75rem;
         }
 
         .trailer-btn:hover {
-          background: #b91c1c; /* Tailwind red-700 */
+          background: #f40612;
         }
-        
-         /* Recommendations */
-        .recommendations {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-       
+
         .recommended-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr); /* 3 columns on mobile */
@@ -219,11 +223,14 @@
             font-weight: 600;
             color: #f3f4f6;
             text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         /* Bookmark styles */
         .bookmark-btn.active {
-            background-color: #ef4444;
+            background-color: #4f46e5;
             color: white;
         }
 
@@ -362,6 +369,20 @@
         /* Cast & Director Details Page */
         #cast-details-page, #director-details-page {
             position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            color: white;
+            border-radius: 9999px;
+            padding: 0.5rem;
+            z-index: 10;
+        }
+        .back-btn:hover {
+            background-color: rgba(0,0,0,0.8);
         }
 
         /* Free to Watch Banner */
@@ -1127,7 +1148,7 @@
                 window.scrollTo(0, 0);
                 updateNavActiveState('discover');
                  if (addToHistory) {
-                    pageHistory = [() => showDiscoverPage(false)];
+                    pageHistory.push(() => showDiscoverPage(false));
                 }
             };
 
@@ -2037,41 +2058,67 @@
                     const usRating = data.content_ratings.results.find(r => r.iso_3166_1 === 'US');
                     if (usRating && usRating.rating) certification = usRating.rating;
                 }
+                
+                const runtime = type === 'movie' ? data.runtime : (data.episode_run_time ? data.episode_run_time[0] : null);
+                const runtimeText = runtime ? `${Math.floor(runtime / 60)}h ${runtime % 60}m` : '';
 
                 movieModalContent.innerHTML = `
                 <div class="movie-detail-page rounded-lg" style="background-image: url('${backdropUrl}')">
-                    <div class="overlay p-4 md:p-6 rounded-lg">
-                        ${freeBannerHTML}
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div class="poster-section md:col-span-1">
-                                <img src="${data.poster_path ? imageBaseUrl + data.poster_path : 'https://placehold.co/500x750'}" alt="${title}" class="w-full h-auto shadow-lg">
-                                ${trailerBtn}
-                            </div>
-                            <div class="md:col-span-2 text-white">
-                                <h1 class="title">${title} <span class="text-2xl font-normal text-gray-300">(${year})</span></h1>
-                                <div class="info space-y-3 text-gray-300">
-                                    <p>Released: ${formatDate(releaseDate)}</p>
-                                    <p class="max-h-[120px] overflow-y-auto pr-2">${data.overview || 'No overview available.'}</p>
-                                    <p><strong>Genre:</strong> ${data.genres.map(g => g.name).join(', ')}</p>
-                                    <p><strong>${type === 'movie' ? 'Director' : 'Creator'}:</strong> ${directorOrCreatorHTML || 'N/A'}</p>
-                                    <p><strong>Cast:</strong> ${cast || 'N/A'}</p>
-                                    <p><strong>Rating:</strong> ⭐ ${data.vote_average.toFixed(1)}/10</p>
-                                    <p><strong>Certification:</strong> ${certification}</p>
-                                    <div class="flex items-start">
-                                        <strong class="mr-2 mt-1.5">Available On:</strong>
-                                        <div class="flex flex-wrap items-center">${providersHTML}</div>
-                                    </div>
+                    <div class="overlay">
+                        <div class="detail-header p-4 md:p-8">
+                             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                                <div class="w-2/3 md:w-full mx-auto md:mx-0">
+                                    <img src="${data.poster_path ? imageBaseUrl + data.poster_path : 'https://placehold.co/500x750'}" alt="${title}" class="detail-poster w-full h-auto shadow-lg">
                                 </div>
-                                <div class="mt-4 flex space-x-2">
-                                    <button data-status="watchlist" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Watchlist"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7z"></path></svg></button>
-                                    <button data-status="watched" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Mark as Watched"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></button>
-                                    <button data-status="favourite" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Favourites"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg></button>
+                                <div class="md:col-span-3 text-white">
+                                    <h1 class="detail-title">${title}</h1>
+                                    <div class="detail-meta flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-gray-300">
+                                        <span>${year}</span>
+                                        <span class="border border-gray-500">${certification}</span>
+                                        ${runtimeText ? `<span>${runtimeText}</span>` : ''}
+                                        <span class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.368-2.447a1 1 0 00-1.175 0l-3.368 2.447c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.072 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"></path></svg>
+                                            ${data.vote_average.toFixed(1)}/10
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <section class="recommendations">
+                        <div class="p-4 md:p-8 space-y-8">
+                            ${freeBannerHTML}
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <div class="lg:col-span-2 space-y-4">
+                                    <p class="text-gray-300 leading-relaxed">${data.overview || 'No overview available.'}</p>
+                                    <div>
+                                        <p><strong>Genre:</strong> ${data.genres.map(g => g.name).join(', ')}</p>
+                                        <p><strong>${type === 'movie' ? 'Director' : 'Creator'}:</strong> ${directorOrCreatorHTML || 'N/A'}</p>
+                                        <p><strong>Cast:</strong> ${cast || 'N/A'}</p>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex-shrink-0">${trailerBtn}</div>
+                                        <div class="flex space-x-2">
+                                            <button data-status="watchlist" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Watchlist"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4zm2 2v1h6V6H7zm0 3v1h6V9H7z"></path></svg></button>
+                                            <button data-status="watched" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Mark as Watched"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg></button>
+                                            <button data-status="favourite" class="bookmark-btn btn-secondary p-2 rounded-lg" title="Add to Favourites"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg></button>
+                                        </div>
+                                    </div>
+                                     <div class="flex items-start">
+                                        <strong class="mr-2 mt-1.5">Available On:</strong>
+                                        <div class="flex flex-wrap items-center">${providersHTML}</div>
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-gray-900/50 rounded-lg">
+                                    <div class="flex items-center gap-4 mb-3">
+                                        <h3 class="text-xl font-bold text-indigo-400 whitespace-nowrap">Ask AI:</h3>
+                                        <input type="text" id="ai-query" placeholder="e.g., Explain the ending..." class="w-full p-2 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-indigo-500">
+                                        <button id="ai-ask-btn" class="btn-primary font-bold py-2 px-6 rounded-md">Ask</button>
+                                    </div>
+                                    <div id="ai-response" class="text-gray-300 bg-gray-800 p-4 rounded-md min-h-[100px] overflow-y-auto max-h-[150px]"></div>
+                                </div>
+                            </div>
+
+                             <section>
                                 <div class="border-b border-gray-700 mb-4">
                                     <nav id="rec-nav-tabs" class="-mb-px flex space-x-6" aria-label="Tabs">
                                         <button data-rec-tab="genre" class="tab-btn whitespace-nowrap pb-2 px-1 font-semibold text-sm active">Similar</button>
@@ -2081,14 +2128,6 @@
                                 <div id="genre-recs-content" class="recommended-grid"></div>
                                 <div id="ai-recs-content" class="hidden text-gray-300 space-y-2"></div>
                             </section>
-                            <div class="p-4 bg-gray-900/50 rounded-lg">
-                                <div class="flex items-center gap-4 mb-3">
-                                <h3 class="text-xl font-bold text-red-500 whitespace-nowrap">Ask AI:</h3>
-                                <input type="text" id="ai-query" placeholder="e.g., Explain the ending..." class="w-full p-2 rounded-md bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-red-500">
-                                <button id="ai-ask-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md">Ask</button>
-                                </div>
-                                <div id="ai-response" class="text-gray-300 bg-gray-800 p-4 rounded-md min-h-[100px]"></div>
-                            </div>
                         </div>
                     </div>
                 </div>`;
@@ -2145,7 +2184,6 @@
                 movieModal.classList.add('hidden');
                 document.body.classList.remove('modal-open');
                 window.scrollTo(0, 0);
-                updateNavActiveState('details');
 
                 pageHistory.push(() => showCastDetailsPage(personId));
 
@@ -2162,7 +2200,10 @@
                     .map(item => renderMovieGridCard(mapApiData(item))).join('');
                 
                 castDetailsContent.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <button id="cast-back-btn" class="back-btn" title="Go Back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-16 md:pt-0">
                         <div class="md:col-span-1">
                             <img src="${personData.profile_path ? imageBaseUrl + personData.profile_path : 'https://placehold.co/500x750'}" alt="${personData.name}" class="rounded-lg shadow-lg w-full">
                         </div>
@@ -2182,6 +2223,7 @@
                         </div>
                     </div>
                 `;
+                document.getElementById('cast-back-btn').addEventListener('click', goBack);
             }
 
             async function showDirectorDetailsPage(personId) {
@@ -2193,7 +2235,6 @@
                 movieModal.classList.add('hidden');
                 document.body.classList.remove('modal-open');
                 window.scrollTo(0, 0);
-                updateNavActiveState('details');
 
                 pageHistory.push(() => showDirectorDetailsPage(personId));
 
@@ -2212,7 +2253,10 @@
                     .map(item => renderMovieGridCard(mapApiData(item))).join('');
 
                 directorDetailsContent.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                     <button id="director-back-btn" class="back-btn" title="Go Back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-16 md:pt-0">
                         <div class="md:col-span-1">
                             <img src="${data.profile_path ? imageBaseUrl + data.profile_path : 'https://placehold.co/500x750'}" alt="${data.name}" class="rounded-lg shadow-lg w-full">
                         </div>
@@ -2232,6 +2276,7 @@
                         </div>
                     </div>
                 `;
+                 document.getElementById('director-back-btn').addEventListener('click', goBack);
             }
 
             // --- EVENT LISTENERS ---
@@ -2478,11 +2523,11 @@
                 // Clear page history and reset to the correct base page
                 pageHistory = [];
                 if (!discoverPage.classList.contains('hidden')) {
-                    showDiscoverPage();
+                    pageHistory.push(() => showDiscoverPage(false));
                 } else if (!myListsPage.classList.contains('hidden')) {
-                    showMyListsPage();
+                     pageHistory.push(() => showMyListsPage(false));
                 } else {
-                    showHomePage();
+                     pageHistory.push(() => showHomePage(false));
                 }
             };
 
