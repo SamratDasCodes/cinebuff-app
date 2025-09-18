@@ -785,6 +785,31 @@
             }
         };
 
+        // --- AI API Caller ---
+        async function callAI(prompt) {
+            try {
+                // This makes a request to the openrouter.js serverless function
+                const response = await fetch('/api/openrouter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    console.error(`OpenRouter API Error: ${response.status} ${response.statusText}`, errorBody);
+                    return "Sorry, the AI is currently unavailable.";
+                }
+                
+                const data = await response.json();
+                return data.text;
+
+            } catch (error) {
+                console.error('Failed to call OpenRouter API endpoint:', error);
+                return "Sorry, there was an error connecting to the AI.";
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // --- CONFIG ---
             const imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
@@ -2509,4 +2534,5 @@
     </script>
 </body>
 </html>
+", could you tell me why I am unable to select the "Upcoming" filter when "TV Series" is chosen?
 
