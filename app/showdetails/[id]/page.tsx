@@ -6,6 +6,7 @@ import { Calendar, Clock, Star, Play } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
 import { BackButton } from "@/components/BackButton";
+import { SeasonEpisodeList } from "@/components/SeasonEpisodeList";
 
 export const revalidate = 3600;
 
@@ -321,6 +322,11 @@ export default async function ShowDetailsPage({ params }: PageProps) {
                         <RecommendedMovies movieId={movieId} mediaType="tv" />
                     </Suspense>
                 </section>
+
+                {/* Seasons & Episodes */}
+                {movie.seasons && movie.seasons.length > 0 && (
+                    <SeasonEpisodeList tvId={movieId} seasons={movie.seasons} />
+                )}
 
             </div>
         </main >

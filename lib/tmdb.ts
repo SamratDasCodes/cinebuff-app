@@ -372,3 +372,15 @@ export async function fetchPersonMovieCredits(id: number) {
         return [];
     }
 }
+
+export async function fetchTvSeason(tvId: number, seasonNumber: number) {
+    if (!TMDB_API_KEY) return null;
+    try {
+        const res = await fetch(`${BASE_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 } });
+        if (!res.ok) return null;
+        return await res.json();
+    } catch (e) {
+        console.warn("Fetch TV Season Error:", e);
+        return null; // Gracefully fail
+    }
+}
