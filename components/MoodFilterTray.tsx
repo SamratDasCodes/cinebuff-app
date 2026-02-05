@@ -5,7 +5,7 @@ import { searchKeywords } from "@/lib/tmdb";
 import { type Mood, MOOD_MAPPINGS, type FilterParams } from "@/lib/constants";
 import { MicroButton } from "./ui/MicroButton";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings2, ChevronDown, Search, X, BookOpen } from "lucide-react";
+import { Settings2, ChevronDown, Search, X, BookOpen, Home } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { HelpModal } from "./HelpModal";
 import { OmniSearch } from "./OmniSearch";
@@ -123,6 +123,7 @@ export function MoodFilterTray() {
 
     const [showFilters, setShowFilters] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
+    const [mobileSearchExpanded, setMobileSearchExpanded] = useState(false);
     const [keywordInput, setKeywordInput] = useState("");
     const [keywordResults, setKeywordResults] = useState<{ id: number, name: string }[]>([]);
     const debouncedKeyword = useDebounceState(keywordInput, 300);
@@ -153,21 +154,50 @@ export function MoodFilterTray() {
 
             {/* Search & Mode Switcher Row */}
             {/* Explicitly visible container with minimum height */}
-            <div className="w-full flex flex-col md:flex-row gap-6 items-center justify-center relative z-30 min-h-[50px]">
-                {/* Home Button */}
-                <button
-                    onClick={() => router.push('/home')}
-                    className="p-3 bg-white border border-black/10 rounded-full text-black hover:bg-black hover:text-white transition-all hover:scale-105 hover:shadow-lg shrink-0"
-                    title="Go Home"
-                >
-                    <div className="w-5 h-5 flex items-center justify-center font-bold text-xs">H</div>
-                </button>
+            {/* Search & Mode Switcher Row */}
+            {/* Explicitly visible container with minimum height */}
+            <div className="w-full flex flex-row gap-4 items-center justify-between md:justify-center relative z-30 min-h-[50px] px-4 md:px-0">
+                {/* Home Button (Hidden when mobile search is expanded) */}
+                {!mobileSearchExpanded && (
+                    <button
+                        onClick={() => router.push('/home')}
+                        className="p-3 bg-white border border-black/10 rounded-full text-black hover:bg-black hover:text-white transition-all hover:scale-105 hover:shadow-lg shrink-0"
+                        title="Go Home"
+                    >
+                        <Home size={20} />
+                    </button>
+                )}
 
-                <div className="w-full max-w-md relative z-40">
+                {/* OmniSearch Container */}
+                {/* Mobile: Hidden by default, shown when expanded. Desktop: Always visible. */}
+                <div className={`
+                    relative z-40 transition-all duration-300
+                    ${mobileSearchExpanded ? 'w-full block' : 'hidden md:block w-full max-w-md'}
+                `}>
                     <OmniSearch />
+                    {/* Mobile Close Button for Search */}
+                    {mobileSearchExpanded && (
+                        <button
+                            onClick={() => setMobileSearchExpanded(false)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-black/50 hover:text-black md:hidden"
+                        >
+                            <X size={16} />
+                        </button>
+                    )}
                 </div>
-                {/* Global Media Slider */}
-                <div className="shrink-0 relative z-30">
+
+                {/* Mobile Search Trigger (Visible only on mobile when collapsed) */}
+                {!mobileSearchExpanded && (
+                    <button
+                        onClick={() => setMobileSearchExpanded(true)}
+                        className="md:hidden p-3 bg-white border border-black/10 rounded-full text-black hover:bg-black hover:text-white transition-all hover:scale-105 hover:shadow-lg shrink-0"
+                    >
+                        <Search size={20} />
+                    </button>
+                )}
+
+                {/* Global Media Slider (Hidden when mobile search is expanded) */}
+                <div className={`shrink-0 relative z-30 ${mobileSearchExpanded ? 'hidden md:block' : 'block'}`}>
                     <MediaTypeToggle />
                 </div>
             </div>
