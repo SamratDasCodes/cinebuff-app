@@ -1,4 +1,5 @@
-import { fetchPersonDetails, fetchPersonMovieCredits, Movie, CastCredit } from "@/lib/tmdb";
+import { fetchPersonDetails, fetchPersonMovieCredits } from "@/lib/tmdb";
+import { Movie, CastCredit } from "@/lib/constants";
 import { MovieCard } from "@/components/MovieCard";
 import Image from "next/image";
 import { BackButton } from "@/components/BackButton";

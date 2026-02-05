@@ -1,6 +1,6 @@
 "use client";
 
-import { Movie } from "@/lib/tmdb";
+import { Movie } from "@/lib/constants";
 import { MovieCard } from "./MovieCard";
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
