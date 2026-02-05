@@ -241,7 +241,7 @@ export function MoodFilterTray() {
                         {/* Year */}
                         {selectedYear && (
                             <button onClick={() => updateUrl({ year: null })} className="px-3 py-1 bg-white border border-gray-200 text-gray-600 rounded-full text-xs flex items-center gap-1 hover:bg-gray-100 transition-colors">
-                                {selectedYear} <X size={10} />
+                                {selectedYear === 'upcoming' ? 'Upcoming' : selectedYear} <X size={10} />
                             </button>
                         )}
 
@@ -403,10 +403,15 @@ export function MoodFilterTray() {
                                             <div className="relative">
                                                 <select
                                                     value={selectedYear || ""}
-                                                    onChange={(e) => updateUrl({ year: e.target.value ? parseInt(e.target.value) : null })}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        if (val === 'upcoming') updateUrl({ year: 'upcoming' });
+                                                        else updateUrl({ year: val ? parseInt(val) : null });
+                                                    }}
                                                     className="appearance-none bg-gray-50 border border-black/10 text-gray-700 text-sm rounded-xl focus:ring-accent focus:border-accent block w-28 p-2.5 cursor-pointer hover:bg-black/5 transition-colors"
                                                 >
                                                     <option value="">All Time</option>
+                                                    <option value="upcoming">Upcoming</option>
                                                     {Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i).map(year => (
                                                         <option key={year} value={year}>{year}</option>
                                                     ))}

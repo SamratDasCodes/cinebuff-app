@@ -34,7 +34,7 @@ export interface FilterParams {
     moods: Mood[];
     languages: string[];
     userKeywords: string[]; // IDs as strings
-    year?: number | null;
+    year?: number | string | null;
     page?: number;
     query?: string;
     includeAdult?: boolean;

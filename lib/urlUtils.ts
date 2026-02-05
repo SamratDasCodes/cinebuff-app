@@ -41,9 +41,13 @@ export function parseSearchParams(searchParams: { [key: string]: string | string
     const adult = get('include_adult');
     if (adult === 'true') params.includeAdult = true;
 
-    // Numbers
+    // Numbers & Special strings
     const year = get('year');
-    if (year && !isNaN(parseInt(year))) params.year = parseInt(year);
+    if (year === 'upcoming') {
+        params.year = 'upcoming';
+    } else if (year && !isNaN(parseInt(year))) {
+        params.year = parseInt(year);
+    }
 
     const rating = get('min_rating');
     if (rating && !isNaN(parseFloat(rating))) params.minRating = parseFloat(rating);

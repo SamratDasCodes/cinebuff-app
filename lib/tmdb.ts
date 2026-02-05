@@ -108,7 +108,44 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
 
             if (allGenres.size > 0) params.append('with_genres', Array.from(allGenres).join('|'));
             if (allKeywords.size > 0) params.append('with_keywords', Array.from(allKeywords).join(','));
-            if (year) params.append('primary_release_year', year.toString()); // Note: for TV use 'first_air_date_year'
+
+            // Date Logic (Upcoming vs Released)
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+            if (year === 'upcoming') {
+                // Upcoming: From Tomorrow onwards
+                if (endpoint.includes('tv')) {
+                    params.append('first_air_date.gte', tomorrowStr);
+                } else {
+                    params.append('primary_release_date.gte', tomorrowStr);
+                    params.append('release_date.gte', tomorrowStr); // Redundant but safe
+                }
+                // Force Sort Ascending for Upcoming if not specified otherwise? 
+                // Creating a "Calendar" feel.
+                if (sortBy === 'primary_release_date.desc' || sortBy === 'popularity.desc') {
+                    params.set('sort_by', 'primary_release_date.asc');
+                }
+            } else {
+                // Standard: Released (Up to Today)
+                if (endpoint.includes('tv')) {
+                    params.append('first_air_date.lte', todayStr);
+                } else {
+                    params.append('primary_release_date.lte', todayStr);
+                    params.append('release_date.lte', todayStr);
+                }
+                // Specific Year
+                if (year) {
+                    params.append('primary_release_year', year.toString());
+                    // For TV:
+                    if (endpoint.includes('tv')) {
+                        params.append('first_air_date_year', year.toString());
+                    }
+                }
+            }
 
             // Handle Search Query vs Discover
             let url = '';

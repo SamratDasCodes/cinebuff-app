@@ -16,8 +16,8 @@ interface MovieState {
     selectedLanguages: string[];
     toggleLanguage: (lang: string) => void;
 
-    selectedYear: number | null;
-    setSelectedYear: (year: number | null) => void;
+    selectedYear: number | string | null;
+    setSelectedYear: (year: number | string | null) => void;
 
     searchQuery: string;
     setSearchQuery: (query: string) => void;
