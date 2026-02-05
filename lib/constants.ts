@@ -10,6 +10,7 @@ export interface Movie {
     adult?: boolean;
     media_type?: 'movie' | 'tv' | 'anime';
     original_language: string;
+    name?: string; // For TV Shows
 }
 
 export type Mood =

@@ -67,6 +67,20 @@ interface MovieState {
 
     activePerson: Person | null;
     setActivePerson: (person: Person | null) => void;
+
+    // User Identity & Tracking
+    userId: string;
+    userName: string;
+    setUserName: (name: string) => void;
+
+    cookieConsent: boolean | null; // null = not asked yet
+    setCookieConsent: (consent: boolean) => void;
+
+    searchHistory: string[];
+    addToSearchHistory: (query: string) => void;
+
+    clickHistory: { id: number, type: 'movie' | 'tv' | 'person', timestamp: number }[];
+    addToClickHistory: (id: number, type: 'movie' | 'tv' | 'person') => void;
 }
 
 export const useMovieStore = create<MovieState>()(
@@ -192,9 +206,31 @@ export const useMovieStore = create<MovieState>()(
 
             activePerson: null,
             setActivePerson: (person) => set({ activePerson: person }),
+
+            // User Tracking
+            userId: `guest_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`, // Simple ID generation
+            userName: "Guest User",
+            setUserName: (name) => set({ userName: name }),
+
+            cookieConsent: null,
+            setCookieConsent: (consent) => set({ cookieConsent: consent }),
+
+            searchHistory: [],
+            addToSearchHistory: (query) => set((state) => {
+                if (!state.cookieConsent) return {}; // Don't track if no consent
+                if (state.searchHistory.includes(query)) return { searchHistory: [query, ...state.searchHistory.filter(q => q !== query)].slice(0, 20) };
+                return { searchHistory: [query, ...state.searchHistory].slice(0, 20) };
+            }),
+
+            clickHistory: [],
+            addToClickHistory: (id, type) => set((state) => {
+                if (!state.cookieConsent) return {}; // Don't track if no consent
+                const entry = { id, type, timestamp: Date.now() };
+                return { clickHistory: [entry, ...state.clickHistory].slice(0, 50) };
+            }),
         }),
         {
-            name: 'mood-cinema-storage',
+            name: 'mood-cinema-cache-v1',
             partialize: (state) => ({
                 watchedMovies: state.watchedMovies,
                 likedMovies: state.likedMovies,
@@ -202,7 +238,12 @@ export const useMovieStore = create<MovieState>()(
                 includeAdult: state.includeAdult,
                 selectedLanguages: state.selectedLanguages,
                 selectedKeywords: state.selectedKeywords,
-                selectedYear: state.selectedYear
+                selectedYear: state.selectedYear,
+                userId: state.userId,
+                userName: state.userName,
+                cookieConsent: state.cookieConsent,
+                searchHistory: state.searchHistory,
+                clickHistory: state.clickHistory
             }),
         }
     )

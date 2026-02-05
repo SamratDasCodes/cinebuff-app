@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: "Aesthetic movie discovery platform powered by your mood.",
 };
 
+import { CookieConsent } from "@/components/CookieConsent";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,6 +26,7 @@ export default function RootLayout({
         className={`${roboto.variable} antialiased`}
       >
         {children}
+        <CookieConsent />
       </body>
     </html>
   );

@@ -5,9 +5,8 @@ import { searchKeywords } from "@/lib/tmdb";
 import { type Mood, MOOD_MAPPINGS, type FilterParams } from "@/lib/constants";
 import { MicroButton } from "./ui/MicroButton";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings2, ChevronDown, Search, X, BookOpen, Home } from "lucide-react";
+import { Settings2, ChevronDown, Search, X, BookOpen, Home, User } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { HelpModal } from "./HelpModal";
 import { OmniSearch } from "./OmniSearch";
 import { MediaTypeToggle } from "./MediaTypeToggle";
 import { useRouter, usePathname } from "next/navigation"; // New
@@ -122,7 +121,6 @@ export function MoodFilterTray() {
     };
 
     const [showFilters, setShowFilters] = useState(false);
-    const [showHelp, setShowHelp] = useState(false);
     const [mobileSearchExpanded, setMobileSearchExpanded] = useState(false);
     const [keywordInput, setKeywordInput] = useState("");
     const [keywordResults, setKeywordResults] = useState<{ id: number, name: string }[]>([]);
@@ -141,15 +139,13 @@ export function MoodFilterTray() {
 
     return (
         <div className="flex flex-col items-center gap-6 py-8 w-full max-w-4xl mx-auto font-sans relative">
-            <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
-
-            {/* Help/Guide Button */}
+            {/* Profile Button - Replaces Help/Guide */}
             <button
-                onClick={() => setShowHelp(true)}
+                onClick={() => router.push('/profile')}
                 className="fixed bottom-6 left-6 z-50 md:absolute md:z-10 md:bottom-auto md:left-0 md:top-8 xl:-left-24 p-3 bg-white border border-black/10 rounded-full text-gray-400 hover:text-black hover:scale-105 hover:shadow-lg transition-all group"
-                title="How to use"
+                title="My Profile"
             >
-                <BookOpen size={20} className="group-hover:text-accent transition-colors" />
+                <User size={20} className="group-hover:text-accent transition-colors" />
             </button>
 
             {/* Search & Mode Switcher Row */}

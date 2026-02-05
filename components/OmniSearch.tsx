@@ -27,7 +27,8 @@ export function OmniSearch() {
     const {
         searchQuery, setSearchQuery,
         selectedMoods, watchedMovies, selectedLanguages,
-        includeAdult, setActivePerson
+        includeAdult, setActivePerson,
+        addToSearchHistory, addToClickHistory // Tracking
     } = useMovieStore();
 
     const [input, setInput] = useState(searchQuery);
@@ -108,6 +109,7 @@ export function OmniSearch() {
             } else {
                 // Submit raw query if nothing selected
                 setSearchQuery(input);
+                addToSearchHistory(input); // Trace
                 setIsOpen(false);
                 router.push(`/home/search?q=${encodeURIComponent(input)}`);
             }
@@ -118,6 +120,9 @@ export function OmniSearch() {
     };
 
     const handleSelect = (item: MultiSearchResult) => {
+        // Trace Click
+        addToClickHistory(item.id, item.media_type as any);
+
         if (item.media_type === 'movie') {
             router.push(`/moviedetails/${item.id}`);
             // setSearchQuery(item.title || ""); // Optional: keep search text? No, clearer to just navigate.
@@ -164,6 +169,7 @@ export function OmniSearch() {
                 onSubmit={(e) => {
                     e.preventDefault();
                     setSearchQuery(input);
+                    addToSearchHistory(input); // Trace
                     setIsOpen(false);
                     router.push(`/home/search?q=${encodeURIComponent(input)}`);
                 }}
