@@ -156,12 +156,12 @@ export function MoodFilterTray() {
             {/* Explicitly visible container with minimum height */}
             {/* Search & Mode Switcher Row */}
             {/* Mobile: Stacked (Row 1: Home+Search, Row 2: Toggle). Desktop: Inline (Home, Search, Toggle) */}
-            <div className="w-full flex flex-col md:flex-row gap-4 items-center justify-between md:justify-center relative z-30 min-h-[50px] px-4 md:px-0">
+            <div className="w-full flex flex-col md:flex-row gap-4 items-center justify-center relative z-30 min-h-[50px] px-4 md:px-0">
 
                 {/* Row 1 (Mobile) / Left Group (Desktop) */}
                 <div className={`
                     w-full md:w-auto flex flex-row gap-4 items-center 
-                    ${mobileSearchExpanded ? 'justify-center' : 'justify-start'} 
+                    justify-center
                     md:justify-center transition-all duration-300
                 `}>
                     {/* Home Button (Hidden when mobile search is expanded) */}
@@ -177,7 +177,7 @@ export function MoodFilterTray() {
 
                     {/* OmniSearch Container */}
                     <div className={`
-                        relative z-40 transition-all duration-300
+                        relative z-40 transition-all duration-300 ease-out
                         ${mobileSearchExpanded ? 'w-full block' : 'hidden md:block w-full max-w-md'}
                     `}>
                         <OmniSearch />
@@ -185,9 +185,9 @@ export function MoodFilterTray() {
                         {mobileSearchExpanded && (
                             <button
                                 onClick={() => setMobileSearchExpanded(false)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-black/50 hover:text-black md:hidden"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-black/40 hover:text-black md:hidden hover:bg-black/5 rounded-full z-50"
                             >
-                                <X size={16} />
+                                <X size={18} />
                             </button>
                         )}
                     </div>
@@ -205,7 +205,7 @@ export function MoodFilterTray() {
 
                 {/* Row 2 (Mobile) / Right Group (Desktop) */}
                 {/* Use w-full flex justify-center on mobile to center the pill */}
-                <div className="shrink-0 relative z-30 w-full md:w-auto flex justify-center md:block">
+                <div className={`shrink-0 relative z-30 w-full md:w-auto flex justify-center md:block transition-all duration-300 ${mobileSearchExpanded ? 'opacity-0 h-0 overflow-hidden md:opacity-100 md:h-auto md:overflow-visible' : 'opacity-100 h-auto'}`}>
                     <MediaTypeToggle />
                 </div>
             </div>
