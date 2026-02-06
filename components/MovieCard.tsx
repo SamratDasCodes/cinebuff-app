@@ -40,7 +40,9 @@ export const MovieCard = memo(function MovieCard({ movie, onClick }: MovieCardPr
         if (onClick) {
             onClick();
         } else {
-            const route = movie.media_type === 'tv' ? 'showdetails' : 'moviedetails';
+            // Robust check: Trust media_type first, fallback to existence of 'name' (TV specific)
+            const isTv = movie.media_type === 'tv' || !!movie.name;
+            const route = isTv ? 'showdetails' : 'moviedetails';
             router.push(`/${route}/${movie.id}`);
         }
     };

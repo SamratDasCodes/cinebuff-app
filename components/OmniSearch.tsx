@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, Film, User, Hash, Loader2, ArrowRight } from "lucide-react";
+import { Search, Film, User, Hash, Loader2, ArrowRight, Star } from "lucide-react";
 import { useMovieStore } from "@/store/useMovieStore";
 import { searchMulti, MultiSearchResult } from "@/lib/tmdb";
 import { motion, AnimatePresence } from "framer-motion";
@@ -161,26 +161,35 @@ export function OmniSearch() {
     return (
         <div ref={containerRef} className="w-full max-w-xl relative group z-50">
 
-            {/* Overlay Effect when active */}
-            {isOpen && <div className="fixed inset-0 bg-black/60 backdrop-blur-[1px] -z-10 animate-in fade-in duration-300 pointer-events-none" />}
+            {/* Global Overlay (Focus Mode) */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm -z-10"
+                    />
+                )}
+            </AnimatePresence>
 
-            {/* Input Wrapper */}
+            {/* SEARCH INPUT */}
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    setSearchQuery(input);
-                    addToSearchHistory(input); // Trace
-                    setIsOpen(false);
-                    router.push(`/home/search?q=${encodeURIComponent(input)}`);
+                    if (input.trim()) {
+                        setSearchQuery(input);
+                        addToSearchHistory(input);
+                        setIsOpen(false);
+                        router.push(`/home/search?q=${encodeURIComponent(input)}`);
+                    }
                 }}
                 className="relative"
             >
-                <button
-                    type="submit"
-                    className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 hover:text-indigo-400 transition-colors z-10 cursor-pointer"
-                >
-                    <Search className={`w-4 h-4 ${isOpen || input ? 'text-indigo-400' : ''}`} />
-                </button>
+                {/* Search Icon */}
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                    <Search className={`w-5 h-5 transition-colors duration-300 ${isOpen ? 'text-indigo-400' : 'text-gray-400'}`} />
+                </div>
 
                 <input
                     ref={inputRef}
@@ -192,104 +201,165 @@ export function OmniSearch() {
                     }}
                     onKeyDown={handleKeyDown}
                     onFocus={() => { if (input.trim().length > 0) setIsOpen(true); }}
-                    placeholder="Search titles, actors, or keywords..."
+                    placeholder="Search movies, shows, people..."
                     className={`
-                        block w-full pl-11 pr-4 py-3 
-                        bg-white border text-sm transition-all duration-300
-                        ${isOpen
-                            ? 'border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)] text-black'
-                            : 'border-black/5 text-gray-700 hover:border-black/20'
-                        }
-                        rounded-xl focus:outline-none placeholder:text-gray-400
+                        block w-full pl-12 pr-10 py-3.5
+                        bg-white/90 backdrop-blur-md border border-white/20
+                        text-black placeholder:text-gray-500
+                        rounded-2xl shadow-sm transition-all duration-300
+                        focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:bg-white focus:shadow-xl focus:scale-[1.01]
                     `}
                 />
 
-                {/* Loading Bar */}
-                {isLoading && (
-                    <div className="absolute top-0 left-0 right-0 h-[1px] bg-indigo-500/20 overflow-hidden rounded-t-xl">
-                        <div className="h-full bg-indigo-500 w-1/3 animate-[shimmer_1s_infinite]" />
-                    </div>
-                )}
+                {/* Clear / Loading Indicator */}
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2">
+                    {isLoading ? (
+                        <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
+                    ) : input ? (
+                        <button
+                            type="button"
+                            onClick={() => { setInput(""); if (inputRef.current) inputRef.current.focus(); }}
+                            className="p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            <div className="w-4 h-4 flex items-center justify-center font-bold text-xs">✕</div>
+                        </button>
+                    ) : null}
+                </div>
             </form>
 
-            {/* Dropdown Results */}
+            {/* RESULTS DROPDOWN */}
             <AnimatePresence>
-                {isOpen && results.length > 0 && (
+                {isOpen && (input.length > 0) && (
                     <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.98 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 right-0 mt-2 bg-[#0a0a0a] border border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-[60vh] overflow-y-auto custom-scrollbar"
+                        exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute top-full left-0 right-0 mt-3 bg-white/80 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden ring-1 ring-black/5"
                     >
-                        <div className="py-2">
-                            {results.map((item, index) => {
-                                const isSelected = index === selectedIndex;
-                                return (
-                                    <button
-                                        key={`${item.media_type}-${item.id}`}
-                                        onClick={() => handleResultSelect(item)}
-                                        onMouseEnter={() => setSelectedIndex(index)}
-                                        className={`
-                                            w-full flex items-center gap-4 px-4 py-3 text-left transition-colors duration-150
-                                            ${isSelected ? 'bg-[#161616] border-l-2 border-indigo-500' : 'border-l-2 border-transparent hover:bg-[#111111]'}
-                                        `}
-                                    >
-                                        {/* Poster / Avatar */}
-                                        <div className="w-10 h-14 relative flex-shrink-0 bg-neutral-900 rounded overflow-hidden border border-white/5">
-                                            {(item.poster_path || item.profile_path) ? (
-                                                <Image
-                                                    src={`https://image.tmdb.org/t/p/w92${item.poster_path || item.profile_path}`}
-                                                    alt={item.title || item.name || "Visual"}
-                                                    fill
-                                                    className={`object-cover ${item.adult ? 'blur-sm scale-110' : ''}`}
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-700">
-                                                    {item.media_type === 'person' ? <User size={16} /> : <Film size={16} />}
+                        {/* Loading Skeletons */}
+                        {isLoading && results.length === 0 && (
+                            <div className="p-2 space-y-2">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="flex items-center gap-4 p-3 rounded-xl animate-pulse">
+                                        <div className="w-12 h-16 bg-black/5 rounded-lg" />
+                                        <div className="flex-1 space-y-2">
+                                            <div className="h-4 bg-black/5 rounded w-3/4" />
+                                            <div className="h-3 bg-black/5 rounded w-1/2" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* No Results */}
+                        {!isLoading && results.length === 0 && debouncedInput && (
+                            <div className="p-8 text-center text-gray-400">
+                                <Film className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                                <p className="text-sm">No results found for "{input}"</p>
+                            </div>
+                        )}
+
+                        {/* Results List */}
+                        {!isLoading && results.length > 0 && (
+                            <div className="py-2 max-h-[65vh] overflow-y-auto custom-scrollbar">
+                                {results.map((item, index) => {
+                                    const isSelected = index === selectedIndex;
+                                    return (
+                                        <motion.button
+                                            key={`${item.media_type}-${item.id}`}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.03 }} // Staggered entry
+                                            onClick={() => handleResultSelect(item)}
+                                            onMouseEnter={() => setSelectedIndex(index)}
+                                            className={`
+                                                w-full flex items-center gap-4 px-4 py-3 text-left transition-all duration-200 group
+                                                ${isSelected
+                                                    ? 'bg-black/5'
+                                                    : 'hover:bg-black/5'}
+                                            `}
+                                        >
+                                            {/* Poster */}
+                                            <div className={`
+                                                w-12 h-16 relative flex-shrink-0 rounded-lg overflow-hidden shadow-sm transition-transform duration-300
+                                                ${isSelected ? 'scale-105 shadow-md' : ''}
+                                            `}>
+                                                {(item.poster_path || item.profile_path) ? (
+                                                    <Image
+                                                        src={`https://image.tmdb.org/t/p/w92${item.poster_path || item.profile_path}`}
+                                                        alt={item.title || item.name || "Visual"}
+                                                        fill
+                                                        className={`object-cover ${item.adult ? 'blur-sm grayscale' : ''}`}
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                                                        {item.media_type === 'person' ? <User size={18} /> : <Film size={18} />}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Info */}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    <h4 className={`text-base font-semibold truncate transition-colors ${isSelected ? 'text-black' : 'text-gray-800'}`}>
+                                                        {item.title || item.name}
+                                                    </h4>
+                                                    {item.adult && (
+                                                        <span className="text-[10px] bg-rose-100 text-rose-600 px-1 rounded border border-rose-200 font-bold">18+</span>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
 
-                                        {/* Info */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-0.5">
-                                                <span className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-gray-300'}`}>
-                                                    {item.title || item.name}
-                                                </span>
-                                                {item.adult && (
-                                                    <span className="bg-rose-500/20 text-rose-400 text-[10px] px-1.5 rounded font-bold border border-rose-500/20">
-                                                        18+
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    {/* Badge */}
+                                                    <span className={`
+                                                        text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider
+                                                        ${item.media_type === 'movie' ? 'bg-indigo-50 border-indigo-100 text-indigo-600' :
+                                                            item.media_type === 'person' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' :
+                                                                'bg-orange-50 border-orange-100 text-orange-600'}
+                                                    `}>
+                                                        {item.media_type === 'movie' ? 'Movie' : item.media_type === 'person' ? 'Person' : 'TV'}
                                                     </span>
-                                                )}
-                                                {/* Smart Badge: Mood Match? */}
-                                                {/* Logic placeholder: if (item.score > x) ... */}
+
+                                                    {/* Meta */}
+                                                    <span className="text-xs text-gray-400 flex items-center gap-2">
+                                                        {item.release_date && <span>{item.release_date.split('-')[0]}</span>}
+                                                        {item.vote_average && item.vote_average > 0 && (
+                                                            <span className="flex items-center gap-0.5 text-yellow-500 font-medium">
+                                                                <Star size={10} fill="currentColor" /> {item.vote_average.toFixed(1)}
+                                                            </span>
+                                                        )}
+                                                    </span>
+                                                </div>
                                             </div>
 
-                                            <div className="flex items-center gap-3 text-xs text-gray-500">
-                                                {item.release_date && (
-                                                    <span>{item.release_date.split('-')[0]}</span>
-                                                )}
-                                                {item.vote_average && item.vote_average > 0 && (
-                                                    <span className="flex items-center gap-1 text-yellow-500/80">
-                                                        ★ {item.vote_average.toFixed(1)}
-                                                    </span>
-                                                )}
+                                            {/* Action Icon (Arrow) */}
+                                            <div className={`
+                                                pr-2 text-gray-400 bg-transparent
+                                                transition-all duration-300 transform
+                                                ${isSelected ? 'translate-x-0 opacity-100 text-indigo-500' : 'translate-x-2 opacity-0'}
+                                            `}>
+                                                <ArrowRight size={18} />
                                             </div>
-                                        </div>
 
-                                        {/* Type Badge */}
-                                        <div className={`
-                                            text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded
-                                            ${item.media_type === 'movie' ? 'bg-indigo-500/10 text-indigo-400' :
-                                                item.media_type === 'person' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gray-800 text-gray-400'}
-                                        `}>
-                                            {item.media_type === 'movie' ? 'Movie' : item.media_type === 'person' ? 'Person' : 'Media'}
-                                        </div>
+                                        </motion.button>
+                                    );
+                                })}
+
+                                <div className="p-2 border-t border-black/5 mt-2">
+                                    <button
+                                        onClick={() => {
+                                            setSearchQuery(input);
+                                            setIsOpen(false);
+                                            router.push(`/home/search?q=${encodeURIComponent(input)}`);
+                                        }}
+                                        className="w-full text-center text-xs font-bold text-indigo-600 hover:underline py-2"
+                                    >
+                                        View all results for "{input}"
                                     </button>
-                                );
-                            })}
-                        </div>
+                                </div>
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>

@@ -18,6 +18,7 @@ export default function ProfilePage() {
         setUserName,
         likedMovies,
         watchedMovies,
+        watchlistMovies,
         includeAdult,
         toggleIncludeAdult,
     } = useMovieStore();
@@ -73,6 +74,11 @@ export default function ProfilePage() {
 
     // Library View State
     const [libraryMode, setLibraryMode] = useState<'favorites' | 'watchlist' | 'watched'>('favorites');
+    const [hasMounted, setHasMounted] = useState(false);
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
 
     return (
         <main className="min-h-screen bg-[#fafafa] text-black">
@@ -122,24 +128,24 @@ export default function ProfilePage() {
                         )}
 
                         <div className="flex items-center justify-center md:justify-start gap-2 text-gray-400 text-xs font-mono bg-gray-50 w-fit mx-auto md:mx-0 px-2 py-1 rounded border border-gray-100" title="Your Unique Device ID">
-                            <span>ID: {userId}</span>
+                            <span>ID: {hasMounted ? userId : "..."}</span>
                         </div>
                         <p className="text-gray-500 font-medium pt-2">Welcome back to your personal space.</p>
 
                         <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-4">
                             <button onClick={() => setLibraryMode('favorites')} className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${libraryMode === 'favorites' ? 'bg-black text-white border-black' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
                                 <Heart size={16} className={libraryMode === 'favorites' ? "text-rose-500" : "text-gray-400"} fill={libraryMode === 'favorites' ? "currentColor" : "none"} />
-                                <span className="font-bold text-lg">{likedMovies.length}</span>
+                                <span className="font-bold text-lg">{hasMounted ? likedMovies.length : 0}</span>
                                 <span className="text-xs uppercase font-bold opacity-70">Liked</span>
                             </button>
                             <button onClick={() => setLibraryMode('watchlist')} className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${libraryMode === 'watchlist' ? 'bg-black text-white border-black' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
                                 <BookOpen size={16} className={libraryMode === 'watchlist' ? "text-blue-500" : "text-gray-400"} />
-                                <span className="font-bold text-lg">{useMovieStore.getState().watchlistMovies.length}</span>
+                                <span className="font-bold text-lg">{hasMounted ? watchlistMovies.length : 0}</span>
                                 <span className="text-xs uppercase font-bold opacity-70">Watchlist</span>
                             </button>
                             <button onClick={() => setLibraryMode('watched')} className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${libraryMode === 'watched' ? 'bg-black text-white border-black' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
                                 <Eye size={16} className={libraryMode === 'watched' ? "text-green-500" : "text-gray-400"} />
-                                <span className="font-bold text-lg">{watchedMovies.length}</span>
+                                <span className="font-bold text-lg">{hasMounted ? watchedMovies.length : 0}</span>
                                 <span className="text-xs uppercase font-bold opacity-70">Watched</span>
                             </button>
                         </div>

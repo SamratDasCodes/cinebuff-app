@@ -1,5 +1,6 @@
 import { fetchMovieDetails } from "@/lib/tmdb"; // Removed fetchMovieRecommendations
 import { RecommendedMovies } from "@/components/RecommendedMovies"; // New component
+import { InteractionButtons } from "@/components/InteractionButtons";
 import { Suspense } from "react";
 import Image from "next/image";
 import { Calendar, Clock, Star, Play, ArrowLeft } from "lucide-react";
@@ -183,7 +184,9 @@ export default async function MovieDetailsPage({ params }: PageProps) {
                                         Search Trailer
                                     </a>
                                 )}
-                                {/* Add to Watchlist Button could go here */}
+
+                                {/* INTERACTION PILLS (Like, Watchlist, Watched) */}
+                                <InteractionButtons movie={movie} />
 
                                 {/* OTT Pill (Moved inside buttons container) */}
                                 {(() => {

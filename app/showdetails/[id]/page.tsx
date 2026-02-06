@@ -6,6 +6,7 @@ import { Calendar, Clock, Star, Play } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
 import { BackButton } from "@/components/BackButton";
+import { InteractionButtons } from "@/components/InteractionButtons";
 import { SeasonEpisodeList } from "@/components/SeasonEpisodeList";
 
 export const revalidate = 3600;
@@ -188,7 +189,9 @@ export default async function ShowDetailsPage({ params }: PageProps) {
                                         Search Trailer
                                     </a>
                                 )}
-                                {/* Add to Watchlist Button could go here */}
+
+                                {/* INTERACTION PILLS (Like, Watchlist, Watched) */}
+                                <InteractionButtons movie={movie} />
 
                                 {/* OTT Pill (Moved inside buttons container) */}
                                 {(() => {

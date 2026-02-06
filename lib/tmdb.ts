@@ -45,6 +45,7 @@ function normalizeMedia(result: any, mediaType: 'movie' | 'tv'): Movie {
         adult: result.adult,
         original_language: result.original_language,
         media_type: mediaType,
+        name: result.name, // Preserve distinct name for TV detection
     };
 }
 

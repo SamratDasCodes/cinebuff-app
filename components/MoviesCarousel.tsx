@@ -59,7 +59,6 @@ export function MoviesCarousel({ title, movies }: MoviesCarouselProps) {
                     <div key={movie.id} className="min-w-[160px] md:min-w-[200px] snap-start">
                         <MovieCard
                             movie={movie}
-                            onClick={() => router.push(`/moviedetails/${movie.id}`)}
                         />
                     </div>
                 ))}
