@@ -20,7 +20,7 @@ interface MovieGridProps {
     initialTotalResults?: number;
 }
 
-export function MovieGrid({ initialMovies = [], initialTotalResults = 0, overrideMode }: MovieGridProps & { overrideMode?: 'discover' | 'watchlist' | 'favorites' | 'watched' }) {
+export function MovieGrid({ initialMovies, initialTotalResults, overrideMode }: MovieGridProps & { overrideMode?: 'discover' | 'watchlist' | 'favorites' | 'watched' }) {
     const {
         movies, setMovies, addMovies, totalResults, setTotalResults,
         selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery,
@@ -154,9 +154,9 @@ export function MovieGrid({ initialMovies = [], initialTotalResults = 0, overrid
 
     // KEY COMPONENT: Sync Initial Data when Prop Updates (Server Re-render)
     useEffect(() => {
-        if (initialMovies) {
+        if (initialMovies && initialMovies.length > 0) {
             setMovies(initialMovies);
-            setTotalResults(initialTotalResults);
+            setTotalResults(initialTotalResults || 0);
             setPage(1); // Ensure we are on page 1
             setIsLoading(false);
         }

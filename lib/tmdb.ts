@@ -155,18 +155,22 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                 }
             } else {
                 // Standard: Released (Up to Today)
-                if (endpoint.includes('tv')) {
-                    params.append('first_air_date.lte', todayStr);
-                } else {
-                    params.append('primary_release_date.lte', todayStr);
-                    params.append('release_date.lte', todayStr);
-                }
-                // Specific Year
+                // MODIFICATION: If a specific year is requested, we show ALL movies for that year (Released + Upcoming).
+                // We only apply the "released up to today" constraint if NO year is specified (General Discover).
+
                 if (year) {
                     params.append('primary_release_year', year.toString());
                     // For TV:
                     if (endpoint.includes('tv')) {
                         params.append('first_air_date_year', year.toString());
+                    }
+                } else {
+                    // No year specified: Filter to only released content
+                    if (endpoint.includes('tv')) {
+                        params.append('first_air_date.lte', todayStr);
+                    } else {
+                        params.append('primary_release_date.lte', todayStr);
+                        params.append('release_date.lte', todayStr);
                     }
                 }
             }
