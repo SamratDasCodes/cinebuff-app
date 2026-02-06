@@ -230,7 +230,6 @@ export const useMovieStore = create<MovieState>()(
                 selectedWatchProviders: [],
                 sortBy: 'primary_release_date.desc',
                 searchQuery: "",
-                searchQuery: "",
                 page: 1,
                 mediaMode: 'movie', // Default
                 viewFilter: 'discover' // Reset to discover

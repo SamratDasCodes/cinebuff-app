@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"; // Assuming we have these or need to create a simple modal
+// import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"; // Removed: Unused
 import { X, Download, Image as ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MicroButton } from "./ui/MicroButton";
+// import { MicroButton } from "./ui/MicroButton"; // Removed: Unused
 
 interface PersonPhotosModalProps {
     photos: { file_path: string; aspect_ratio: number }[];
