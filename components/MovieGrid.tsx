@@ -3,7 +3,7 @@
 import { useMovieStore } from "@/store/useMovieStore";
 import { MovieCard } from "./MovieCard";
 import { useEffect, useRef, useCallback } from "react";
-import { fetchMovies } from "@/lib/tmdb";
+import { fetchMovies, fetchMovieDetails } from "@/lib/tmdb";
 
 function MovieSkeleton() {
     return (
@@ -17,19 +17,23 @@ import { Movie } from "@/lib/constants";
 
 interface MovieGridProps {
     initialMovies?: Movie[];
+    initialTotalResults?: number;
 }
 
-export function MovieGrid({ initialMovies = [] }: MovieGridProps) {
+export function MovieGrid({ initialMovies = [], initialTotalResults = 0, overrideMode }: MovieGridProps & { overrideMode?: 'discover' | 'watchlist' | 'favorites' | 'watched' }) {
     const {
-        movies, setMovies, addMovies,
+        movies, setMovies, addMovies, totalResults, setTotalResults,
         selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery,
         // Advanced Filters
         selectedRuntime, minRating, selectedWatchProviders, sortBy,
-        watchedMovies, setActiveMovie,
+        watchedMovies, hideWatched, setActiveMovie,
         isLoading, setIsLoading,
         page, setPage,
         includeAdult,
-        mediaMode // Global switch
+        mediaMode, // Global switch
+        // viewFilter, // Deprecated, using overrideMode prop
+        watchlistMovies,
+        likedMovies
     } = useMovieStore();
 
     const observerTarget = useRef<HTMLDivElement>(null);
@@ -49,6 +53,53 @@ export function MovieGrid({ initialMovies = [] }: MovieGridProps) {
     useEffect(() => {
         let isCancelled = false;
 
+        // Determine effective mode: Prop overrides store (though store is deprecated for this)
+        const effectiveMode = overrideMode || 'discover';
+
+        // LIBRARY MODE LOGIC
+        if (effectiveMode !== 'discover') {
+            const fetchLibrary = async () => {
+                setIsLoading(true);
+                setMovies([]); // Clear discover movies to avoid confusion
+
+                const targetIds = effectiveMode === 'watchlist' ? watchlistMovies :
+                    effectiveMode === 'favorites' ? likedMovies :
+                        watchedMovies; // fallback/watched
+
+                // Reverse to show newest added first (assuming array append)
+                const idsToFetch = [...targetIds].reverse();
+
+                if (idsToFetch.length === 0) {
+                    setMovies([]);
+                    setIsLoading(false);
+                    return;
+                }
+
+                try {
+                    // Batch fetch details. Limit to 50 for now to avoid abuse.
+                    // In real app, we'd have a backend endpoint for this.
+                    const promises = idsToFetch.slice(0, 50).map(id => fetchMovieDetails(id).catch(() => null));
+                    const results = await Promise.all(promises);
+
+                    // Filter text content for keywords if needed? 
+                    // For now just show all in list.
+                    const validMovies = results.filter(m => m !== null) as Movie[];
+
+                    if (!isCancelled) {
+                        setMovies(validMovies);
+                    }
+                } catch (e) {
+                    console.error("Library Fetch Error:", e);
+                } finally {
+                    if (!isCancelled) setIsLoading(false);
+                }
+            };
+
+            fetchLibrary();
+            return () => { isCancelled = true; };
+        }
+
+        // DISCOVER MODE LOGIC
         const fetchData = async () => {
             // SSR HYBRID STRATEGY: 
             // If page is 1, we rely on the Server Component to pass 'initialMovies'.
@@ -68,7 +119,7 @@ export function MovieGrid({ initialMovies = [] }: MovieGridProps) {
                 console.log(`Fetching page ${page}...`);
 
                 const keywordIds = selectedKeywords.map(k => k.id.toString());
-                const fetchedMovies = await fetchMovies({
+                const { results: fetchedMovies, totalResults } = await fetchMovies({
                     moods: selectedMoods,
                     languages: selectedLanguages,
                     userKeywords: keywordIds,
@@ -84,8 +135,8 @@ export function MovieGrid({ initialMovies = [] }: MovieGridProps) {
                 });
 
                 if (!isCancelled) {
-                    const filtered = fetchedMovies.filter(m => !watchedMovies.includes(m.id));
-                    addMovies(filtered); // Only append for Page > 1
+                    // Only append for Page > 1. 
+                    addMovies(fetchedMovies);
                 }
             } catch (error) {
                 if (!isCancelled) console.error("Failed to load movies", error);
@@ -99,20 +150,17 @@ export function MovieGrid({ initialMovies = [] }: MovieGridProps) {
         return () => {
             isCancelled = true;
         };
-    }, [page, selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery, selectedRuntime, minRating, selectedWatchProviders, sortBy, watchedMovies, includeAdult, setMovies, addMovies, setIsLoading, mediaMode]);
+    }, [page, selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery, selectedRuntime, minRating, selectedWatchProviders, sortBy, watchedMovies, includeAdult, setMovies, addMovies, setIsLoading, mediaMode, watchlistMovies, likedMovies, overrideMode]);
 
     // KEY COMPONENT: Sync Initial Data when Prop Updates (Server Re-render)
     useEffect(() => {
         if (initialMovies) {
-            // We set movies whenever initialMovies changes.
-            // This handles the "Filter Change via URL" case.
-            // We also setPage(1) implicitly via the store reset elsewhere? 
-            // No, if URL changes, we are on a new "page view" effectively.
             setMovies(initialMovies);
+            setTotalResults(initialTotalResults);
             setPage(1); // Ensure we are on page 1
             setIsLoading(false);
         }
-    }, [initialMovies, setMovies, setPage, setIsLoading]);
+    }, [initialMovies, initialTotalResults, setMovies, setTotalResults, setPage, setIsLoading]);
 
 
     // Stable Intersection Observer
@@ -122,13 +170,14 @@ export function MovieGrid({ initialMovies = [] }: MovieGridProps) {
                 const target = entries[0];
                 if (target.isIntersecting) {
                     // Check refs to avoid closure staleness
-                    if (!isLoadingRef.current) {
+                    const isDiscover = (overrideMode || 'discover') === 'discover';
+                    if (!isLoadingRef.current && isDiscover) {
                         console.log("Observer fired! Incrementing page from", pageRef.current);
                         setPage(pageRef.current + 1);
                     }
                 }
             },
-            { threshold: 0.1, rootMargin: '200px' }
+            { threshold: 0.1, rootMargin: '1000px' }
         );
 
         const currentTarget = observerTarget.current;
@@ -141,6 +190,20 @@ export function MovieGrid({ initialMovies = [] }: MovieGridProps) {
         };
     }, [setPage]); // Minimal dependencies
 
+    // Disable infinite scroll for library views (until we implement pagination for library)
+    useEffect(() => {
+        if ((overrideMode || 'discover') !== 'discover' && observerTarget.current) {
+            // observer.unobserve(observerTarget.current); 
+            // Actually, simply hiding the sentinel or not incrementing page is enough.
+            // Our intersection observer logic handles page increment.
+            // We just need to ensure `setPage` doesn't trigger a 'discover' fetch if we are in 'library' mode.
+            // But wait, the main useEffect handles `viewFilter !== discover` branch first.
+            // So if `page` increments, the main effect runs, sees 'library', and re-fetches library?
+            // Re-fetching library on scroll is redundant.
+            // We should just return if viewFilter is not discover in the Observer callback.
+        }
+    }, [overrideMode]);
+
     // const handleCardClick = (id: number) => {
     //    const movie = movies.find(m => m.id === id);
     //    if (movie) setActiveMovie(movie);
@@ -152,17 +215,21 @@ export function MovieGrid({ initialMovies = [] }: MovieGridProps) {
                 Array.from({ length: 15 }).map((_, i) => <MovieSkeleton key={i} />)
             ) : (
                 <>
-                    {movies.map((movie) => (
-                        <MovieCard
-                            key={movie.id}
-                            movie={movie}
-                        // onClick={() => handleCardClick(movie.id)} <--- Removed to enable internal Link/Navigation
-                        />
-                    ))}
+                    {movies
+                        .filter(movie => !hideWatched || !watchedMovies.includes(movie.id))
+                        .map((movie) => (
+                            <MovieCard
+                                key={movie.id}
+                                movie={movie}
+                            // onClick={() => handleCardClick(movie.id)} <--- Removed to enable internal Link/Navigation
+                            />
+                        ))}
 
-                    {!isLoading && movies.length === 0 && (
+                    {!isLoading && movies.filter(movie => !hideWatched || !watchedMovies.includes(movie.id)).length === 0 && (
                         <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
-                            <h3 className="text-xl font-medium text-black mb-2">No vibe match found</h3>
+                            <h3 className="text-xl font-medium text-black mb-2">
+                                {hideWatched ? "All results hidden (Watched)" : "No vibe match found"}
+                            </h3>
                         </div>
                     )}
                 </>

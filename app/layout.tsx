@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
+import { AuthListener } from "@/components/AuthListener";
+import { SyncEngine } from "@/components/SyncEngine";
+import { ActivityLogger } from "@/components/ActivityLogger";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
@@ -25,6 +28,9 @@ export default function RootLayout({
       <body
         className={`${roboto.variable} antialiased`}
       >
+        <AuthListener />
+        <SyncEngine />
+        <ActivityLogger />
         {children}
         <CookieConsent />
       </body>

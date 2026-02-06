@@ -8,6 +8,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchMovieDetails } from "@/lib/tmdb";
 import { Movie } from "@/lib/constants";
+import { MovieGrid } from "@/components/MovieGrid"; // Import Grid
+import { motion } from "framer-motion";
 
 export default function ProfilePage() {
     const {
@@ -69,6 +71,9 @@ export default function ProfilePage() {
         return () => { isMounted = false; };
     }, [likedMovies, watchedMovies]);
 
+    // Library View State
+    const [libraryMode, setLibraryMode] = useState<'favorites' | 'watchlist' | 'watched'>('favorites');
+
     return (
         <main className="min-h-screen bg-[#fafafa] text-black">
             {/* Back Button */}
@@ -76,7 +81,7 @@ export default function ProfilePage() {
                 <BackButton />
             </div>
 
-            <div className="container mx-auto px-6 pt-24 pb-12 max-w-5xl">
+            <div className="container mx-auto px-6 pt-24 pb-12 max-w-7xl">
 
                 {/* Header Profile Card */}
                 <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl mb-12 flex flex-col md:flex-row items-center md:items-start gap-8 relative overflow-hidden">
@@ -122,116 +127,76 @@ export default function ProfilePage() {
                         <p className="text-gray-500 font-medium pt-2">Welcome back to your personal space.</p>
 
                         <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-4">
-                            <div className="px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-2">
-                                <Heart size={16} className="text-rose-500" fill="currentColor" />
+                            <button onClick={() => setLibraryMode('favorites')} className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${libraryMode === 'favorites' ? 'bg-black text-white border-black' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
+                                <Heart size={16} className={libraryMode === 'favorites' ? "text-rose-500" : "text-gray-400"} fill={libraryMode === 'favorites' ? "currentColor" : "none"} />
                                 <span className="font-bold text-lg">{likedMovies.length}</span>
-                                <span className="text-xs uppercase font-bold text-gray-400">Liked</span>
-                            </div>
-                            <div className="px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-2">
-                                <Eye size={16} className="text-indigo-500" />
+                                <span className="text-xs uppercase font-bold opacity-70">Liked</span>
+                            </button>
+                            <button onClick={() => setLibraryMode('watchlist')} className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${libraryMode === 'watchlist' ? 'bg-black text-white border-black' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
+                                <BookOpen size={16} className={libraryMode === 'watchlist' ? "text-blue-500" : "text-gray-400"} />
+                                <span className="font-bold text-lg">{useMovieStore.getState().watchlistMovies.length}</span>
+                                <span className="text-xs uppercase font-bold opacity-70">Watchlist</span>
+                            </button>
+                            <button onClick={() => setLibraryMode('watched')} className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${libraryMode === 'watched' ? 'bg-black text-white border-black' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
+                                <Eye size={16} className={libraryMode === 'watched' ? "text-green-500" : "text-gray-400"} />
                                 <span className="font-bold text-lg">{watchedMovies.length}</span>
-                                <span className="text-xs uppercase font-bold text-gray-400">Watched</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Settings Section */}
-                <div className="mb-12">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                        <Settings size={24} /> Settings
-                    </h2>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {/* Adult Toggle */}
-                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between group hover:border-black/10 transition-colors">
-                            <div className="space-y-1">
-                                <div className="flex items-center gap-2 font-bold text-lg">
-                                    <ShieldAlert size={20} className={includeAdult ? "text-rose-500" : "text-gray-400"} />
-                                    Adult Content
-                                </div>
-                                <p className="text-sm text-gray-500">Show 18+ content in search results.</p>
-                            </div>
-                            <button
-                                onClick={toggleIncludeAdult}
-                                className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 ${includeAdult ? 'bg-rose-500' : 'bg-gray-200'}`}
-                            >
-                                <div className={`w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-300 ${includeAdult ? 'translate-x-6' : 'translate-x-0'}`} />
+                                <span className="text-xs uppercase font-bold opacity-70">Watched</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Liked Movies Preview */}
-                <section className="mb-12">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold flex items-center gap-3">
-                            <Heart className="text-rose-500" fill="currentColor" size={24} /> Favorites
-                        </h2>
+                {/* Library Tabs */}
+                <div className="mb-8 flex justify-center md:justify-start border-b border-gray-200">
+                    <button
+                        onClick={() => setLibraryMode('favorites')}
+                        className={`pb-4 px-6 font-bold text-sm transition-all relative ${libraryMode === 'favorites' ? 'text-black' : 'text-gray-400 hover:text-gray-600'}`}
+                    >
+                        Favorites
+                        {libraryMode === 'favorites' && <motion.div layoutId="underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
+                    </button>
+                    <button
+                        onClick={() => setLibraryMode('watchlist')}
+                        className={`pb-4 px-6 font-bold text-sm transition-all relative ${libraryMode === 'watchlist' ? 'text-black' : 'text-gray-400 hover:text-gray-600'}`}
+                    >
+                        Watchlist
+                        {libraryMode === 'watchlist' && <motion.div layoutId="underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
+                    </button>
+                    <button
+                        onClick={() => setLibraryMode('watched')}
+                        className={`pb-4 px-6 font-bold text-sm transition-all relative ${libraryMode === 'watched' ? 'text-black' : 'text-gray-400 hover:text-gray-600'}`}
+                    >
+                        History
+                        {libraryMode === 'watched' && <motion.div layoutId="underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
+                    </button>
+                </div>
+
+                {/* Library Grid */}
+                <div>
+                    <MovieGrid overrideMode={libraryMode} />
+                </div>
+
+                {/* Settings Section (Collapsed/Below) */}
+                <div className="mt-20 pt-12 border-t border-gray-200">
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-400">
+                        <Settings size={20} /> Settings
+                    </h2>
+                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between max-w-md">
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-2 font-bold text-lg">
+                                <ShieldAlert size={20} className={includeAdult ? "text-rose-500" : "text-gray-400"} />
+                                Adult Content
+                            </div>
+                            <p className="text-sm text-gray-500">Show 18+ content in search results.</p>
+                        </div>
+                        <button
+                            onClick={toggleIncludeAdult}
+                            className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 ${includeAdult ? 'bg-rose-500' : 'bg-gray-200'}`}
+                        >
+                            <div className={`w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-300 ${includeAdult ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
                     </div>
-
-                    {likedMovies.length === 0 ? (
-                        <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                            <p className="text-gray-400 mb-4">No favorites yet.</p>
-                            <Link href="/home" className="text-indigo-600 font-bold hover:underline">Explore Movies</Link>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {likedPreviews.map(movie => (
-                                <Link href={`/${movie.media_type === 'tv' ? 'showdetails' : 'moviedetails'}/${movie.id}`} key={movie.id} className="group block">
-                                    <div className="aspect-[2/3] relative rounded-xl overflow-hidden bg-gray-100 mb-2">
-                                        {movie.poster_path ? (
-                                            <Image
-                                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                                                alt={movie.title || movie.name || "Untitled"}
-                                                fill
-                                                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                        ) : (
-                                            <div className="flex items-center justify-center w-full h-full text-xs text-gray-400">No Image</div>
-                                        )}
-                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                                    </div>
-                                    <h3 className="font-bold text-sm truncate group-hover:text-indigo-600 transition-colors">{movie.title || movie.name}</h3>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
-                </section>
-
-                {/* Watched Movies Preview */}
-                <section>
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold flex items-center gap-3">
-                            <ExperienceIcon /> Watched History
-                        </h2>
-                    </div>
-
-                    {watchedMovies.length === 0 ? (
-                        <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                            <p className="text-gray-400 mb-4">You haven't marked any movies as watched.</p>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {watchedPreviews.map(movie => (
-                                <Link href={`/${movie.media_type === 'tv' ? 'showdetails' : 'moviedetails'}/${movie.id}`} key={movie.id} className="group block">
-                                    <div className="aspect-[2/3] relative rounded-xl overflow-hidden bg-gray-100 mb-2 grayscale group-hover:grayscale-0 transition-all duration-500">
-                                        {movie.poster_path ? (
-                                            <Image
-                                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                                                alt={movie.title || movie.name || "Untitled"}
-                                                fill
-                                                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                        ) : (
-                                            <div className="flex items-center justify-center w-full h-full text-xs text-gray-400">No Image</div>
-                                        )}
-                                    </div>
-                                    <h3 className="font-bold text-sm truncate text-gray-500 group-hover:text-black transition-colors">{movie.title || movie.name}</h3>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
-                </section>
+                </div>
 
             </div>
         </main>

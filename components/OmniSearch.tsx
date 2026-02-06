@@ -105,7 +105,7 @@ export function OmniSearch() {
         } else if (e.key === 'Enter') {
             e.preventDefault();
             if (selectedIndex >= 0 && results[selectedIndex]) {
-                handleSelect(results[selectedIndex]);
+                handleResultSelect(results[selectedIndex]);
             } else {
                 // Submit raw query if nothing selected
                 setSearchQuery(input);
@@ -119,31 +119,31 @@ export function OmniSearch() {
         }
     };
 
-    const handleSelect = (item: MultiSearchResult) => {
-        // Trace Click
-        addToClickHistory(item.id, item.media_type as any);
+    const handleResultSelect = (result: MultiSearchResult) => {
+        if (!result) return;
 
-        if (item.media_type === 'movie') {
-            router.push(`/moviedetails/${item.id}`);
-            // setSearchQuery(item.title || ""); // Optional: keep search text? No, clearer to just navigate.
-            // setInput(item.title || "");
-        } else if (item.media_type === 'person') {
-            // Open Person Modal
-            setActivePerson({
-                id: item.id,
-                name: item.name || "",
-                // Partial fill
-                biography: "",
-                birthday: "",
-                place_of_birth: "",
-                profile_path: item.profile_path || "",
-                known_for_department: "Acting"
-            });
-            setIsOpen(false);
-            setSearchQuery(""); // Clear search to show grid? Or keep it? Clear it usually better
-            setInput("");
+        // Trace Click
+        addToClickHistory(result.id, result.media_type as any);
+
+        let path = '';
+        if (result.media_type === 'movie') {
+            path = `/moviedetails/${result.id}`;
+        } else if (result.media_type === 'tv') {
+            path = `/showdetails/${result.id}`;
+        } else if (result.media_type === 'person') {
+            path = `/castdetails/${result.id}`;
+        } else {
+            // Fallback for unknown types or 'multi' results that might be something else
+            // If we don't know, maybe just search it?
+            path = `/home/search?query=${encodeURIComponent(result.title || result.name || '')}`;
         }
-        setIsOpen(false);
+
+        if (path) {
+            setSearchQuery(""); // Clear search on navigation? Or keep it? Usually clear.
+            setInput(""); // Clear local input
+            setIsOpen(false);
+            router.push(path);
+        }
     };
 
     // Click Outside
@@ -228,7 +228,7 @@ export function OmniSearch() {
                                 return (
                                     <button
                                         key={`${item.media_type}-${item.id}`}
-                                        onClick={() => handleSelect(item)}
+                                        onClick={() => handleResultSelect(item)}
                                         onMouseEnter={() => setSelectedIndex(index)}
                                         className={`
                                             w-full flex items-center gap-4 px-4 py-3 text-left transition-colors duration-150

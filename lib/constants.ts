@@ -15,7 +15,7 @@ export interface Movie {
 
 export type Mood =
     | 'chilled' | 'adrenaline' | 'mind-bending' | 'romantic'
-    | 'cheerful' | 'dark' | 'inspiring' | 'intense' | 'Hentai';
+    | 'cheerful' | 'dark' | 'inspiring' | 'intense' | 'Hentai' | 'better jaiga pele chole jabo';
 
 // Mappings for Movie (standard) and TV (different IDs)
 // TV IDs: ActionAdv(10759), SciFi(10765), WarPolitics(10768), Kids(10762)
@@ -28,7 +28,8 @@ export const MOOD_MAPPINGS: Record<Mood, { movie_genres?: string; tv_genres?: st
     'dark': { movie_genres: '27,80', tv_genres: '80,9648' }, // Horror, Crime -> TV Crime, Mystery
     'inspiring': { movie_genres: '18', tv_genres: '18' }, // Drama
     'intense': { movie_genres: '53,10752', tv_genres: '10768,10759' }, // Thriller, War -> TV War&Politics, Action&Adv
-    'Hentai': {} // Handled via query
+    'Hentai': {}, // Handled via query
+    'better jaiga pele chole jabo': { movie_genres: '12,14,10751', tv_genres: '10759,10765' } // Adventure, Fantasy, Family -> Escape/Travel vibe
 };
 
 export interface FilterParams {
@@ -55,6 +56,9 @@ export interface Person {
     place_of_birth: string;
     profile_path: string;
     known_for_department: string;
+    images?: {
+        profiles: { file_path: string; aspect_ratio: number }[];
+    };
 }
 
 export interface CastCredit {

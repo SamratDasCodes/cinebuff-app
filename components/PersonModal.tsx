@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { fetchPersonDetails, fetchPersonMovieCredits } from "@/lib/tmdb";
+import { PersonPhotosModal } from "./PersonPhotosModal";
 import { type Person, type CastCredit, type Movie } from "@/lib/constants";
 
 export function PersonModal() {
@@ -21,6 +22,8 @@ export function PersonModal() {
                 fetchPersonDetails(activePerson.id),
                 fetchPersonMovieCredits(activePerson.id)
             ]).then(([d, c]) => {
+                console.log("[PersonModal] Fetched Details:", d);
+                console.log("[PersonModal] Images:", d?.images);
                 setDetails(d);
                 setCredits(c);
                 setIsLoading(false);
@@ -118,6 +121,9 @@ export function PersonModal() {
                                         <Film size={16} className="text-indigo-400" />
                                         <span>{credits.length} Credits</span>
                                     </div>
+
+                                    {/* Photos Button */}
+                                    {details && <PersonPhotosModal photos={details.images?.profiles || []} name={details.name} />}
                                 </div>
 
                                 {/* Known For (Roles) */}

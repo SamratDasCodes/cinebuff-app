@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useMovieStore } from "@/store/useMovieStore";
 import { FilterParams } from "@/lib/constants";
+import { fetchKeywordDetails } from "@/lib/tmdb";
 
 interface ClientStateSyncProps {
     newParams: FilterParams;
@@ -32,31 +33,54 @@ export function ClientStateSync({ newParams }: ClientStateSyncProps) {
     const isFirstMount = useRef(true);
 
     useEffect(() => {
-        // We only want to sync if the params are truly different from current state?
-        // Or blindly sync on mount/update?
-        // Since this component is rendered by the Server Page, it reflects the 'Source of Truth' (URL).
-        // So we should enforce it.
-
-        useMovieStore.setState((state) => ({
-            mediaMode: newParams.mediaMode || state.mediaMode,
-            searchQuery: newParams.query || "",
-            selectedMoods: newParams.moods || [],
-            selectedLanguages: newParams.languages || [],
-            selectedYear: newParams.year || null,
-            includeAdult: newParams.includeAdult || false,
-            selectedRuntime: newParams.runtime || 'all',
-            minRating: newParams.minRating || 0,
-            selectedWatchProviders: newParams.watchProviders || [],
-            sortBy: newParams.sortBy || 'popularity.desc',
-
-            // Keywords: tricky because URL has ["123"], Store has [{id:123, name:?}]
-            // If store has the keyword, keep the name. If not, add placeholder.
-            selectedKeywords: newParams.userKeywords.map(idStr => {
+        const syncState = async () => {
+            // 1. Initial State Sync (Optimistic / Fast)
+            const initialKeywords = newParams.userKeywords.map(idStr => {
                 const id = parseInt(idStr);
-                const existing = state.selectedKeywords.find(k => k.id === id);
-                return existing || { id, name: `${id}` }; // Fallback name
-            })
-        }));
+                const existing = useMovieStore.getState().selectedKeywords.find(k => k.id === id);
+                return existing || { id, name: idStr }; // Temporary fallback
+            });
+
+            useMovieStore.setState((state) => ({
+                mediaMode: newParams.mediaMode || state.mediaMode,
+                searchQuery: newParams.query || "",
+                selectedMoods: newParams.moods || [],
+                selectedLanguages: newParams.languages || [],
+                selectedYear: newParams.year || null,
+                includeAdult: newParams.includeAdult || false,
+                selectedRuntime: newParams.runtime || 'all',
+                minRating: newParams.minRating || 0,
+                selectedWatchProviders: newParams.watchProviders || [],
+                sortBy: newParams.sortBy || 'popularity.desc',
+                selectedKeywords: initialKeywords
+            }));
+
+            // 2. Resolve Missing Keyword Names (Lazy)
+            const missingKeywords = initialKeywords.filter(k => k.name === k.id.toString());
+            if (missingKeywords.length > 0) {
+                // console.log("Resolving keyword names for:", missingKeywords);
+                const resolved = await Promise.all(
+                    missingKeywords.map(async (k) => {
+                        try {
+                            const details = await fetchKeywordDetails(k.id);
+                            return details || k;
+                        } catch {
+                            return k;
+                        }
+                    })
+                );
+
+                // Update Store with Resolved Names
+                useMovieStore.setState((state) => ({
+                    selectedKeywords: state.selectedKeywords.map(k => {
+                        const match = resolved.find(r => r.id === k.id);
+                        return match ? match : k;
+                    })
+                }));
+            }
+        };
+
+        syncState();
 
     }, [newParams]);
 

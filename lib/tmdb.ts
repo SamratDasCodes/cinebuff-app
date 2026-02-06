@@ -18,6 +18,19 @@ export async function searchKeywords(query: string) {
     }
 }
 
+// Helper to get keyword name by ID
+export async function fetchKeywordDetails(id: number) {
+    if (!TMDB_API_KEY) return null;
+    try {
+        const res = await fetch(`${BASE_URL}/keyword/${id}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 * 24 } });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data as { id: number, name: string };
+    } catch (e) {
+        return null;
+    }
+}
+
 // Helper to normalize TV/Movie/Anime results to common Movie interface
 function normalizeMedia(result: any, mediaType: 'movie' | 'tv'): Movie {
     return {
@@ -38,19 +51,27 @@ function normalizeMedia(result: any, mediaType: 'movie' | 'tv'): Movie {
 export async function fetchMovies({ moods, languages, userKeywords, year, query, includeAdult = false, page = 1, runtime = 'all', minRating = 0, watchProviders = [], sortBy = 'primary_release_date.desc', mediaMode = 'movie' }: FilterParams & { query?: string, mediaMode?: 'movie' | 'tv' | 'anime' }) {
     if (!TMDB_API_KEY) {
         console.error("TMDB_API_KEY is missing");
-        return [];
+        return { results: [], totalResults: 0 };
     }
 
     console.log(`Fetching ${mediaMode} - Page: ${page}, Query: "${query || ''}", Moods: ${moods}`);
 
     try {
         const fetchCommon = async (endpoint: string, extraParams: URLSearchParams = new URLSearchParams()) => {
+            // Sanitize sort_by for TV
+            let effectiveSortBy = sortBy;
+            if (endpoint.includes('tv') && sortBy.includes('primary_release_date')) {
+                effectiveSortBy = sortBy.replace('primary_release_date', 'first_air_date');
+            } else if (!endpoint.includes('tv') && sortBy.includes('first_air_date')) {
+                effectiveSortBy = sortBy.replace('first_air_date', 'primary_release_date');
+            }
+
             const params = new URLSearchParams({
                 api_key: TMDB_API_KEY,
                 page: page.toString(),
                 include_adult: includeAdult ? 'true' : 'false',
                 language: 'en-US',
-                sort_by: sortBy,
+                sort_by: effectiveSortBy,
                 ...Object.fromEntries(extraParams)
             });
 
@@ -120,14 +141,17 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                 // Upcoming: From Tomorrow onwards
                 if (endpoint.includes('tv')) {
                     params.append('first_air_date.gte', tomorrowStr);
+                    // Force Sort Ascending for Upcoming if not specified otherwise
+                    if (sortBy === 'primary_release_date.desc' || sortBy === 'popularity.desc') {
+                        params.set('sort_by', 'first_air_date.asc');
+                    }
                 } else {
                     params.append('primary_release_date.gte', tomorrowStr);
-                    params.append('release_date.gte', tomorrowStr); // Redundant but safe
-                }
-                // Force Sort Ascending for Upcoming if not specified otherwise? 
-                // Creating a "Calendar" feel.
-                if (sortBy === 'primary_release_date.desc' || sortBy === 'popularity.desc') {
-                    params.set('sort_by', 'primary_release_date.asc');
+                    params.append('release_date.gte', tomorrowStr);
+                    // Force Sort Ascending for Upcoming
+                    if (sortBy === 'primary_release_date.desc' || sortBy === 'popularity.desc') {
+                        params.set('sort_by', 'primary_release_date.asc');
+                    }
                 }
             } else {
                 // Standard: Released (Up to Today)
@@ -169,50 +193,60 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                 url = `${BASE_URL}/${endpoint}`;
             }
 
-            const res = await fetch(`${url}?${params.toString()}`, { next: { revalidate: 3600 } });
-            if (!res.ok) throw new Error(`Failed to fetch ${endpoint}: ${res.status}`);
-            return await res.json();
+            const fullUrl = `${url}?${params.toString()}`;
+            // console.log("Fetching:", fullUrl); // Debug log (can be verbose)
+
+            try {
+                const res = await fetch(fullUrl, { next: { revalidate: 3600 } });
+                if (!res.ok) {
+                    const errorBody = await res.text(); // Get detailed error from TMDB
+                    console.error(`[TMDB Error] Status: ${res.status} ${res.statusText}`);
+                    console.error(`[TMDB Error] Body: ${errorBody}`);
+                    throw new Error(`Failed to fetch ${endpoint}: ${res.status} ${res.statusText}`);
+                }
+                return await res.json();
+            } catch (innerError) {
+                console.error(`[TMDB Fetch Error] URL: ${fullUrl}`);
+                console.error(`[TMDB Fetch Error] Cause:`, innerError);
+                throw innerError; // Rethrow to be caught by outer block or handled
+            }
         };
 
         // --- EXECUTION STRATEGIES ---
 
         let results: Movie[] = [];
+        let totalResults = 0;
 
         if (mediaMode === 'anime') {
-            // Fetch both Movies and TV for Anime
             const [moviesData, tvData] = await Promise.all([
                 fetchCommon('discover/movie'),
                 fetchCommon('discover/tv')
             ]);
-
             const normalizedMovies = (moviesData.results || []).map((m: any) => normalizeMedia(m, 'movie'));
             const normalizedTV = (tvData.results || []).map((t: any) => normalizeMedia(t, 'tv'));
             results = [...normalizedMovies, ...normalizedTV];
+            totalResults = (moviesData.total_results || 0) + (tvData.total_results || 0);
+
         } else if (mediaMode === 'tv') {
             const data = await fetchCommon('discover/tv');
             results = (data.results || []).map((t: any) => normalizeMedia(t, 'tv'));
+            totalResults = data.total_results || 0;
+
         } else {
-            // Default Movie
             const data = await fetchCommon('discover/movie');
             results = (data.results || []).map((m: any) => normalizeMedia(m, 'movie'));
+            totalResults = data.total_results || 0;
         }
-
-        // Post-Processing Filters
-        // Note: We removed stricter adult filter for Hentai because the 'query=hentai' strategy implies intent.
-        // We trust the search results to be relevant.
 
         if (sortBy.includes('popularity')) {
             results.sort((a, b) => b.vote_average - a.vote_average);
-            // Note: using vote_average for popularity sort as it's often more relevant for mixed media types, 
-            // but if user explicitly asked for popularity, maybe b.popularity - a.popularity is better.
-            // Keeping vote_average as per previous logic for now.
         }
 
-        return results;
+        return { results, totalResults };
 
     } catch (error) {
         console.error(error);
-        return [];
+        return { results: [], totalResults: 0 };
     }
 }
 
@@ -267,7 +301,7 @@ export async function fetchMovieDetails(id: number, forceType?: 'movie' | 'tv') 
 // Multi-Search Types
 export interface MultiSearchResult {
     id: number;
-    media_type: 'movie' | 'person' | 'keyword';
+    media_type: 'movie' | 'person' | 'keyword' | 'tv';
     title?: string; // For movies
     name?: string; // For people/keywords
     poster_path?: string; // For movies
@@ -349,7 +383,7 @@ export async function fetchMovieRecommendations(id: number, page: number = 1, me
 export async function fetchPersonDetails(id: number) {
     if (!TMDB_API_KEY || isNaN(id)) return null;
     try {
-        const res = await fetch(`${BASE_URL}/person/${id}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 } });
+        const res = await fetch(`${BASE_URL}/person/${id}?api_key=${TMDB_API_KEY}&append_to_response=images`, { next: { revalidate: 3600 } });
         if (!res.ok) return null;
         return await res.json() as Person;
     } catch (e) {

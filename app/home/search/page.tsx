@@ -4,8 +4,10 @@ import { parseSearchParams } from "@/lib/urlUtils";
 import { ClientStateSync } from "@/components/ClientStateSync";
 import { Search } from "lucide-react";
 
-export default async function SearchPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
-    const filters = parseSearchParams(searchParams);
+import { ResultCount } from "@/components/ResultCount";
+
+export default async function SearchPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+    const filters = parseSearchParams(await searchParams);
     const query = filters.query;
 
     if (!query) {
@@ -26,19 +28,22 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
         );
     }
 
-    const movies = await fetchMovies(filters);
+    const { results: movies, totalResults } = await fetchMovies(filters);
 
     return (
         <main className="min-h-screen text-white pb-20">
             <ClientStateSync newParams={filters} />
             <div className="max-w-7xl mx-auto">
                 <div className="mb-6 px-4 md:px-8 mt-8">
-                    <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
-                        Results for <span className="text-indigo-600">"{query}"</span>
-                    </h1>
+                    <div className="flex items-center gap-4">
+                        <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
+                            Results for <span className="text-indigo-600">"{query}"</span>
+                        </h1>
+                        <ResultCount initialValue={totalResults} />
+                    </div>
                 </div>
 
-                <MovieGrid initialMovies={movies} />
+                <MovieGrid initialMovies={movies} initialTotalResults={totalResults} />
             </div>
         </main>
     );

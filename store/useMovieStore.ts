@@ -30,8 +30,14 @@ interface MovieState {
     watchedMovies: number[];
     toggleWatched: (id: number) => void;
 
+    hideWatched: boolean;
+    toggleHideWatched: () => void;
+
     likedMovies: number[];
     toggleLike: (id: number) => void;
+
+    watchlistMovies: number[];
+    toggleWatchlist: (id: number) => void;
 
     sensitiveMode: boolean;
     toggleSensitiveMode: () => void;
@@ -59,16 +65,27 @@ interface MovieState {
     page: number;
     setPage: (page: number) => void;
     addMovies: (movies: Movie[]) => void;
+
+    totalResults: number;
+    setTotalResults: (total: number) => void;
+
     resetFilters: () => void;
 
     // Global Media Mode
     mediaMode: 'movie' | 'tv' | 'anime';
     setMediaMode: (mode: 'movie' | 'tv' | 'anime') => void;
 
+    viewFilter: 'discover' | 'watchlist' | 'favorites';
+    setViewFilter: (filter: 'discover' | 'watchlist' | 'favorites') => void;
+
     activePerson: Person | null;
     setActivePerson: (person: Person | null) => void;
 
     // User Identity & Tracking
+    user: any | null; // Firebase User
+    setUser: (user: any | null) => void;
+
+    // Legacy/Guest tracking
     userId: string;
     userName: string;
     setUserName: (name: string) => void;
@@ -136,6 +153,9 @@ export const useMovieStore = create<MovieState>()(
                 };
             }),
 
+            hideWatched: false,
+            toggleHideWatched: () => set((state) => ({ hideWatched: !state.hideWatched })),
+
             likedMovies: [],
             toggleLike: (id) => set((state) => {
                 const isLiked = state.likedMovies.includes(id);
@@ -143,6 +163,16 @@ export const useMovieStore = create<MovieState>()(
                     likedMovies: isLiked
                         ? state.likedMovies.filter(m => m !== id)
                         : [...state.likedMovies, id]
+                };
+            }),
+
+            watchlistMovies: [],
+            toggleWatchlist: (id) => set((state) => {
+                const isWatchlisted = state.watchlistMovies.includes(id);
+                return {
+                    watchlistMovies: isWatchlisted
+                        ? state.watchlistMovies.filter(m => m !== id)
+                        : [...state.watchlistMovies, id]
                 };
             }),
 
@@ -187,6 +217,9 @@ export const useMovieStore = create<MovieState>()(
                 return { movies: [...state.movies, ...uniqueNewMovies] };
             }),
 
+            totalResults: 0,
+            setTotalResults: (total) => set({ totalResults: total }),
+
             resetFilters: () => set({
                 selectedMoods: [],
                 selectedLanguages: [],
@@ -197,17 +230,25 @@ export const useMovieStore = create<MovieState>()(
                 selectedWatchProviders: [],
                 sortBy: 'primary_release_date.desc',
                 searchQuery: "",
+                searchQuery: "",
                 page: 1,
-                mediaMode: 'movie' // Default
+                mediaMode: 'movie', // Default
+                viewFilter: 'discover' // Reset to discover
             }),
 
             mediaMode: 'movie',
             setMediaMode: (mode) => set({ mediaMode: mode }),
 
+            viewFilter: 'discover',
+            setViewFilter: (filter) => set({ viewFilter: filter }),
+
             activePerson: null,
             setActivePerson: (person) => set({ activePerson: person }),
 
-            // User Tracking
+            // User Identity & Tracking
+            user: null,
+            setUser: (user) => set({ user }),
+
             userId: `guest_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`, // Simple ID generation
             userName: "Guest User",
             setUserName: (name) => set({ userName: name }),
@@ -234,8 +275,10 @@ export const useMovieStore = create<MovieState>()(
             partialize: (state) => ({
                 watchedMovies: state.watchedMovies,
                 likedMovies: state.likedMovies,
+                watchlistMovies: state.watchlistMovies,
                 sensitiveMode: state.sensitiveMode,
                 includeAdult: state.includeAdult,
+                hideWatched: state.hideWatched,
                 selectedLanguages: state.selectedLanguages,
                 selectedKeywords: state.selectedKeywords,
                 selectedYear: state.selectedYear,

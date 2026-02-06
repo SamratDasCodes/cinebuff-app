@@ -2,14 +2,14 @@
 
 import { useMovieStore } from "@/store/useMovieStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, ExternalLink, Heart, Check } from "lucide-react";
+import { X, Play, ExternalLink, Heart, Check, Bookmark } from "lucide-react";
 import Image from "next/image";
 import { MicroButton } from "./ui/MicroButton";
 import { useEffect, useState } from "react";
 import { fetchMovieDetails } from "@/lib/tmdb";
 
 export function MovieModal() {
-    const { activeMovie, setActiveMovie, likedMovies, toggleLike, watchedMovies, toggleWatched } = useMovieStore();
+    const { activeMovie, setActiveMovie, likedMovies, toggleLike, watchedMovies, toggleWatched, watchlistMovies, toggleWatchlist } = useMovieStore();
     const [details, setDetails] = useState<any>(null);
 
     useEffect(() => {
@@ -23,6 +23,7 @@ export function MovieModal() {
 
     const isLiked = likedMovies.includes(activeMovie.id);
     const isWatched = watchedMovies.includes(activeMovie.id);
+    const isWatchlisted = watchlistMovies.includes(activeMovie.id);
 
     return (
         <AnimatePresence>
@@ -116,23 +117,43 @@ export function MovieModal() {
                                     </MicroButton>
                                 </div>
 
-                                {/* Social Actions */}
-                                <div className="flex gap-4 pt-4 border-t border-black/5">
-                                    <MicroButton
-                                        variant={isLiked ? "primary" : "secondary"}
-                                        onClick={() => toggleLike(activeMovie.id)}
-                                        className="gap-2"
-                                    >
-                                        <Heart size={16} fill={isLiked ? "currentColor" : "none"} /> {isLiked ? "Liked" : "Like"}
-                                    </MicroButton>
-
-                                    <MicroButton
-                                        variant={isWatched ? "primary" : "secondary"}
+                                {/* Social Actions - Pills */}
+                                <div className="flex gap-2 pt-4 border-t border-black/5">
+                                    {/* Watched Pill */}
+                                    <button
                                         onClick={() => toggleWatched(activeMovie.id)}
-                                        className="gap-2"
+                                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition-all duration-300 ${isWatched
+                                            ? "bg-green-500 text-white shadow-lg shadow-green-500/30"
+                                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                                            }`}
                                     >
-                                        <Check size={16} /> {isWatched ? "Watched" : "Mark as Watched"}
-                                    </MicroButton>
+                                        <Check size={18} />
+                                        <span>Watched</span>
+                                    </button>
+
+                                    {/* Watchlist Pill */}
+                                    <button
+                                        onClick={() => toggleWatchlist(activeMovie.id)}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition-all duration-300 ${isWatchlisted
+                                            ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30"
+                                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                                            }`}
+                                    >
+                                        <Bookmark size={18} fill={isWatchlisted ? "currentColor" : "none"} />
+                                        <span>Watchlist</span>
+                                    </button>
+
+                                    {/* Favourite/Like Pill */}
+                                    <button
+                                        onClick={() => toggleLike(activeMovie.id)}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition-all duration-300 ${isLiked
+                                            ? "bg-red-500 text-white shadow-lg shadow-red-500/30"
+                                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                                            }`}
+                                    >
+                                        <Heart size={18} fill={isLiked ? "currentColor" : "none"} />
+                                        <span>Liked</span>
+                                    </button>
                                 </div>
                             </div>
                         )}

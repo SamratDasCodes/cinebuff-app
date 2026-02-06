@@ -5,10 +5,11 @@ import { searchKeywords } from "@/lib/tmdb";
 import { type Mood, MOOD_MAPPINGS, type FilterParams } from "@/lib/constants";
 import { MicroButton } from "./ui/MicroButton";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings2, ChevronDown, Search, X, BookOpen, Home, User } from "lucide-react";
+import { Settings2, ChevronDown, Search, X, Home, User, EyeOff } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { OmniSearch } from "./OmniSearch";
 import { MediaTypeToggle } from "./MediaTypeToggle";
+import { LoginModal } from "./LoginModal";
 import { useRouter, usePathname } from "next/navigation"; // New
 import { createUrlString } from "@/lib/urlUtils"; // New
 
@@ -27,7 +28,7 @@ function useDebounceState<T>(value: T, delay: number): T {
 }
 
 // Match the updated Mood type from tmdb.ts
-const MOODS: Mood[] = ['chilled', 'adrenaline', 'dark', 'cheerful', 'mind-bending', 'romantic', 'inspiring', 'intense'];
+const MOODS: Mood[] = ['chilled', 'adrenaline', 'dark', 'cheerful', 'mind-bending', 'romantic', 'inspiring', 'intense', 'better jaiga pele chole jabo'];
 const LANGUAGES = [
     { code: 'en', label: 'English' },
     { code: 'hi', label: 'Hindi' },
@@ -53,8 +54,12 @@ export function MoodFilterTray() {
         selectedWatchProviders,
         sortBy,
         mediaMode = 'movie', // Default fallback
-        includeAdult
+        includeAdult,
+        hideWatched, toggleHideWatched,
+        user // Firebase User
     } = useMovieStore();
+
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
 
     // Helper to push updates
     const updateUrl = (updates: Partial<FilterParams>) => {
@@ -140,13 +145,27 @@ export function MoodFilterTray() {
     return (
         <div className="flex flex-col items-center gap-6 py-8 w-full max-w-4xl mx-auto font-sans relative">
             {/* Profile Button - Replaces Help/Guide */}
+            {/* Profile Button - Replaces Help/Guide */}
             <button
-                onClick={() => router.push('/profile')}
-                className="fixed bottom-6 left-6 z-50 md:absolute md:z-10 md:bottom-auto md:left-0 md:top-8 xl:-left-24 p-3 bg-white border border-black/10 rounded-full text-gray-400 hover:text-black hover:scale-105 hover:shadow-lg transition-all group"
-                title="My Profile"
+                onClick={() => {
+                    if (user) router.push('/profile');
+                    else setIsLoginOpen(true);
+                }}
+                className={`
+                    fixed bottom-6 left-6 z-50 md:absolute md:z-10 md:bottom-auto md:left-0 md:top-8 xl:-left-24 p-3 
+                    border transition-all group rounded-full
+                    ${user
+                        ? 'bg-black text-white border-black hover:bg-gray-900 shadow-lg'
+                        : 'bg-white text-gray-400 border-black/10 hover:text-black hover:scale-105 hover:shadow-lg'}
+                `}
+                title={user ? "My Profile" : "Log In"}
             >
-                <User size={20} className="group-hover:text-accent transition-colors" />
+                <User size={20} className={user ? "text-white" : "group-hover:text-accent transition-colors"} />
+                {user && <div className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />}
             </button>
+
+            {/* Login Modal */}
+            <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
 
             {/* Search & Mode Switcher Row */}
             {/* Explicitly visible container with minimum height */}
@@ -272,7 +291,7 @@ export function MoodFilterTray() {
             <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`
-                    p-3 rounded-xl border transition-all duration-300 group relative z-20 flex items-center gap-2
+                    mt-2 p-3 rounded-xl border transition-all duration-300 group relative z-20 flex items-center gap-2
                     ${showFilters
                         ? 'bg-black text-white border-black shadow-[0_0_15px_rgba(0,0,0,0.4)]'
                         : 'bg-white text-gray-500 border-gray-200 hover:text-black'}
@@ -470,7 +489,24 @@ export function MoodFilterTray() {
                                             />
                                         </div>
 
-                                        <div className="space-y-3">
+                                        <div className="space-y-3 flex gap-2">
+                                            {/* Hide Watched Toggle */}
+                                            <button
+                                                onClick={toggleHideWatched}
+                                                className={`
+                                            flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold transition-all duration-300 h-[38px]
+                                            ${hideWatched
+                                                        ? 'bg-black text-white border-black shadow-[0_0_15px_rgba(0,0,0,0.4)]'
+                                                        : 'bg-gray-50 text-gray-400 border-gray-200 hover:text-gray-600'}
+                                        `}
+                                                title="Hide Watched Content"
+                                            >
+                                                <EyeOff size={14} />
+                                                <span>Hidden</span>
+                                                <div className={`w-2 h-2 rounded-full ${hideWatched ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                            </button>
+
+                                            {/* 18+ Toggle */}
                                             <button
                                                 onClick={() => updateUrl({ includeAdult: !includeAdult })}
                                                 className={`

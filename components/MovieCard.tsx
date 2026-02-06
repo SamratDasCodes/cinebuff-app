@@ -4,8 +4,8 @@ import { fetchMovieDetails } from "@/lib/tmdb";
 import { Movie } from "@/lib/constants";
 import { GlassCard } from "./ui/GlassCard";
 import Image from "next/image";
-import { Play, Eye, EyeOff, Info } from "lucide-react";
-import { useState } from "react";
+import { Play, Eye, EyeOff, Info, Check, Bookmark, Heart } from "lucide-react";
+import { useState, memo } from "react";
 import { MicroButton } from "./ui/MicroButton";
 import { useMovieStore } from "@/store/useMovieStore";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,19 +13,20 @@ import { useRouter } from "next/navigation";
 
 interface MovieCardProps {
     movie: Movie;
-    onClick?: () => void; // Optional now, or removed if strictly Link. Let's keep optional for versatility but default to Link behavior if not handled? 
-    // Actually, simple is best. The grid passes onClick for modal. We want to CHANGE that behavior.
-    // So let's rely on the parent (MovieGrid) to pass the navigation function OR handle it here using Next Link.
-    // The previous prompt said: "The details page url will be in /moviedetails".
-    // So the card should probably be a Link itself or navigate on click.
+    onClick?: () => void;
 }
 
-export function MovieCard({ movie, onClick }: MovieCardProps) {
-    const { sensitiveMode } = useMovieStore();
+export const MovieCard = memo(function MovieCard({ movie, onClick }: MovieCardProps) {
+    // ... implementations
+    const { sensitiveMode, likedMovies, toggleLike, watchedMovies, toggleWatched, watchlistMovies, toggleWatchlist } = useMovieStore();
     const [isHovered, setIsHovered] = useState(false);
-    // Blur if sensitive mode is on OR if text implies adult, but specifically if movie.adult is true
-    // Requirement: x-rated posters blured by default.
-    const [blurred, setBlurred] = useState(movie.adult || sensitiveMode);
+    // console.log(`[MovieCard] ${movie.title} Adult:`, movie.adult); 
+
+    // Heuristic: Check title for explicit keywords if adult flag is missing
+    const isExplicitTitle = /hentai|sex|erotic|uncensored|nude|adulteress|incest|taboo/i.test(movie.title || "");
+    const shouldBlur = Boolean(movie.adult) || sensitiveMode || isExplicitTitle;
+
+    const [blurred, setBlurred] = useState(shouldBlur);
     const [loadingTrailer, setLoadingTrailer] = useState(false);
 
     const toggleBlur = (e: React.MouseEvent) => {
@@ -158,6 +159,36 @@ export function MovieCard({ movie, onClick }: MovieCardProps) {
                             </MicroButton>
                         </div>
 
+                        {/* Action Pills Row */}
+                        <div className="flex gap-2 mt-3">
+                            {/* Watchlist */}
+                            <button
+                                onClick={(e) => { e.stopPropagation(); toggleWatchlist(movie.id); }}
+                                className={`p-2 rounded-full transition-all ${watchlistMovies.includes(movie.id) ? 'bg-blue-500 text-white' : 'bg-white/20 text-black hover:bg-blue-100 hover:text-blue-500'}`}
+                                title={watchlistMovies.includes(movie.id) ? "Remove from Watchlist" : "Add to Watchlist"}
+                            >
+                                <Bookmark size={16} fill={watchlistMovies.includes(movie.id) ? "currentColor" : "none"} />
+                            </button>
+
+                            {/* Watched */}
+                            <button
+                                onClick={(e) => { e.stopPropagation(); toggleWatched(movie.id); }}
+                                className={`p-2 rounded-full transition-all ${watchedMovies.includes(movie.id) ? 'bg-green-500 text-white' : 'bg-white/20 text-black hover:bg-green-100 hover:text-green-500'}`}
+                                title={watchedMovies.includes(movie.id) ? "Mark as Unwatched" : "Mark as Watched"}
+                            >
+                                <Check size={16} />
+                            </button>
+
+                            {/* Like */}
+                            <button
+                                onClick={(e) => { e.stopPropagation(); toggleLike(movie.id); }}
+                                className={`p-2 rounded-full transition-all ${likedMovies.includes(movie.id) ? 'bg-red-500 text-white' : 'bg-white/20 text-black hover:bg-red-100 hover:text-red-500'}`}
+                                title={likedMovies.includes(movie.id) ? "Unlike" : "Like"}
+                            >
+                                <Heart size={16} fill={likedMovies.includes(movie.id) ? "currentColor" : "none"} />
+                            </button>
+                        </div>
+
                         <div className="text-xs text-green-400 font-medium mt-1">
                             {Math.round(movie.vote_average * 10)}% Match
                         </div>
@@ -166,4 +197,4 @@ export function MovieCard({ movie, onClick }: MovieCardProps) {
             </AnimatePresence>
         </GlassCard >
     );
-}
+});
