@@ -115,6 +115,10 @@ interface MovieState {
     // Sync Status
     syncStatus: 'idle' | 'syncing' | 'saved' | 'error';
     setSyncStatus: (status: 'idle' | 'syncing' | 'saved' | 'error') => void;
+
+    // Cache Control
+    lastParams: string;
+    setLastParams: (params: string) => void;
 }
 
 export const useMovieStore = create<MovieState>()(
@@ -327,6 +331,9 @@ export const useMovieStore = create<MovieState>()(
 
             syncStatus: 'idle',
             setSyncStatus: (status) => set({ syncStatus: status }),
+
+            lastParams: "",
+            setLastParams: (params) => set({ lastParams: params }),
         }),
         {
             name: 'mood-cinema-cache-v1',
@@ -346,7 +353,13 @@ export const useMovieStore = create<MovieState>()(
                 cookieConsent: state.cookieConsent,
                 searchHistory: state.searchHistory,
                 clickHistory: state.clickHistory,
-                // Persist Preferences
+                // Persist Data for Restoration
+                movies: state.movies,
+                page: state.page,
+                totalResults: state.totalResults,
+                lastParams: state.lastParams,
+
+                // Preferences
                 defaultMediaMode: state.defaultMediaMode,
                 defaultSortBy: state.defaultSortBy,
                 defaultLanguages: state.defaultLanguages,

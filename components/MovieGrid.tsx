@@ -33,7 +33,8 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
         mediaMode, // Global switch
         // viewFilter, // Deprecated, using overrideMode prop
         watchlistMovies,
-        likedMovies
+        likedMovies,
+        lastParams, setLastParams
     } = useMovieStore();
 
     const observerTarget = useRef<HTMLDivElement>(null);
@@ -161,15 +162,45 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
         };
     }, [page, selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery, selectedRuntime, minRating, selectedWatchProviders, sortBy, watchedMovies, includeAdult, setMovies, addMovies, setIsLoading, mediaMode, watchlistMovies, likedMovies, overrideMode]);
 
-    // KEY COMPONENT: Sync Initial Data when Prop Updates (Server Re-render)
+    // KEY COMPONENT: Sync Initial Data & Smart Hydration
     useEffect(() => {
         if (initialMovies && initialMovies.length > 0) {
+            // New Logic: Check if we have cached data for this exact view
+            const currentParams = {
+                moods: selectedMoods,
+                languages: selectedLanguages,
+                keywords: selectedKeywords.map(k => k.id).sort(), // Sort for stability
+                year: selectedYear,
+                query: searchQuery,
+                runtime: selectedRuntime,
+                minRating,
+                watchProviders: selectedWatchProviders.sort(),
+                sortBy,
+                mediaMode,
+                includeAdult
+            };
+            const currentHash = JSON.stringify(currentParams);
+
+            if (currentHash === lastParams && movies.length > 0) {
+                // Cache Hit! We have data for this view.
+                // Restore loading state to false and keep existing movies/page
+                setIsLoading(false);
+                // console.log("Smart Hydration: Restored cached movies", movies.length);
+                return;
+            }
+
+            // Cache Miss or New Filter (Reset)
+            // console.log("Smart Hydration: Cache miss, applying initial data");
             setMovies(initialMovies);
             setTotalResults(initialTotalResults || 0);
             setPage(1); // Ensure we are on page 1
             setIsLoading(false);
+            setLastParams(currentHash); // Update cache hash
         }
-    }, [initialMovies, initialTotalResults, setMovies, setTotalResults, setPage, setIsLoading]);
+    }, [initialMovies, initialTotalResults, setMovies, setTotalResults, setPage, setIsLoading,
+        selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery,
+        selectedRuntime, minRating, selectedWatchProviders, sortBy, mediaMode, includeAdult,
+        lastParams, setLastParams, movies.length]);
 
 
     // Stable Intersection Observer
