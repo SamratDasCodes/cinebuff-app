@@ -20,7 +20,7 @@ interface MovieGridProps {
     initialTotalResults?: number;
 }
 
-export function MovieGrid({ initialMovies, initialTotalResults, overrideMode }: MovieGridProps & { overrideMode?: 'discover' | 'watchlist' | 'favorites' | 'watched' }) {
+export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, customMovies }: MovieGridProps & { overrideMode?: 'discover' | 'watchlist' | 'favorites' | 'watched' | 'custom', customMovies?: Movie[] }) {
     const {
         movies, setMovies, addMovies, totalResults, setTotalResults,
         selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery,
@@ -55,6 +55,15 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode }: 
 
         // Determine effective mode: Prop overrides store (though store is deprecated for this)
         const effectiveMode = overrideMode || 'discover';
+
+        // CUSTOM MODE LOGIC (Direct Injection)
+        if (effectiveMode === 'custom') {
+            if (customMovies) {
+                setMovies(customMovies);
+                setIsLoading(false);
+            }
+            return;
+        }
 
         // LIBRARY MODE LOGIC
         if (effectiveMode !== 'discover') {

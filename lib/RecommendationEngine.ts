@@ -1,3 +1,5 @@
+"use server";
+
 import { fetchMovieDetails, fetchMovies } from "./tmdb";
 import { Movie } from "./constants";
 
@@ -12,6 +14,7 @@ const WEIGHTS = {
 interface UserInterestProfile {
     genres: Record<number, number>; // GenreID -> Score
     keywords: Record<number, number>; // KeywordID -> Score
+    languages: Record<string, number>; // LanguageCode -> Score
     processedIds: Set<number>; // To avoid reprocessing
 }
 
@@ -25,6 +28,7 @@ async function buildUserInterestProfile(
     const profile: UserInterestProfile = {
         genres: {},
         keywords: {},
+        languages: {},
         processedIds: new Set()
     };
 
@@ -48,6 +52,11 @@ async function buildUserInterestProfile(
             details.genres?.forEach((g: any) => {
                 profile.genres[g.id] = (profile.genres[g.id] || 0) + weight;
             });
+
+            // Score Languages
+            if (details.original_language) {
+                profile.languages[details.original_language] = (profile.languages[details.original_language] || 0) + weight;
+            }
 
             // Score Keywords (if available in details, fetchMovieDetails appends distinct 'keywords' usually? 
             // Wait, fetchMovieDetails appends `keywords` in `append_to_response`? 
@@ -91,19 +100,25 @@ export async function generatePersonalizedFeed(
         .slice(0, 3) // Top 3
         .map(([id]) => id);
 
+    // C. Extract Top Languages
+    const topLanguages = Object.entries(profile.languages)
+        .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+        .slice(0, 2) // Top 2
+        .map(([lang]) => lang);
+
     if (topGenres.length === 0) {
         // Cold Start: Return Trending if no data
         const { fetchTrending } = await import("./tmdb");
         return (await fetchTrending('week')) as unknown as Movie[];
     }
 
-    // C. Fetch Recommendations (Discovery)
-    return await fetchDiscovery(topGenres, [...watchedIds, ...dislikedIds]);
+    // D. Fetch Recommendations (Discovery)
+    return await fetchDiscovery(topGenres, topLanguages, [...watchedIds, ...dislikedIds]);
 
 }
 
 // Dedicated Discovery Fetcher for Recommendations
-async function fetchDiscovery(genreIds: string[], excludeIds: number[]) {
+async function fetchDiscovery(genreIds: string[], languageCodes: string[], excludeIds: number[]) {
     const TMDB_API_KEY = process.env.TMDB_API_KEY!;
     const BASE_URL = 'https://api.themoviedb.org/3';
 
@@ -119,6 +134,11 @@ async function fetchDiscovery(genreIds: string[], excludeIds: number[]) {
         // Actually for "Personalized", maybe AND for the top 2? 
         // Let's stick to pipe (OR) for top 3 to ensure we get results.
     });
+
+    if (languageCodes.length > 0) {
+        // TMDB allows pipe for OR logic in with_original_language
+        params.append('with_original_language', languageCodes.join('|'));
+    }
 
     try {
         const res = await fetch(`${BASE_URL}/discover/movie?${params.toString()}`, { next: { revalidate: 3600 } });

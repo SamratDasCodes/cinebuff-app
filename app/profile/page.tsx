@@ -2,7 +2,7 @@
 
 import { useMovieStore } from "@/store/useMovieStore";
 import { BackButton } from "@/components/BackButton";
-import { Settings, Heart, Eye, User, Film, BookOpen, ShieldAlert, Edit2, LogOut } from "lucide-react";
+import { Settings, Heart, Eye, User, Film, BookOpen, ShieldAlert, Edit2, LogOut, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -74,7 +74,7 @@ export default function ProfilePage() {
         }
 
         async function loadRecommendations() {
-            if (likedMovies.length === 0 && watchlistMovies.length === 0 && watchedMovies.length === 0) return;
+            // Allow Cold Start (Engine handles empty lists by returning Trending)
 
             setRecLoading(true);
             try {
@@ -98,7 +98,7 @@ export default function ProfilePage() {
     }, [likedMovies, watchedMovies, watchlistMovies]);
 
     // Library View State
-    const [libraryMode, setLibraryMode] = useState<'favorites' | 'watchlist' | 'watched'>('favorites');
+    const [libraryMode, setLibraryMode] = useState<'favorites' | 'watchlist' | 'watched' | 'recommended'>('favorites');
     const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
@@ -173,82 +173,23 @@ export default function ProfilePage() {
                                 <span className="font-bold text-lg">{hasMounted ? watchedMovies.length : 0}</span>
                                 <span className="text-xs uppercase font-bold opacity-70">Watched</span>
                             </button>
+                            <button onClick={() => setLibraryMode('recommended')} className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${libraryMode === 'recommended' ? 'bg-black text-white border-black' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
+                                <Sparkles size={16} className={libraryMode === 'recommended' ? "text-purple-500" : "text-gray-400"} />
+                                <span className="font-bold text-lg">{recommendations.length}</span>
+                                <span className="text-xs uppercase font-bold opacity-70">For You</span>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Daily Mix / Recommendations */}
-                {recommendations.length > 0 && (
-                    <div className="mb-12">
-                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                            ✨ Your Daily Mix
-                        </h2>
-                        <div className="relative">
-                            <div className="flex gap-4 overflow-x-auto pb-6 snap-x custom-scrollbar">
-                                {recommendations.map((movie) => (
-                                    <Link key={movie.id} href={`/moviedetails/${movie.id}`} className="min-w-[160px] md:min-w-[200px] snap-start group relative">
-                                        <div className="aspect-[2/3] rounded-xl overflow-hidden shadow-md bg-gray-200">
-                                            {movie.poster_path ? (
-                                                <Image
-                                                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                                                    alt={movie.title || "Movie"}
-                                                    width={200}
-                                                    height={300}
-                                                    className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                    <Film size={24} />
-                                                </div>
-                                            )}
-                                            {/* Quick Add Overlay */}
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                <div className="text-white font-bold text-xs bg-black/60 px-2 py-1 rounded-full backdrop-blur-sm">
-                                                    {movie.vote_average?.toFixed(1)} ★
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <h3 className="mt-2 text-sm font-bold truncate group-hover:text-indigo-600 transition-colors">
-                                            {movie.title}
-                                        </h3>
-                                        <p className="text-xs text-gray-400">
-                                            {movie.release_date?.split('-')[0]}
-                                        </p>
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                )}
 
-                {/* Library Tabs */}
-                <div className="mb-8 flex justify-center md:justify-start border-b border-gray-200">
-                    <button
-                        onClick={() => setLibraryMode('favorites')}
-                        className={`pb-4 px-6 font-bold text-sm transition-all relative ${libraryMode === 'favorites' ? 'text-black' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                        Favorites
-                        {libraryMode === 'favorites' && <motion.div layoutId="underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
-                    </button>
-                    <button
-                        onClick={() => setLibraryMode('watchlist')}
-                        className={`pb-4 px-6 font-bold text-sm transition-all relative ${libraryMode === 'watchlist' ? 'text-black' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                        Watchlist
-                        {libraryMode === 'watchlist' && <motion.div layoutId="underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
-                    </button>
-                    <button
-                        onClick={() => setLibraryMode('watched')}
-                        className={`pb-4 px-6 font-bold text-sm transition-all relative ${libraryMode === 'watched' ? 'text-black' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                        History
-                        {libraryMode === 'watched' && <motion.div layoutId="underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
-                    </button>
-                </div>
 
                 {/* Library Grid */}
                 <div>
-                    <MovieGrid overrideMode={libraryMode} />
+                    <MovieGrid
+                        overrideMode={libraryMode === 'recommended' ? 'custom' : libraryMode as any}
+                        customMovies={libraryMode === 'recommended' ? recommendations : undefined}
+                    />
                 </div>
 
                 {/* Settings Section (Collapsed/Below) */}
