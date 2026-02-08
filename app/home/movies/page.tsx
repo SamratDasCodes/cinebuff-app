@@ -7,24 +7,35 @@ import { ClientStateSync } from "@/components/ClientStateSync"; // We need this 
 
 import { ResultCount } from "@/components/ResultCount";
 
-export default async function MoviesPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-    const filters = parseSearchParams(await searchParams);
+import { cookies } from "next/headers"; // Import cookies
 
-    // Force mediaMode
-    filters.mediaMode = 'movie';
+export default async function MoviesPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+    const rawFilters = parseSearchParams(await searchParams);
+    const effectiveFilters = { ...rawFilters }; // Clone for mutation
+    const cookieStore = await cookies();
+
+    // Force mediaMode (server-side enforcement)
+    effectiveFilters.mediaMode = 'movie';
+    rawFilters.mediaMode = 'movie'; // Ensure client sync knows this too
 
     // Apply Defaults if not present (Matches Store defaults)
-    if (!filters.languages || filters.languages.length === 0) {
-        filters.languages = ['en', 'bn', 'hi'];
+    if (!effectiveFilters.languages || effectiveFilters.languages.length === 0) {
+        const defaultLangs = cookieStore.get('default_languages')?.value;
+        effectiveFilters.languages = defaultLangs ? defaultLangs.split(',') : ['en', 'bn', 'hi'];
     }
 
-    const { results: movies, totalResults } = await fetchMovies(filters);
+    if (!effectiveFilters.sortBy && !searchParams['sort_by']) {
+        const defaultSort = cookieStore.get('default_sort_by')?.value;
+        if (defaultSort) effectiveFilters.sortBy = defaultSort;
+    }
+
+    const { results: movies, totalResults } = await fetchMovies(effectiveFilters);
     console.log("[MoviesPage] totalResults:", totalResults);
 
     return (
         <main className="min-h-screen text-white pb-20">
             {/* Sync URL Params to Store for UI Consistency (e.g. Filter Tray highlighting) */}
-            <ClientStateSync newParams={filters} />
+            <ClientStateSync newParams={rawFilters} />
 
             <div className="max-w-7xl mx-auto">
                 <div className="mb-6 px-4 md:px-8">

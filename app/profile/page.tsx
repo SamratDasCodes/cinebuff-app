@@ -22,6 +22,12 @@ export default function ProfilePage() {
         dislikedMovies,
         includeAdult,
         toggleIncludeAdult,
+        defaultMediaMode,
+        setDefaultMediaMode,
+        defaultSortBy,
+        setDefaultSortBy,
+        defaultLanguages,
+        setDefaultLanguages
     } = useMovieStore();
 
     // Local state for fetched movies (limited preview)
@@ -98,7 +104,7 @@ export default function ProfilePage() {
     }, [likedMovies, watchedMovies, watchlistMovies]);
 
     // Library View State
-    const [libraryMode, setLibraryMode] = useState<'favorites' | 'watchlist' | 'watched' | 'recommended'>('favorites');
+    const [libraryMode, setLibraryMode] = useState<'favorites' | 'watchlist' | 'watched' | 'recommended' | 'settings'>('favorites');
     const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
@@ -158,6 +164,10 @@ export default function ProfilePage() {
                         <p className="text-gray-500 font-medium pt-2">Welcome back to your personal space.</p>
 
                         <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-4">
+                            <button onClick={() => setLibraryMode('settings')} className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${libraryMode === 'settings' ? 'bg-black text-white border-black' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
+                                <Settings size={16} className={libraryMode === 'settings' ? "text-white" : "text-gray-400"} />
+                                <span className="text-xs uppercase font-bold opacity-70">Settings</span>
+                            </button>
                             <button onClick={() => setLibraryMode('favorites')} className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${libraryMode === 'favorites' ? 'bg-black text-white border-black' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
                                 <Heart size={16} className={libraryMode === 'favorites' ? "text-rose-500" : "text-gray-400"} fill={libraryMode === 'favorites' ? "currentColor" : "none"} />
                                 <span className="font-bold text-lg">{hasMounted ? likedMovies.length : 0}</span>
@@ -184,34 +194,123 @@ export default function ProfilePage() {
 
 
 
-                {/* Library Grid */}
+                {/* Content Area */}
                 <div>
-                    <MovieGrid
-                        overrideMode={libraryMode === 'recommended' ? 'custom' : libraryMode as any}
-                        customMovies={libraryMode === 'recommended' ? recommendations : undefined}
-                    />
-                </div>
-
-                {/* Settings Section (Collapsed/Below) */}
-                <div className="mt-20 pt-12 border-t border-gray-200">
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-400">
-                        <Settings size={20} /> Settings
-                    </h2>
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between max-w-md">
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2 font-bold text-lg">
-                                <ShieldAlert size={20} className={includeAdult ? "text-rose-500" : "text-gray-400"} />
-                                Adult Content
+                    {libraryMode === 'settings' ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {/* General Settings */}
+                            <div>
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-400">
+                                    <ShieldAlert size={20} /> Content Safety
+                                </h2>
+                                <div className="space-y-4">
+                                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2 font-bold text-lg">
+                                                Include Adult Content
+                                            </div>
+                                            <p className="text-sm text-gray-500">Enable 18+ content in results.</p>
+                                        </div>
+                                        <button
+                                            onClick={toggleIncludeAdult}
+                                            className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 ${includeAdult ? 'bg-rose-500' : 'bg-gray-200'}`}
+                                        >
+                                            <div className={`w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-300 ${includeAdult ? 'translate-x-6' : 'translate-x-0'}`} />
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <p className="text-sm text-gray-500">Show 18+ content in search results.</p>
+
+                            {/* Defaults / Preferences */}
+                            <div>
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-400">
+                                    <Settings size={20} /> Preferences
+                                </h2>
+                                <div className="space-y-4">
+                                    {/* Default Mode */}
+                                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <div className="font-bold text-lg">Default Mode</div>
+                                            <p className="text-sm text-gray-500">Start the app in this mode.</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            {[
+                                                { id: 'movie', label: 'Movies' },
+                                                { id: 'tv', label: 'TV' },
+                                                { id: 'anime', label: 'Anime' }
+                                            ].map((mode) => (
+                                                <button
+                                                    key={mode.id}
+                                                    onClick={() => setDefaultMediaMode(mode.id as any)}
+                                                    className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${defaultMediaMode === mode.id ? 'bg-black text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                                                >
+                                                    {mode.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Default Sort */}
+                                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <div className="font-bold text-lg">Default Sort</div>
+                                            <p className="text-sm text-gray-500">Preferred sorting method.</p>
+                                        </div>
+                                        <select
+                                            value={defaultSortBy}
+                                            onChange={(e) => setDefaultSortBy(e.target.value)}
+                                            className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold focus:outline-none focus:border-black"
+                                        >
+                                            <option value="popularity.desc">Popular</option>
+                                            <option value="primary_release_date.desc">Newest</option>
+                                            <option value="vote_average.desc">Top Rated</option>
+                                            <option value="revenue.desc">Revenue</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Default Languages */}
+                                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm w-full">
+                                        <div className="mb-4">
+                                            <div className="font-bold text-lg">Default Languages</div>
+                                            <p className="text-sm text-gray-500">Content enabled by default.</p>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[
+                                                { code: 'en', name: 'English' },
+                                                { code: 'bn', name: 'Bengali' },
+                                                { code: 'hi', name: 'Hindi' },
+                                                { code: 'es', name: 'Spanish' },
+                                                { code: 'fr', name: 'French' },
+                                                { code: 'ja', name: 'Japanese' },
+                                                { code: 'ko', name: 'Korean' }
+                                            ].map((lang) => {
+                                                const isSelected = defaultLanguages.includes(lang.code);
+                                                return (
+                                                    <button
+                                                        key={lang.code}
+                                                        onClick={() => {
+                                                            const newLangs = isSelected
+                                                                ? defaultLanguages.filter(l => l !== lang.code)
+                                                                : [...defaultLanguages, lang.code];
+                                                            setDefaultLanguages(newLangs.length ? newLangs : ['en']); // Prevent empty
+                                                        }}
+                                                        className={`px-3 py-1.5 rounded-full text-sm font-bold border transition-all ${isSelected ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'}`}
+                                                    >
+                                                        {lang.name}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <button
-                            onClick={toggleIncludeAdult}
-                            className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 ${includeAdult ? 'bg-rose-500' : 'bg-gray-200'}`}
-                        >
-                            <div className={`w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-300 ${includeAdult ? 'translate-x-6' : 'translate-x-0'}`} />
-                        </button>
-                    </div>
+                    ) : (
+                        <MovieGrid
+                            overrideMode={libraryMode === 'recommended' ? 'custom' : libraryMode as any}
+                            customMovies={libraryMode === 'recommended' ? recommendations : undefined}
+                        />
+                    )}
                 </div>
 
                 {/* Account Actions */}

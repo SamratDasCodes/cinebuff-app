@@ -102,6 +102,16 @@ interface MovieState {
     clickHistory: { id: number, type: 'movie' | 'tv' | 'person', timestamp: number }[];
     addToClickHistory: (id: number, type: 'movie' | 'tv' | 'person') => void;
 
+    // Preferences
+    defaultMediaMode: 'movie' | 'tv' | 'anime';
+    setDefaultMediaMode: (mode: 'movie' | 'tv' | 'anime') => void;
+
+    defaultSortBy: string;
+    setDefaultSortBy: (sort: string) => void;
+
+    defaultLanguages: string[];
+    setDefaultLanguages: (langs: string[]) => void;
+
     // Sync Status
     syncStatus: 'idle' | 'syncing' | 'saved' | 'error';
     setSyncStatus: (status: 'idle' | 'syncing' | 'saved' | 'error') => void;
@@ -109,7 +119,7 @@ interface MovieState {
 
 export const useMovieStore = create<MovieState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             movies: [],
             setMovies: (movies) => set({ movies }),
 
@@ -243,20 +253,22 @@ export const useMovieStore = create<MovieState>()(
             totalResults: 0,
             setTotalResults: (total) => set({ totalResults: total }),
 
-            resetFilters: () => set({
+            resetFilters: () => set((state) => ({
                 selectedMoods: [],
-                selectedLanguages: ['en', 'bn', 'hi'],
+                selectedLanguages: state.defaultLanguages || ['en', 'bn', 'hi'],
                 selectedYear: null,
                 selectedKeywords: [],
                 selectedRuntime: 'all',
                 minRating: 0,
                 selectedWatchProviders: [],
-                sortBy: 'primary_release_date.desc',
+                // Use Defaults
+                sortBy: state.defaultSortBy,
+                mediaMode: state.defaultMediaMode,
+
                 searchQuery: "",
                 page: 1,
-                mediaMode: 'movie', // Default
                 viewFilter: 'discover' // Reset to discover
-            }),
+            })),
 
             mediaMode: 'movie',
             setMediaMode: (mode) => set({ mediaMode: mode }),
@@ -296,6 +308,23 @@ export const useMovieStore = create<MovieState>()(
                 return { clickHistory: [entry, ...state.clickHistory].slice(0, 50) };
             }),
 
+            // Preferences
+            defaultMediaMode: 'movie',
+            setDefaultMediaMode: (mode) => {
+                set({ defaultMediaMode: mode, mediaMode: mode });
+                document.cookie = `default_media_mode=${mode}; path=/; max-age=31536000; SameSite=Lax`;
+            },
+            defaultSortBy: 'primary_release_date.desc',
+            setDefaultSortBy: (sort) => {
+                set({ defaultSortBy: sort, sortBy: sort });
+                document.cookie = `default_sort_by=${sort}; path=/; max-age=31536000; SameSite=Lax`;
+            },
+            defaultLanguages: ['en', 'bn', 'hi'],
+            setDefaultLanguages: (langs) => {
+                set({ defaultLanguages: langs, selectedLanguages: langs });
+                document.cookie = `default_languages=${langs.join(',')}; path=/; max-age=31536000; SameSite=Lax`;
+            },
+
             syncStatus: 'idle',
             setSyncStatus: (status) => set({ syncStatus: status }),
         }),
@@ -316,7 +345,14 @@ export const useMovieStore = create<MovieState>()(
                 userName: state.userName,
                 cookieConsent: state.cookieConsent,
                 searchHistory: state.searchHistory,
-                clickHistory: state.clickHistory
+                clickHistory: state.clickHistory,
+                // Persist Preferences
+                defaultMediaMode: state.defaultMediaMode,
+                defaultSortBy: state.defaultSortBy,
+                defaultLanguages: state.defaultLanguages,
+                // Persist Current State too?
+                mediaMode: state.mediaMode,
+                sortBy: state.sortBy,
             }),
         }
     )

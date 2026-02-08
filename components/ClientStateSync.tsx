@@ -42,16 +42,16 @@ export function ClientStateSync({ newParams }: ClientStateSyncProps) {
             });
 
             useMovieStore.setState((state) => ({
-                mediaMode: newParams.mediaMode || state.mediaMode,
+                mediaMode: newParams.mediaMode || state.mediaMode, // syncing mediaMode from URL might be tricky if route handles it.
                 searchQuery: newParams.query || "",
                 selectedMoods: newParams.moods || [],
-                selectedLanguages: newParams.languages || [],
+                selectedLanguages: (newParams.languages && newParams.languages.length > 0) ? newParams.languages : (state.defaultLanguages || ['en', 'bn', 'hi']),
                 selectedYear: newParams.year || null,
-                includeAdult: newParams.includeAdult || false,
+                includeAdult: newParams.includeAdult || state.includeAdult, // Persist or Default?
                 selectedRuntime: newParams.runtime || 'all',
                 minRating: newParams.minRating || 0,
                 selectedWatchProviders: newParams.watchProviders || [],
-                sortBy: newParams.sortBy || 'popularity.desc',
+                sortBy: newParams.sortBy || state.defaultSortBy || 'popularity.desc',
                 selectedKeywords: initialKeywords
             }));
 

@@ -6,9 +6,12 @@ import { Search } from "lucide-react";
 
 import { ResultCount } from "@/components/ResultCount";
 
+import { cookies } from "next/headers";
+
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
     const filters = parseSearchParams(await searchParams);
     const query = filters.query;
+    const cookieStore = await cookies();
 
     if (!query) {
         return (
@@ -26,6 +29,12 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 </div>
             </main>
         );
+    }
+
+    // Apply Defaults for Search Results too
+    if (!filters.languages || filters.languages.length === 0) {
+        const defaultLangs = cookieStore.get('default_languages')?.value;
+        filters.languages = defaultLangs ? defaultLangs.split(',') : ['en', 'bn', 'hi'];
     }
 
     const { results: movies, totalResults } = await fetchMovies(filters);
