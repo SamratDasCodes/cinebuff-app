@@ -18,7 +18,8 @@ export function ActivityLogger() {
     const prevClickRef = useRef<any>(latestClick);
 
     useEffect(() => {
-        if (latestSearch && latestSearch !== prevSearchRef.current && db) {
+        // Only log if authenticated
+        if (user && latestSearch && latestSearch !== prevSearchRef.current && db) {
             try {
                 addDoc(collection(db, "activity_logs"), {
                     type: 'search',
@@ -41,7 +42,7 @@ export function ActivityLogger() {
             latestClick.timestamp !== prevClickRef.current?.timestamp
         );
 
-        if (isNew && db) {
+        if (user && isNew && db) {
             try {
                 addDoc(collection(db, "activity_logs"), {
                     type: 'click',

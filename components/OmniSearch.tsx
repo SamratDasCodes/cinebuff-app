@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, Film, User, Hash, Loader2, ArrowRight, Star } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { useMovieStore } from "@/store/useMovieStore";
-import { searchMulti, MultiSearchResult } from "@/lib/tmdb";
+import { searchMulti, MultiSearchResult, fetchTrending, fetchMovieRecommendations } from "@/lib/tmdb";
+import { parseSearchIntent, SearchIntent } from "@/lib/searchLogic";
+import { OmniSearchTile } from "./OmniSearchTile";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 // Helper hook for debounce
@@ -22,17 +23,20 @@ function useDebounce<T>(value: T, delay: number): T {
     return debouncedValue;
 }
 
-export function OmniSearch() {
-    const router = useRouter(); // <--- Add this
+export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onClose?: () => void }) {
+    const router = useRouter();
     const {
         searchQuery, setSearchQuery,
-        selectedMoods, watchedMovies, selectedLanguages,
-        includeAdult, setActivePerson,
-        addToSearchHistory, addToClickHistory // Tracking
+        watchedMovies, includeAdult,
+        addToSearchHistory, addToClickHistory,
+        searchHistory, // Access history from store
+        selectedMoods
     } = useMovieStore();
 
     const [input, setInput] = useState(searchQuery);
     const [results, setResults] = useState<MultiSearchResult[]>([]);
+    const [trending, setTrending] = useState<MultiSearchResult[]>([]);
+    const [intent, setIntent] = useState<SearchIntent | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -41,107 +45,156 @@ export function OmniSearch() {
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // Sync local input with store if changed elsewhere (e.g. clear filters)
-    useEffect(() => {
-        setInput(searchQuery);
-    }, [searchQuery]);
+    // Helper to close everything
+    const handleClose = () => {
+        setIsOpen(false);
+        if (onClose) onClose();
+    };
 
-    // Perform Search
+    // Sync input
+    useEffect(() => { setInput(searchQuery); }, [searchQuery]);
+
+    // External Trigger (Mobile)
+    useEffect(() => {
+        if (manualOpen) {
+            setIsOpen(true);
+        }
+    }, [manualOpen]);
+
+    // Fetch Trending Once (for Zero State)
+    useEffect(() => {
+        fetchTrending('week').then(data => {
+            // Normalize slightly to fit MultiSearchResult if needed, but it should match mostly
+            setTrending(data as unknown as MultiSearchResult[]);
+        });
+    }, []);
+
+    // Perform Search Logic
     useEffect(() => {
         if (!debouncedInput || debouncedInput.trim().length === 0) {
             setResults([]);
-            setIsOpen(false);
+            setIntent(null);
             return;
         }
 
         setIsLoading(true);
         setIsOpen(true);
 
-        searchMulti(debouncedInput, includeAdult).then(data => {
-            // --- SMART FILTERING & RANKING ---
+        const detectedIntent = parseSearchIntent(debouncedInput);
+        setIntent(detectedIntent);
 
-            // 1. Filter out Person/TV if strictly movie focused? No, let's keep them but maybe deprioritize.
-            // The directive said: Categorize into Movies, People, Keywords.
+        const performSearch = async () => {
+            try {
+                // HANDLE "SIMILAR TO" INTENT
+                if (detectedIntent.type === 'similar' && detectedIntent.query) {
+                    // 1. Find the target entity (Movie/TV)
+                    const targets = await searchMulti(detectedIntent.query, includeAdult);
 
-            // 2. Personalization logic
-            const processed = data.map(item => {
-                let score = 0;
+                    if (targets.length > 0) {
+                        const bestMatch = targets[0]; // Assume first result is what user meant
+                        const validMedia = bestMatch.media_type === 'movie' || bestMatch.media_type === 'tv';
 
-                // Boost Mood Matches (Conceptually mapping Genres to Moods)
-                // This is a simplified check since we don't have the full genre map here easily avail 
-                // without importing the huge object, but we can check if we loaded it or pass genre IDs.
-                // For now, simpler: Boost Movies over TV/People
-                // Match weighting
-                if (item.media_type === 'movie') score += 10;
-                if (item.media_type === 'person') score += 15; // Boost people higher to ensure visibility in mixed results
+                        if (validMedia) {
+                            // 2. Fetch Recommendations
+                            const recs = await fetchMovieRecommendations(bestMatch.id, 1, bestMatch.media_type as 'movie' | 'tv');
+                            // Normalize to MultiSearchResult kind of structure if needed, luckily types overlap mostly
+                            // We might need to inject media_type since recommendations might not have it in raw fetch?
+                            // fetchMovieRecommendations does normalizeMedia which adds media_type.
 
-                // Boost items with matching query in title (relevance)
-                const text = item.title || item.name || "";
-                if (text.toLowerCase().startsWith(debouncedInput.toLowerCase())) score += 10;
-                if (text.toLowerCase() === debouncedInput.toLowerCase()) score += 20; // Exact match super boost
+                            // Sort by match score isn't really applicable to recs, they are already ranked by TMDB.
+                            // But let's apply our de-prioritize watched logic.
+                            const processed = (recs as unknown as MultiSearchResult[]).map(item => {
+                                let score = item.vote_average || 0;
+                                if (watchedMovies.includes(item.id)) score -= 20;
+                                return { ...item, score };
+                            }); // .sort not strictly needed if we trust TMDB order, but let's keep it clean
 
-                // De-prioritize Watched (if we have IDs)
-                if (watchedMovies.includes(item.id)) score -= 20;
+                            setResults(processed);
+                            setIsLoading(false);
+                            return; // EXIT EARLY
+                        }
+                    }
+                    // If target not found or not valid media, fall through to normal search
+                }
 
-                return { ...item, score };
-            }).sort((a, b) => b.score - a.score);
+                // NORMAL SEARCH
+                const data = await searchMulti(debouncedInput, includeAdult);
+                const processed = data.map(item => {
+                    let score = 0;
+                    if (item.media_type === 'movie') score += 10;
+                    if (item.media_type === 'person') score += 15;
 
-            setResults(processed);
-            setIsLoading(false);
-        });
+                    const text = item.title || item.name || "";
+                    if (text.toLowerCase().startsWith(debouncedInput.toLowerCase())) score += 10;
+                    if (text.toLowerCase() === debouncedInput.toLowerCase()) score += 20;
+
+                    if (watchedMovies.includes(item.id)) score -= 20;
+
+                    return { ...item, score };
+                }).sort((a, b) => b.score - a.score);
+
+                setResults(processed);
+            } catch (error) {
+                console.error("Search Failed", error);
+                setResults([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        performSearch();
 
     }, [debouncedInput, watchedMovies, includeAdult]);
 
-    // Keyboard Nav
+    // Keyboard Nav (Shared)
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (!isOpen) return;
+        const activeList = (input.trim().length === 0) ? trending : results; // Switch based on mode
 
         if (e.key === 'ArrowDown') {
             e.preventDefault();
-            setSelectedIndex(prev => (prev < results.length - 1 ? prev + 1 : prev));
+            setSelectedIndex(prev => (prev < activeList.length - 1 ? prev + 1 : prev));
         } else if (e.key === 'ArrowUp') {
             e.preventDefault();
             setSelectedIndex(prev => (prev > 0 ? prev - 1 : prev));
         } else if (e.key === 'Enter') {
             e.preventDefault();
-            if (selectedIndex >= 0 && results[selectedIndex]) {
-                handleResultSelect(results[selectedIndex]);
+            if (selectedIndex >= 0 && activeList[selectedIndex]) {
+                handleResultSelect(activeList[selectedIndex]);
             } else {
-                // Submit raw query if nothing selected
-                setSearchQuery(input);
-                addToSearchHistory(input); // Trace
-                setIsOpen(false);
-                router.push(`/home/search?q=${encodeURIComponent(input)}`);
+                submitSearch(input);
             }
         } else if (e.key === 'Escape') {
-            setIsOpen(false);
+            handleClose();
             inputRef.current?.blur();
         }
     };
 
+    const submitSearch = (query: string) => {
+        if (!query.trim()) return;
+        setSearchQuery(query);
+        addToSearchHistory(query);
+        handleClose();
+        router.push(`/home/search?q=${encodeURIComponent(query)}`);
+    };
+
     const handleResultSelect = (result: MultiSearchResult) => {
         if (!result) return;
-
-        // Trace Click
         addToClickHistory(result.id, result.media_type as any);
 
+        // Check Intent for "Movies like..."
+        // If we had a 'similar' intent, we might want to trigger that search instead of navigation.
+        // But for now, let's stick to direct navigation or explicit search page.
+
         let path = '';
-        if (result.media_type === 'movie') {
-            path = `/moviedetails/${result.id}`;
-        } else if (result.media_type === 'tv') {
-            path = `/showdetails/${result.id}`;
-        } else if (result.media_type === 'person') {
-            path = `/castdetails/${result.id}`;
-        } else {
-            // Fallback for unknown types or 'multi' results that might be something else
-            // If we don't know, maybe just search it?
-            path = `/home/search?query=${encodeURIComponent(result.title || result.name || '')}`;
-        }
+        if (result.media_type === 'movie') path = `/moviedetails/${result.id}`;
+        else if (result.media_type === 'tv') path = `/showdetails/${result.id}`;
+        else if (result.media_type === 'person') path = `/castdetails/${result.id}`;
+        else path = `/home/search?q=${encodeURIComponent(result.title || result.name || '')}`;
 
         if (path) {
-            setSearchQuery(""); // Clear search on navigation? Or keep it? Usually clear.
-            setInput(""); // Clear local input
-            setIsOpen(false);
+            setInput("");
+            handleClose();
             router.push(path);
         }
     };
@@ -150,219 +203,219 @@ export function OmniSearch() {
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
+                handleClose();
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    // ... (keep logic above same, only changing render)
+    const showZeroState = isOpen && input.trim().length === 0;
+    const showResults = isOpen && input.trim().length > 0;
+
+    // We only render the overlay if isOpen is true to avoid layout thrashing, 
+    // but the input might be inside a provider or header. 
+    // Actually, to make it "Full Screen", we might need to portal it or just use fixed positioning to cover everything.
+
+    // Effect to lock body scroll when open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [isOpen]);
+
+    // Back Gesture Support (Mobile & Desktop)
+    useEffect(() => {
+        if (isOpen) {
+            // Push a dummy state so 'Back' closes the modal instead of navigating back history
+            window.history.pushState({ searchOpen: true }, "");
+
+            const handlePopState = () => {
+                handleClose();
+            };
+
+            window.addEventListener('popstate', handlePopState);
+
+            return () => {
+                window.removeEventListener('popstate', handlePopState);
+            };
+        }
+    }, [isOpen]);
 
     return (
-        <div ref={containerRef} className="w-full max-w-xl relative group z-50">
+        <>
+            {/* TRIGGER / HEADER SEARCH BAR (When closed or initial state) */}
+            {/* We keep a placeholder in the header to expand from, OR we just render the fullscreen overlay over it. */}
+            {/* Let's render the header input as usual, but when focused/active, we mount the overlay. */}
 
-            {/* Global Overlay (Focus Mode) */}
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm -z-10"
+            <div ref={containerRef} className={`w-full max-w-3xl relative z-50 transition-all duration-300 ${isOpen ? '' : ''}`}>
+
+                {/* COMPACT INPUT (Visible when closed) */}
+                <div className={`relative ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                        <Search className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        onFocus={() => setIsOpen(true)}
+                        placeholder="Search movies, people..."
+                        className="
+                            block w-full pl-12 pr-4 py-2.5
+                            bg-white/10 backdrop-blur-md border border-white/20
+                            text-white placeholder:text-gray-400
+                            rounded-full shadow-sm hover:bg-white/20 transition-all
+                            focus:outline-none
+                        "
                     />
-                )}
-            </AnimatePresence>
-
-            {/* SEARCH INPUT */}
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    if (input.trim()) {
-                        setSearchQuery(input);
-                        addToSearchHistory(input);
-                        setIsOpen(false);
-                        router.push(`/home/search?q=${encodeURIComponent(input)}`);
-                    }
-                }}
-                className="relative"
-            >
-                {/* Search Icon */}
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                    <Search className={`w-5 h-5 transition-colors duration-300 ${isOpen ? 'text-indigo-400' : 'text-gray-400'}`} />
                 </div>
 
-                <input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    onChange={(e) => {
-                        setInput(e.target.value);
-                        if (!isOpen && e.target.value.trim().length > 0) setIsOpen(true);
-                    }}
-                    onKeyDown={handleKeyDown}
-                    onFocus={() => { if (input.trim().length > 0) setIsOpen(true); }}
-                    placeholder="Search movies, shows, people..."
-                    className={`
-                        block w-full pl-12 pr-10 py-3.5
-                        bg-white/90 backdrop-blur-md border border-white/20
-                        text-black placeholder:text-gray-500
-                        rounded-2xl shadow-sm transition-all duration-300
-                        focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:bg-white focus:shadow-xl focus:scale-[1.01]
-                    `}
-                />
-
-                {/* Clear / Loading Indicator */}
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2">
-                    {isLoading ? (
-                        <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
-                    ) : input ? (
-                        <button
-                            type="button"
-                            onClick={() => { setInput(""); if (inputRef.current) inputRef.current.focus(); }}
-                            className="p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                {/* FULL SCREEN OVERLAY */}
+                <AnimatePresence>
+                    {isOpen && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-lg flex flex-col"
                         >
-                            <div className="w-4 h-4 flex items-center justify-center font-bold text-xs">✕</div>
-                        </button>
-                    ) : null}
-                </div>
-            </form>
+                            {/* HEADER SECTION */}
+                            <div className="flex-shrink-0 border-b border-black/5 bg-white/50 p-4 md:p-6 shadow-sm">
+                                <div className="max-w-7xl mx-auto w-full flex items-center gap-4">
+                                    <Search className="w-6 h-6 text-indigo-600" />
+                                    <input
+                                        ref={inputRef}
+                                        type="text"
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        onKeyDown={handleKeyDown}
+                                        autoFocus
+                                        placeholder="Type to search..."
+                                        className="
+                                            flex-1 bg-transparent border-none outline-none 
+                                            text-2xl md:text-4xl font-bold text-black placeholder:text-gray-400
+                                        "
+                                    />
+                                    <div className="hidden md:flex items-center gap-4">
+                                        {isLoading && <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />}
+                                        <button
+                                            onClick={handleClose}
+                                            className="p-2 rounded-full hover:bg-black/5 text-gray-400 hover:text-black transition-colors"
+                                        >
+                                            <span className="sr-only">Close</span>
+                                            <span className="text-sm font-medium tracking-widest uppercase">Esc</span>
+                                        </button>
+                                    </div>
+                                </div>
 
-            {/* RESULTS DROPDOWN */}
-            <AnimatePresence>
-                {isOpen && (input.length > 0) && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full left-0 right-0 mt-3 bg-white/80 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden ring-1 ring-black/5"
-                    >
-                        {/* Loading Skeletons */}
-                        {isLoading && results.length === 0 && (
-                            <div className="p-2 space-y-2">
-                                {[1, 2, 3].map(i => (
-                                    <div key={i} className="flex items-center gap-4 p-3 rounded-xl animate-pulse">
-                                        <div className="w-12 h-16 bg-black/5 rounded-lg" />
-                                        <div className="flex-1 space-y-2">
-                                            <div className="h-4 bg-black/5 rounded w-3/4" />
-                                            <div className="h-3 bg-black/5 rounded w-1/2" />
+                                {/* INTENT / SUGGESTIONS */}
+                                {intent && intent.type !== 'text' && (
+                                    <div className="max-w-7xl mx-auto mt-2">
+                                        <div className="inline-flex items-center gap-2 bg-indigo-500/20 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full border border-indigo-500/30">
+                                            {intent.type === 'similar' ? '✨ Recommendation Mode' : '🔎 Smart Filter'}
+                                            <span className="opacity-75 font-normal text-white">
+                                                {intent.type === 'similar' ? `Finding movies like "${intent.query}"` : `Filtering: ${intent.query}`}
+                                            </span>
                                         </div>
                                     </div>
-                                ))}
+                                )}
                             </div>
-                        )}
 
-                        {/* No Results */}
-                        {!isLoading && results.length === 0 && debouncedInput && (
-                            <div className="p-8 text-center text-gray-400">
-                                <Film className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                                <p className="text-sm">No results found for "{input}"</p>
-                            </div>
-                        )}
-
-                        {/* Results List */}
-                        {!isLoading && results.length > 0 && (
-                            <div className="py-2 max-h-[65vh] overflow-y-auto custom-scrollbar">
-                                {results.map((item, index) => {
-                                    const isSelected = index === selectedIndex;
-                                    return (
-                                        <motion.button
-                                            key={`${item.media_type}-${item.id}`}
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.03 }} // Staggered entry
-                                            onClick={() => handleResultSelect(item)}
-                                            onMouseEnter={() => setSelectedIndex(index)}
-                                            className={`
-                                                w-full flex items-center gap-4 px-4 py-3 text-left transition-all duration-200 group
-                                                ${isSelected
-                                                    ? 'bg-black/5'
-                                                    : 'hover:bg-black/5'}
-                                            `}
-                                        >
-                                            {/* Poster */}
-                                            <div className={`
-                                                w-12 h-16 relative flex-shrink-0 rounded-lg overflow-hidden shadow-sm transition-transform duration-300
-                                                ${isSelected ? 'scale-105 shadow-md' : ''}
-                                            `}>
-                                                {(item.poster_path || item.profile_path) ? (
-                                                    <Image
-                                                        src={`https://image.tmdb.org/t/p/w92${item.poster_path || item.profile_path}`}
-                                                        alt={item.title || item.name || "Visual"}
-                                                        fill
-                                                        className={`object-cover ${item.adult ? 'blur-sm grayscale' : ''}`}
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
-                                                        {item.media_type === 'person' ? <User size={18} /> : <Film size={18} />}
+                            {/* RESULTS GRID SCROLLABLE AREA */}
+                            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8">
+                                <div className="max-w-7xl mx-auto">
+                                    {showZeroState && (
+                                        <div className="space-y-8">
+                                            {/* Recent Searches */}
+                                            {searchHistory.length > 0 && (
+                                                <div className="space-y-4">
+                                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Recent</h3>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {searchHistory.slice(0, 5).map((term, i) => (
+                                                            <button
+                                                                key={i}
+                                                                onClick={() => submitSearch(term)}
+                                                                className="px-4 py-2 rounded-full bg-black/5 border border-black/5 text-gray-600 hover:bg-black/10 hover:text-black hover:border-black/20 transition-all text-sm"
+                                                            >
+                                                                {term}
+                                                            </button>
+                                                        ))}
                                                     </div>
-                                                )}
-                                            </div>
-
-                                            {/* Info */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2">
-                                                    <h4 className={`text-base font-semibold truncate transition-colors ${isSelected ? 'text-black' : 'text-gray-800'}`}>
-                                                        {item.title || item.name}
-                                                    </h4>
-                                                    {item.adult && (
-                                                        <span className="text-[10px] bg-rose-100 text-rose-600 px-1 rounded border border-rose-200 font-bold">18+</span>
-                                                    )}
                                                 </div>
+                                            )}
 
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    {/* Badge */}
-                                                    <span className={`
-                                                        text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider
-                                                        ${item.media_type === 'movie' ? 'bg-indigo-50 border-indigo-100 text-indigo-600' :
-                                                            item.media_type === 'person' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' :
-                                                                'bg-orange-50 border-orange-100 text-orange-600'}
-                                                    `}>
-                                                        {item.media_type === 'movie' ? 'Movie' : item.media_type === 'person' ? 'Person' : 'TV'}
-                                                    </span>
-
-                                                    {/* Meta */}
-                                                    <span className="text-xs text-gray-400 flex items-center gap-2">
-                                                        {item.release_date && <span>{item.release_date.split('-')[0]}</span>}
-                                                        {item.vote_average && item.vote_average > 0 && (
-                                                            <span className="flex items-center gap-0.5 text-yellow-500 font-medium">
-                                                                <Star size={10} fill="currentColor" /> {item.vote_average.toFixed(1)}
-                                                            </span>
-                                                        )}
-                                                    </span>
+                                            {/* Trending */}
+                                            <div className="space-y-4">
+                                                <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                                                    Trending Now
+                                                </h3>
+                                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                                    {trending.slice(0, 6).map((item, index) => (
+                                                        <OmniSearchTile
+                                                            key={item.id}
+                                                            item={item}
+                                                            isSelected={index === selectedIndex}
+                                                            onSelect={handleResultSelect}
+                                                            onMouseEnter={() => setSelectedIndex(index)}
+                                                        />
+                                                    ))}
                                                 </div>
                                             </div>
+                                        </div>
+                                    )}
 
-                                            {/* Action Icon (Arrow) */}
-                                            <div className={`
-                                                pr-2 text-gray-400 bg-transparent
-                                                transition-all duration-300 transform
-                                                ${isSelected ? 'translate-x-0 opacity-100 text-indigo-500' : 'translate-x-2 opacity-0'}
-                                            `}>
-                                                <ArrowRight size={18} />
+                                    {showResults && !isLoading && results.length > 0 && (
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-end">
+                                                <h3 className="text-xl font-bold text-black">Top Results</h3>
+                                                <button
+                                                    onClick={() => submitSearch(input)}
+                                                    className="text-sm text-indigo-600 hover:text-black transition-colors"
+                                                >
+                                                    View All Results
+                                                </button>
                                             </div>
 
-                                        </motion.button>
-                                    );
-                                })}
+                                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                                                {results.map((item, index) => (
+                                                    <OmniSearchTile
+                                                        key={`${item.media_type}-${item.id}`}
+                                                        item={item}
+                                                        isSelected={index === selectedIndex}
+                                                        onSelect={handleResultSelect}
+                                                        onMouseEnter={() => setSelectedIndex(index)}
+                                                    />
+                                                ))}
+                                            </div>
 
-                                <div className="p-2 border-t border-black/5 mt-2">
-                                    <button
-                                        onClick={() => {
-                                            setSearchQuery(input);
-                                            setIsOpen(false);
-                                            router.push(`/home/search?q=${encodeURIComponent(input)}`);
-                                        }}
-                                        className="w-full text-center text-xs font-bold text-indigo-600 hover:underline py-2"
-                                    >
-                                        View all results for "{input}"
-                                    </button>
+                                            <div className="py-12 flex justify-center">
+                                                <button
+                                                    onClick={() => submitSearch(input)}
+                                                    className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-full transition-all transform hover:scale-105"
+                                                >
+                                                    See All Results for "{input}"
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {showResults && !isLoading && results.length === 0 && (
+                                        <div className="h-full flex flex-col items-center justify-center text-gray-500 pt-20">
+                                            <Search className="w-16 h-16 mb-4 opacity-20" />
+                                            <p className="text-xl font-medium">No results found for "{input}"</p>
+                                            <p className="text-sm mt-2 opacity-50">Try checking your spelling or use different keywords.</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        )}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </>
     );
 }

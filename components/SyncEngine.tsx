@@ -31,7 +31,32 @@ export function SyncEngine() {
         const unsubscribe = onSnapshot(userRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                // ... (logic skipped for brevity)
+                // Incoming (Cloud) Data
+                // We compare with current state to prevent infinite loops (useEffect -> Write -> Snapshot -> SetState -> useEffect)
+                const currentState = useMovieStore.getState();
+
+                // Helper to check difference
+                const hasChanged = (local: any[], cloud: any[]) => {
+                    if (!cloud) return false;
+                    if (local.length !== cloud.length) return true;
+                    return JSON.stringify(local.sort()) !== JSON.stringify(cloud.sort());
+                };
+
+                const updates: any = {};
+                if (hasChanged(currentState.watchedMovies, data.watchedMovies)) updates.watchedMovies = data.watchedMovies;
+                if (hasChanged(currentState.likedMovies, data.likedMovies)) updates.likedMovies = data.likedMovies;
+                if (hasChanged(currentState.watchlistMovies, data.watchlistMovies)) updates.watchlistMovies = data.watchlistMovies;
+
+                // Settings
+                if (data.settings) {
+                    if (data.settings.sensitiveMode !== currentState.sensitiveMode) updates.sensitiveMode = data.settings.sensitiveMode;
+                    if (data.settings.includeAdult !== currentState.includeAdult) updates.includeAdult = data.settings.includeAdult;
+                }
+
+                if (Object.keys(updates).length > 0) {
+                    console.log("SyncEngine: Applying Cloud Updates:", Object.keys(updates));
+                    useMovieStore.setState(updates);
+                }
             }
         }, (error) => {
             console.warn("SyncEngine: Firestore Read Error (likely permissions):", error.message);
@@ -46,6 +71,7 @@ export function SyncEngine() {
         if (!user) return;
 
         const syncProfile = async () => {
+            useMovieStore.getState().setSyncStatus('syncing');
             try {
                 const userRef = doc(db, "users", user.uid);
                 await setDoc(userRef, {
@@ -55,8 +81,17 @@ export function SyncEngine() {
                     settings,
                     lastSynced: serverTimestamp()
                 }, { merge: true });
+
+                useMovieStore.getState().setSyncStatus('saved');
+
+                // Reset to idle after a delay for cleaner UI
+                setTimeout(() => {
+                    useMovieStore.getState().setSyncStatus('idle');
+                }, 2000);
+
             } catch (error) {
                 console.warn("SyncEngine: Firestore Write Error:", error);
+                useMovieStore.getState().setSyncStatus('error');
             }
         };
 

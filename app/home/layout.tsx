@@ -3,6 +3,7 @@
 import { MoodFilterTray } from "@/components/MoodFilterTray";
 import { MovieModal } from "@/components/MovieModal";
 import { PersonModal } from "@/components/PersonModal";
+import { SyncStatus } from "@/components/SyncStatus";
 
 export default function HomeLayout({
     children,
@@ -16,6 +17,7 @@ export default function HomeLayout({
             <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 pt-4">
                 <MovieModal />
                 <PersonModal />
+                <SyncStatus />
 
                 <MoodFilterTray />
 

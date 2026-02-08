@@ -2,7 +2,7 @@
 
 import { useMovieStore } from "@/store/useMovieStore";
 import { BackButton } from "@/components/BackButton";
-import { Settings, Heart, Eye, User, Film, BookOpen, ShieldAlert, Edit2 } from "lucide-react";
+import { Settings, Heart, Eye, User, Film, BookOpen, ShieldAlert, Edit2, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -19,6 +19,7 @@ export default function ProfilePage() {
         likedMovies,
         watchedMovies,
         watchlistMovies,
+        dislikedMovies,
         includeAdult,
         toggleIncludeAdult,
     } = useMovieStore();
@@ -42,13 +43,17 @@ export default function ProfilePage() {
         }
     };
 
+    // Recommendations State
+    const [recommendations, setRecommendations] = useState<Movie[]>([]);
+    const [recLoading, setRecLoading] = useState(false);
+
     useEffect(() => {
         let isMounted = true;
 
         async function loadPreviews() {
             setLoading(true);
             try {
-                // Fetch last 4 liked
+                // Fetch last 4 liked & watched for preview
                 const recentLikedIds = [...likedMovies].reverse().slice(0, 4);
                 const recentWatchedIds = [...watchedMovies].reverse().slice(0, 4);
 
@@ -68,9 +73,29 @@ export default function ProfilePage() {
             }
         }
 
+        async function loadRecommendations() {
+            if (likedMovies.length === 0 && watchlistMovies.length === 0 && watchedMovies.length === 0) return;
+
+            setRecLoading(true);
+            try {
+                // Dynamic import to avoid server-side issues if any
+                console.log("🎬 Generating Personalized Feed...", { liked: likedMovies.length, watched: watchedMovies.length, disliked: dislikedMovies.length });
+                const { generatePersonalizedFeed } = await import("@/lib/RecommendationEngine");
+                const recs = await generatePersonalizedFeed(likedMovies, watchlistMovies, watchedMovies, dislikedMovies);
+                console.log("✨ Recommendations Generated:", recs.length, recs);
+                if (isMounted) setRecommendations(recs.slice(0, 10)); // Top 10
+            } catch (e) {
+                console.error("Rec Engine Error:", e);
+            } finally {
+                if (isMounted) setRecLoading(false);
+            }
+        }
+
         loadPreviews();
+        loadRecommendations();
+
         return () => { isMounted = false; };
-    }, [likedMovies, watchedMovies]);
+    }, [likedMovies, watchedMovies, watchlistMovies]);
 
     // Library View State
     const [libraryMode, setLibraryMode] = useState<'favorites' | 'watchlist' | 'watched'>('favorites');
@@ -87,7 +112,7 @@ export default function ProfilePage() {
                 <BackButton />
             </div>
 
-            <div className="container mx-auto px-6 pt-24 pb-12 max-w-7xl">
+            <div className="container mx-auto px-6 pt-24 pb-32 max-w-7xl">
 
                 {/* Header Profile Card */}
                 <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl mb-12 flex flex-col md:flex-row items-center md:items-start gap-8 relative overflow-hidden">
@@ -152,6 +177,50 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
+                {/* Daily Mix / Recommendations */}
+                {recommendations.length > 0 && (
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                            ✨ Your Daily Mix
+                        </h2>
+                        <div className="relative">
+                            <div className="flex gap-4 overflow-x-auto pb-6 snap-x custom-scrollbar">
+                                {recommendations.map((movie) => (
+                                    <Link key={movie.id} href={`/moviedetails/${movie.id}`} className="min-w-[160px] md:min-w-[200px] snap-start group relative">
+                                        <div className="aspect-[2/3] rounded-xl overflow-hidden shadow-md bg-gray-200">
+                                            {movie.poster_path ? (
+                                                <Image
+                                                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                                    alt={movie.title || "Movie"}
+                                                    width={200}
+                                                    height={300}
+                                                    className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                    <Film size={24} />
+                                                </div>
+                                            )}
+                                            {/* Quick Add Overlay */}
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                <div className="text-white font-bold text-xs bg-black/60 px-2 py-1 rounded-full backdrop-blur-sm">
+                                                    {movie.vote_average?.toFixed(1)} ★
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h3 className="mt-2 text-sm font-bold truncate group-hover:text-indigo-600 transition-colors">
+                                            {movie.title}
+                                        </h3>
+                                        <p className="text-xs text-gray-400">
+                                            {movie.release_date?.split('-')[0]}
+                                        </p>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Library Tabs */}
                 <div className="mb-8 flex justify-center md:justify-start border-b border-gray-200">
                     <button
@@ -204,8 +273,23 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
+                {/* Account Actions */}
+                <div className="mt-8 flex justify-center md:justify-start">
+                    <button
+                        onClick={async () => {
+                            const { signOut } = await import('firebase/auth');
+                            const { auth } = await import('@/lib/firebase');
+                            if (auth) await signOut(auth);
+                        }}
+                        className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition-colors"
+                    >
+                        <LogOut size={20} />
+                        Log Out
+                    </button>
+                </div>
+
             </div>
-        </main>
+        </main >
     );
 }
 

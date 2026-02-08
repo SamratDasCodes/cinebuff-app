@@ -76,6 +76,8 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                 ...Object.fromEntries(extraParams)
             });
 
+            // ... (Filters setup logic is unchanged, but we need to re-generate params inside or just keep them above)
+
             // Common Filters
             if (minRating > 0) {
                 params.append('vote_average.gte', minRating.toString());
@@ -85,13 +87,12 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                 params.append('with_watch_providers', watchProviders.join('|'));
                 params.append('watch_region', 'IN');
             }
-
-            // Runtime (Approximate for TV as episode runtime)
+            // Runtime
             if (runtime === 'short') params.append('with_runtime.lte', '90');
             else if (runtime === 'medium') { params.append('with_runtime.gte', '90'); params.append('with_runtime.lte', '120'); }
             else if (runtime === 'long') params.append('with_runtime.gte', '120');
 
-            // Moods/Keywords Logic
+            // Moods/Keywords Logic construction (retained from previous state)
             const allGenres = new Set<string>();
             const allKeywords = new Set<string>();
             let forceAdult = false;
@@ -105,33 +106,25 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                     forceAdult = true;
                     isHentaiMode = true;
                 }
-
-                // Determine which genres to use based on endpoint type
                 const isTvEndpoint = endpoint.includes('tv');
                 const genresStr = isTvEndpoint ? config.tv_genres : config.movie_genres;
-
                 if (genresStr) genresStr.split(',').forEach(g => allGenres.add(g));
                 if (config.with_keywords) config.with_keywords.split(',').forEach(k => allKeywords.add(k));
             });
 
             const effectiveIncludeAdult = includeAdult || forceAdult;
-
-            // For Anime: Enforce Animation Genre + Japanese Language
             if (mediaMode === 'anime') {
-                allGenres.add('16'); // Animation
+                allGenres.add('16');
                 params.append('with_original_language', 'ja');
             } else {
                 if (languages && languages.length > 0) params.append('with_original_language', languages.join('|'));
             }
 
-            if (forceAdult) {
-                params.set('include_adult', 'true');
-            }
-
+            if (forceAdult) params.set('include_adult', 'true');
             if (allGenres.size > 0) params.append('with_genres', Array.from(allGenres).join('|'));
-            if (allKeywords.size > 0) params.append('with_keywords', Array.from(allKeywords).join(','));
+            if (allKeywords.size > 0) params.append('with_keywords', Array.from(allKeywords).join('|'));
 
-            // Date Logic (Upcoming vs Released)
+            // Date Logic
             const today = new Date();
             const todayStr = today.toISOString().split('T')[0];
             const tomorrow = new Date(today);
@@ -139,47 +132,33 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
             const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
             if (year === 'upcoming') {
-                // Upcoming: From Tomorrow onwards
                 if (endpoint.includes('tv')) {
                     params.append('first_air_date.gte', tomorrowStr);
-                    // Force Sort Ascending for Upcoming if not specified otherwise
                     if (sortBy === 'primary_release_date.desc' || sortBy === 'popularity.desc') {
                         params.set('sort_by', 'first_air_date.asc');
                     }
                 } else {
                     params.append('primary_release_date.gte', tomorrowStr);
                     params.append('release_date.gte', tomorrowStr);
-                    // Force Sort Ascending for Upcoming
                     if (sortBy === 'primary_release_date.desc' || sortBy === 'popularity.desc') {
                         params.set('sort_by', 'primary_release_date.asc');
                     }
                 }
             } else {
-                // Standard: Released (Up to Today)
-                // MODIFICATION: If a specific year is requested, we show ALL movies for that year (Released + Upcoming).
-                // We only apply the "released up to today" constraint if NO year is specified (General Discover).
-
                 if (year) {
                     params.append('primary_release_year', year.toString());
-                    // For TV:
-                    if (endpoint.includes('tv')) {
-                        params.append('first_air_date_year', year.toString());
-                    }
+                    if (endpoint.includes('tv')) params.append('first_air_date_year', year.toString());
                 } else {
-                    // No year specified: Filter to only released content
-                    if (endpoint.includes('tv')) {
-                        params.append('first_air_date.lte', todayStr);
-                    } else {
+                    if (endpoint.includes('tv')) params.append('first_air_date.lte', todayStr);
+                    else {
                         params.append('primary_release_date.lte', todayStr);
                         params.append('release_date.lte', todayStr);
                     }
                 }
             }
 
-            // Handle Search Query vs Discover
+            // Url Construction
             let url = '';
-
-            // Hentai Strategy: Force Search Query 'hentai'
             if (isHentaiMode) {
                 const searchEndpoint = endpoint.includes('tv') ? 'search/tv' : 'search/movie';
                 url = `${BASE_URL}/${searchEndpoint}`;
@@ -188,32 +167,56 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                 if (year) params.append('primary_release_year', year.toString());
             }
             else if (query && query.trim().length > 0) {
-                // Search doesn't support as many filters, simpler fallback
                 const searchEndpoint = endpoint.includes('tv') ? 'search/tv' : 'search/movie';
                 url = `${BASE_URL}/${searchEndpoint}`;
-                params.delete('sort_by'); // Search is relevant sorted usually
+                params.delete('sort_by');
                 params.append('query', query);
                 if (year) params.append('primary_release_year', year.toString());
             } else {
                 url = `${BASE_URL}/${endpoint}`;
             }
 
-            const fullUrl = `${url}?${params.toString()}`;
-            // console.log("Fetching:", fullUrl); // Debug log (can be verbose)
+            // Fix for TMDB pipe encoding issues: Replace encoded pipes with literal pipes
+            // Some environments/parsers struggle with %7C in some specific params
+            const fullUrl = `${url}?${params.toString().replace(/%7C/g, '|')}`;
 
-            try {
-                const res = await fetch(fullUrl, { next: { revalidate: 3600 } });
-                if (!res.ok) {
-                    const errorBody = await res.text(); // Get detailed error from TMDB
-                    console.error(`[TMDB Error] Status: ${res.status} ${res.statusText}`);
-                    console.error(`[TMDB Error] Body: ${errorBody}`);
-                    throw new Error(`Failed to fetch ${endpoint}: ${res.status} ${res.statusText}`);
+            // --- RETRY LOGIC START ---
+            let attempts = 0;
+            const maxAttempts = 3;
+
+            while (attempts < maxAttempts) {
+                try {
+                    const res = await fetch(fullUrl, {
+                        next: { revalidate: 3600 },
+                        headers: {
+                            'User-Agent': 'MoodCinema/1.0',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!res.ok) {
+                        const errorBody = await res.text();
+                        console.error(`[TMDB Error] Status: ${res.status} ${res.statusText}`);
+                        // If 4xx error (client side), typical retry won't fix it, break immediately unless it's 429
+                        if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+                            throw new Error(`Failed to fetch ${endpoint}: ${res.status} ${res.statusText}`);
+                        }
+                        throw new Error(`Failed to fetch ${endpoint}: ${res.status} ${res.statusText}`);
+                    }
+                    return await res.json();
+                } catch (innerError) {
+                    attempts++;
+                    // Redact API Key from logs for safety
+                    const safeUrl = fullUrl.replace(/api_key=[^&]+/, 'api_key=REDACTED');
+                    console.error(`[TMDB Fetch Error - Attempt ${attempts}/${maxAttempts}] URL: ${safeUrl}`);
+                    console.error(`[TMDB Fetch Error] Cause:`, (innerError as Error).message);
+
+                    if (attempts >= maxAttempts) {
+                        throw innerError;
+                    }
+                    // Wait before retry (1s, 2s)
+                    await new Promise(resolve => setTimeout(resolve, attempts * 1000));
                 }
-                return await res.json();
-            } catch (innerError) {
-                console.error(`[TMDB Fetch Error] URL: ${fullUrl}`);
-                console.error(`[TMDB Fetch Error] Cause:`, innerError);
-                throw innerError; // Rethrow to be caught by outer block or handled
             }
         };
 
@@ -266,8 +269,8 @@ export async function fetchMovieDetails(id: number, forceType?: 'movie' | 'tv') 
     // Smart Fetch: Try Movie first, then TV
     const smartFetch = async (type: 'movie' | 'tv') => {
         const appends = type === 'movie'
-            ? 'videos,credits,watch/providers,release_dates'
-            : 'videos,credits,watch/providers,content_ratings';
+            ? 'videos,credits,watch/providers,release_dates,keywords'
+            : 'videos,credits,watch/providers,content_ratings,keywords';
 
         const url = `${BASE_URL}/${type}/${id}?api_key=${TMDB_API_KEY}&append_to_response=${appends}`;
 
@@ -421,5 +424,18 @@ export async function fetchTvSeason(tvId: number, seasonNumber: number) {
     } catch (e) {
         console.warn("Fetch TV Season Error:", e);
         return null; // Gracefully fail
+    }
+}
+
+export async function fetchTrending(timeWindow: 'day' | 'week' = 'day') {
+    if (!TMDB_API_KEY) return [];
+    try {
+        const res = await fetch(`${BASE_URL}/trending/all/${timeWindow}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 * 4 } });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.results as any[]).map(r => normalizeMedia(r, r.media_type));
+    } catch (e) {
+        console.warn("Trending Error:", e);
+        return [];
     }
 }

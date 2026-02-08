@@ -13,6 +13,11 @@ export default async function MoviesPage({ searchParams }: { searchParams: Promi
     // Force mediaMode
     filters.mediaMode = 'movie';
 
+    // Apply Defaults if not present (Matches Store defaults)
+    if (!filters.languages || filters.languages.length === 0) {
+        filters.languages = ['en', 'bn', 'hi'];
+    }
+
     const { results: movies, totalResults } = await fetchMovies(filters);
     console.log("[MoviesPage] totalResults:", totalResults);
 

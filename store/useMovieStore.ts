@@ -36,6 +36,9 @@ interface MovieState {
     likedMovies: number[];
     toggleLike: (id: number) => void;
 
+    dislikedMovies: number[];
+    toggleDislike: (id: number) => void;
+
     watchlistMovies: number[];
     toggleWatchlist: (id: number) => void;
 
@@ -98,6 +101,10 @@ interface MovieState {
 
     clickHistory: { id: number, type: 'movie' | 'tv' | 'person', timestamp: number }[];
     addToClickHistory: (id: number, type: 'movie' | 'tv' | 'person') => void;
+
+    // Sync Status
+    syncStatus: 'idle' | 'syncing' | 'saved' | 'error';
+    setSyncStatus: (status: 'idle' | 'syncing' | 'saved' | 'error') => void;
 }
 
 export const useMovieStore = create<MovieState>()(
@@ -119,7 +126,7 @@ export const useMovieStore = create<MovieState>()(
                 };
             }),
 
-            selectedLanguages: [],
+            selectedLanguages: ['en', 'bn', 'hi'],
             toggleLanguage: (lang) => set((state) => {
                 const isSelected = state.selectedLanguages.includes(lang);
                 return {
@@ -159,10 +166,26 @@ export const useMovieStore = create<MovieState>()(
             likedMovies: [],
             toggleLike: (id) => set((state) => {
                 const isLiked = state.likedMovies.includes(id);
+                // If liking, remove from dislike if present
+                const newDisliked = isLiked ? state.dislikedMovies : state.dislikedMovies.filter(m => m !== id);
                 return {
                     likedMovies: isLiked
                         ? state.likedMovies.filter(m => m !== id)
-                        : [...state.likedMovies, id]
+                        : [...state.likedMovies, id],
+                    dislikedMovies: newDisliked
+                };
+            }),
+
+            dislikedMovies: [],
+            toggleDislike: (id) => set((state) => {
+                const isDisliked = state.dislikedMovies.includes(id);
+                // If disliking, remove from like if present
+                const newLiked = isDisliked ? state.likedMovies : state.likedMovies.filter(m => m !== id);
+                return {
+                    dislikedMovies: isDisliked
+                        ? state.dislikedMovies.filter(m => m !== id)
+                        : [...state.dislikedMovies, id],
+                    likedMovies: newLiked
                 };
             }),
 
@@ -222,7 +245,7 @@ export const useMovieStore = create<MovieState>()(
 
             resetFilters: () => set({
                 selectedMoods: [],
-                selectedLanguages: [],
+                selectedLanguages: ['en', 'bn', 'hi'],
                 selectedYear: null,
                 selectedKeywords: [],
                 selectedRuntime: 'all',
@@ -246,7 +269,11 @@ export const useMovieStore = create<MovieState>()(
 
             // User Identity & Tracking
             user: null,
-            setUser: (user) => set({ user }),
+            setUser: (user) => set((state) => ({
+                user,
+                // If logging in, switch to UID. If logging out, generate a new Guest ID.
+                userId: user ? user.uid : `guest_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`
+            })),
 
             userId: `guest_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`, // Simple ID generation
             userName: "Guest User",
@@ -268,12 +295,16 @@ export const useMovieStore = create<MovieState>()(
                 const entry = { id, type, timestamp: Date.now() };
                 return { clickHistory: [entry, ...state.clickHistory].slice(0, 50) };
             }),
+
+            syncStatus: 'idle',
+            setSyncStatus: (status) => set({ syncStatus: status }),
         }),
         {
             name: 'mood-cinema-cache-v1',
             partialize: (state) => ({
                 watchedMovies: state.watchedMovies,
                 likedMovies: state.likedMovies,
+                dislikedMovies: state.dislikedMovies,
                 watchlistMovies: state.watchlistMovies,
                 sensitiveMode: state.sensitiveMode,
                 includeAdult: state.includeAdult,

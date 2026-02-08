@@ -195,16 +195,10 @@ export function MoodFilterTray() {
                         relative z-40 transition-all duration-300 ease-out
                         ${mobileSearchExpanded ? 'w-full block' : 'hidden md:block w-full max-w-md'}
                     `}>
-                        <OmniSearch />
-                        {/* Mobile Close Button for Search */}
-                        {mobileSearchExpanded && (
-                            <button
-                                onClick={() => setMobileSearchExpanded(false)}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-black/40 hover:text-black md:hidden hover:bg-black/5 rounded-full z-50"
-                            >
-                                <X size={18} />
-                            </button>
-                        )}
+                        <OmniSearch
+                            manualOpen={mobileSearchExpanded}
+                            onClose={() => setMobileSearchExpanded(false)}
+                        />
                     </div>
 
                     {/* Mobile Search Trigger (Visible only on mobile when collapsed) */}

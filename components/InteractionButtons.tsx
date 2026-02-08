@@ -1,7 +1,7 @@
 "use client";
 
 import { useMovieStore } from "@/store/useMovieStore";
-import { Heart, Eye, BookOpen, Check } from "lucide-react";
+import { Heart, Eye, BookOpen, Check, ThumbsDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Movie } from "@/lib/constants";
 
@@ -17,11 +17,14 @@ export function InteractionButtons({ movie }: InteractionButtonsProps) {
         toggleWatched,
         watchlistMovies,
         toggleWatchlist,
+        dislikedMovies,
+        toggleDislike
     } = useMovieStore();
 
     const isLiked = likedMovies.includes(movie.id);
     const isWatched = watchedMovies.includes(movie.id);
     const isWatchlisted = watchlistMovies.includes(movie.id);
+    const isDisliked = dislikedMovies.includes(movie.id);
 
     // Client-side only rendering to prevent hydration mismatch
     // We already handle this in store persistence but let's be safe visually if needed.
@@ -33,12 +36,28 @@ export function InteractionButtons({ movie }: InteractionButtonsProps) {
 
     return (
         <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+            {/* DISLIKE */}
+            <button
+                onClick={() => toggleDislike(movie.id)}
+                className={`group flex items-center justify-center p-3 rounded-full border transition-all duration-300 ${isDisliked
+                    ? "bg-gray-800 border-gray-900 text-white"
+                    : "bg-white border-gray-200 text-gray-400 hover:border-red-200 hover:text-red-500"
+                    }`}
+                title={isDisliked ? "Remove Dislike" : "Dislike/Hide"}
+            >
+                <ThumbsDown
+                    size={20}
+                    className={`transition-transform duration-300 ${isDisliked ? "scale-110 fill-current" : "group-hover:scale-110"}`}
+                    fill={isDisliked ? "currentColor" : "none"}
+                />
+            </button>
+
             {/* LIKED / FAVORITE */}
             <button
                 onClick={() => toggleLike(movie.id)}
                 className={`group flex items-center justify-center gap-2 px-5 py-3 rounded-full border transition-all duration-300 ${isLiked
-                        ? "bg-rose-50 border-rose-200 text-rose-600"
-                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-400 hover:text-black"
+                    ? "bg-rose-50 border-rose-200 text-rose-600"
+                    : "bg-white border-gray-200 text-gray-600 hover:border-gray-400 hover:text-black"
                     }`}
                 title={isLiked ? "Remove from Favorites" : "Add to Favorites"}
             >
@@ -54,8 +73,8 @@ export function InteractionButtons({ movie }: InteractionButtonsProps) {
             <button
                 onClick={() => toggleWatchlist(movie.id)}
                 className={`group flex items-center justify-center gap-2 px-5 py-3 rounded-full border transition-all duration-300 ${isWatchlisted
-                        ? "bg-blue-50 border-blue-200 text-blue-600"
-                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-400 hover:text-black"
+                    ? "bg-blue-50 border-blue-200 text-blue-600"
+                    : "bg-white border-gray-200 text-gray-600 hover:border-gray-400 hover:text-black"
                     }`}
                 title={isWatchlisted ? "Remove from Watchlist" : "Add to Watchlist"}
             >
@@ -67,8 +86,8 @@ export function InteractionButtons({ movie }: InteractionButtonsProps) {
             <button
                 onClick={() => toggleWatched(movie.id)}
                 className={`group flex items-center justify-center gap-2 px-5 py-3 rounded-full border transition-all duration-300 ${isWatched
-                        ? "bg-green-50 border-green-200 text-green-600"
-                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-400 hover:text-black"
+                    ? "bg-green-50 border-green-200 text-green-600"
+                    : "bg-white border-gray-200 text-gray-600 hover:border-gray-400 hover:text-black"
                     }`}
                 title={isWatched ? "Mark as Unwatched" : "Mark as Watched"}
             >
