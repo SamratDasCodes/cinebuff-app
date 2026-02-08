@@ -89,9 +89,10 @@ export function OmniSearchTile({ item, isSelected, onSelect, onMouseEnter }: Omn
                 </h3>
 
                 {/* Date */}
-                {(item.release_date || item.first_air_date) && (
+                {/* Date */}
+                {item.release_date && (
                     <p className="text-gray-400 text-xs mt-1 font-medium">
-                        {(item.release_date || item.first_air_date)?.split('-')[0]}
+                        {item.release_date.split('-')[0]}
                     </p>
                 )}
 
