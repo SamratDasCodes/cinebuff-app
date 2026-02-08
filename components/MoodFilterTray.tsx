@@ -358,20 +358,47 @@ export function MoodFilterTray() {
                                     <div className="space-y-3">
                                         <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Region & Language</span>
                                         <div className="flex flex-wrap gap-2">
-                                            {LANGUAGES.map((lang) => (
-                                                <button
-                                                    key={lang.code}
-                                                    onClick={() => handleToggleLanguage(lang.code)}
-                                                    className={`
-                                            px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200
-                                            ${selectedLanguages.includes(lang.code)
-                                                            ? 'bg-accent/10 border-accent text-accent shadow-sm'
-                                                            : 'bg-black/5 border-transparent text-gray-500 hover:bg-black/10 hover:text-black'}
-                                          `}
-                                                >
-                                                    {lang.label}
-                                                </button>
-                                            ))}
+                                            {mediaMode === 'anime' ? (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleToggleLanguage('ja')}
+                                                        className={`
+                                                            px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200
+                                                            ${selectedLanguages.includes('ja')
+                                                                ? 'bg-accent/10 border-accent text-accent shadow-sm'
+                                                                : 'bg-black/5 border-transparent text-gray-500 hover:bg-black/10 hover:text-black'}
+                                                        `}
+                                                    >
+                                                        Original (Japanese)
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleToggleLanguage('en')}
+                                                        className={`
+                                                            px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200
+                                                            ${selectedLanguages.includes('en')
+                                                                ? 'bg-accent/10 border-accent text-accent shadow-sm'
+                                                                : 'bg-black/5 border-transparent text-gray-500 hover:bg-black/10 hover:text-black'}
+                                                        `}
+                                                    >
+                                                        English (Dubbed)
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                LANGUAGES.map((lang) => (
+                                                    <button
+                                                        key={lang.code}
+                                                        onClick={() => handleToggleLanguage(lang.code)}
+                                                        className={`
+                                                px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200
+                                                ${selectedLanguages.includes(lang.code)
+                                                                ? 'bg-accent/10 border-accent text-accent shadow-sm'
+                                                                : 'bg-black/5 border-transparent text-gray-500 hover:bg-black/10 hover:text-black'}
+                                              `}
+                                                    >
+                                                        {lang.label}
+                                                    </button>
+                                                ))
+                                            )}
                                         </div>
                                     </div>
 

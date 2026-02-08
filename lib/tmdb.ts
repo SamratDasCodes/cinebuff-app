@@ -114,8 +114,8 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
 
             const effectiveIncludeAdult = includeAdult || forceAdult;
             if (mediaMode === 'anime') {
-                allGenres.add('16');
-                params.append('with_original_language', 'ja');
+                allGenres.add('16'); // Animation Genre
+                if (languages && languages.length > 0) params.append('with_original_language', languages.join('|'));
             } else {
                 if (languages && languages.length > 0) params.append('with_original_language', languages.join('|'));
             }
@@ -176,9 +176,8 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                 url = `${BASE_URL}/${endpoint}`;
             }
 
-            // Fix for TMDB pipe encoding issues: Replace encoded pipes with literal pipes
-            // Some environments/parsers struggle with %7C in some specific params
-            const fullUrl = `${url}?${params.toString().replace(/%7C/g, '|')}`;
+            // Using standard URL encoding. TMDB supports %7C for pipes.
+            const fullUrl = `${url}?${params.toString()}`;
 
             // --- RETRY LOGIC START ---
             let attempts = 0;
@@ -189,8 +188,9 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                     const res = await fetch(fullUrl, {
                         next: { revalidate: 3600 },
                         headers: {
-                            'User-Agent': 'MoodCinema/1.0',
-                            'Accept': 'application/json'
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                            'Accept': 'application/json',
+                            'Connection': 'close' // Avoid keeping connections open to prevent ECONNRESET in some environments
                         }
                     });
 
@@ -209,7 +209,9 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                     // Redact API Key from logs for safety
                     const safeUrl = fullUrl.replace(/api_key=[^&]+/, 'api_key=REDACTED');
                     console.error(`[TMDB Fetch Error - Attempt ${attempts}/${maxAttempts}] URL: ${safeUrl}`);
-                    console.error(`[TMDB Fetch Error] Cause:`, (innerError as Error).message);
+
+                    const err = innerError as any;
+                    console.error(`[TMDB Fetch Error] Cause:`, err.message, err.cause ? `(Cause: ${err.cause})` : '');
 
                     if (attempts >= maxAttempts) {
                         throw innerError;

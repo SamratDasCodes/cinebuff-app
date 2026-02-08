@@ -9,7 +9,8 @@ import { ResultCount } from "@/components/ResultCount";
 import { cookies } from "next/headers";
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-    const filters = parseSearchParams(await searchParams);
+    const params = await searchParams;
+    const filters = parseSearchParams(params);
     const query = filters.query;
     const cookieStore = await cookies();
 
@@ -35,6 +36,11 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     if (!filters.languages || filters.languages.length === 0) {
         const defaultLangs = cookieStore.get('default_languages')?.value;
         filters.languages = defaultLangs ? defaultLangs.split(',') : ['en', 'bn', 'hi'];
+    }
+
+    if (!params['sort_by']) {
+        const defaultSort = cookieStore.get('default_sort_by')?.value;
+        if (defaultSort) filters.sortBy = defaultSort;
     }
 
     const { results: movies, totalResults } = await fetchMovies(filters);

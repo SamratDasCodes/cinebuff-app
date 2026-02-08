@@ -41,17 +41,24 @@ export function ClientStateSync({ newParams }: ClientStateSyncProps) {
                 return existing || { id, name: idStr }; // Temporary fallback
             });
 
+            // Determine effective media mode to decide on defaults
+            const currentState = useMovieStore.getState();
+            const effectiveMode = newParams.mediaMode || currentState.mediaMode;
+            const isDefaultMode = effectiveMode === currentState.defaultMediaMode;
+
             useMovieStore.setState((state) => ({
-                mediaMode: newParams.mediaMode || state.mediaMode, // syncing mediaMode from URL might be tricky if route handles it.
+                mediaMode: effectiveMode, // syncing mediaMode from URL might be tricky if route handles it.
                 searchQuery: newParams.query || "",
                 selectedMoods: newParams.moods || [],
-                selectedLanguages: (newParams.languages && newParams.languages.length > 0) ? newParams.languages : (state.defaultLanguages || ['en', 'bn', 'hi']),
+                selectedLanguages: (newParams.languages && newParams.languages.length > 0)
+                    ? newParams.languages
+                    : ((isDefaultMode && effectiveMode !== 'anime') ? (currentState.defaultLanguages || ['en', 'bn', 'hi']) : []),
                 selectedYear: newParams.year || null,
-                includeAdult: newParams.includeAdult || state.includeAdult, // Persist or Default?
+                includeAdult: newParams.includeAdult || currentState.includeAdult, // Persist or Default?
                 selectedRuntime: newParams.runtime || 'all',
                 minRating: newParams.minRating || 0,
                 selectedWatchProviders: newParams.watchProviders || [],
-                sortBy: newParams.sortBy || state.defaultSortBy || 'popularity.desc',
+                sortBy: newParams.sortBy || ((isDefaultMode && effectiveMode !== 'anime') ? currentState.defaultSortBy : 'popularity.desc'),
                 selectedKeywords: initialKeywords
             }));
 

@@ -8,30 +8,23 @@ import { ResultCount } from "@/components/ResultCount";
 import { cookies } from "next/headers";
 
 export default async function AnimePage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-    const rawFilters = parseSearchParams(await searchParams);
-    const effectiveFilters = { ...rawFilters };
+    const params = await searchParams;
+    const filters = parseSearchParams(params);
     const cookieStore = await cookies();
 
     // Force mediaMode
-    effectiveFilters.mediaMode = 'anime';
-    rawFilters.mediaMode = 'anime';
+    filters.mediaMode = 'anime';
 
     // Apply Defaults
-    if (!effectiveFilters.languages || effectiveFilters.languages.length === 0) {
-        const defaultLangs = cookieStore.get('default_languages')?.value;
-        effectiveFilters.languages = defaultLangs ? defaultLangs.split(',') : ['en', 'bn', 'hi', 'ja']; // Anime default includes JP
-    }
+    // Anime: No default language filter as per request.
 
-    if (!effectiveFilters.sortBy && !searchParams['sort_by']) {
-        const defaultSort = cookieStore.get('default_sort_by')?.value;
-        if (defaultSort) effectiveFilters.sortBy = defaultSort;
-    }
+    // Anime: No default language or sort filters to apply from user preferences.
 
-    const { results: movies, totalResults } = await fetchMovies(effectiveFilters);
+    const { results: movies, totalResults } = await fetchMovies(filters);
 
     return (
         <main className="min-h-screen text-white pb-20">
-            <ClientStateSync newParams={rawFilters} />
+            <ClientStateSync newParams={filters} />
             <div className="max-w-7xl mx-auto">
                 <div className="mb-6 px-4 md:px-8">
                     <div className="flex items-center gap-4">

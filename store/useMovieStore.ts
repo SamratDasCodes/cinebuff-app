@@ -255,7 +255,7 @@ export const useMovieStore = create<MovieState>()(
 
             resetFilters: () => set((state) => ({
                 selectedMoods: [],
-                selectedLanguages: state.defaultLanguages || ['en', 'bn', 'hi'],
+                selectedLanguages: state.mediaMode === 'anime' ? [] : (state.defaultLanguages || ['en', 'bn', 'hi']),
                 selectedYear: null,
                 selectedKeywords: [],
                 selectedRuntime: 'all',
@@ -263,7 +263,7 @@ export const useMovieStore = create<MovieState>()(
                 selectedWatchProviders: [],
                 // Use Defaults
                 sortBy: state.defaultSortBy,
-                mediaMode: state.defaultMediaMode,
+                mediaMode: state.mediaMode,
 
                 searchQuery: "",
                 page: 1,

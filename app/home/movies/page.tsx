@@ -10,32 +10,36 @@ import { ResultCount } from "@/components/ResultCount";
 import { cookies } from "next/headers"; // Import cookies
 
 export default async function MoviesPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-    const rawFilters = parseSearchParams(await searchParams);
-    const effectiveFilters = { ...rawFilters }; // Clone for mutation
-    const cookieStore = await cookies();
+    const params = await searchParams;
+    const filters = parseSearchParams(params);
+    const cookieStore = await cookies(); // Read cookies
 
-    // Force mediaMode (server-side enforcement)
-    effectiveFilters.mediaMode = 'movie';
-    rawFilters.mediaMode = 'movie'; // Ensure client sync knows this too
+    // Force mediaMode
+    filters.mediaMode = 'movie';
 
-    // Apply Defaults if not present (Matches Store defaults)
-    if (!effectiveFilters.languages || effectiveFilters.languages.length === 0) {
-        const defaultLangs = cookieStore.get('default_languages')?.value;
-        effectiveFilters.languages = defaultLangs ? defaultLangs.split(',') : ['en', 'bn', 'hi'];
+    // Apply Defaults if not present (Matches Store defaults) AND if this is the user's default mode
+    const defaultMode = cookieStore.get('default_media_mode')?.value || 'movie';
+    const isDefaultMode = defaultMode === 'movie';
+
+    if (isDefaultMode) {
+        if (!filters.languages || filters.languages.length === 0) {
+            const defaultLangs = cookieStore.get('default_languages')?.value;
+            filters.languages = defaultLangs ? defaultLangs.split(',') : ['en', 'bn', 'hi'];
+        }
+
+        if (!params['sort_by']) { // Check raw param only
+            const defaultSort = cookieStore.get('default_sort_by')?.value;
+            if (defaultSort) filters.sortBy = defaultSort;
+        }
     }
 
-    if (!effectiveFilters.sortBy && !searchParams['sort_by']) {
-        const defaultSort = cookieStore.get('default_sort_by')?.value;
-        if (defaultSort) effectiveFilters.sortBy = defaultSort;
-    }
-
-    const { results: movies, totalResults } = await fetchMovies(effectiveFilters);
+    const { results: movies, totalResults } = await fetchMovies(filters);
     console.log("[MoviesPage] totalResults:", totalResults);
 
     return (
         <main className="min-h-screen text-white pb-20">
             {/* Sync URL Params to Store for UI Consistency (e.g. Filter Tray highlighting) */}
-            <ClientStateSync newParams={rawFilters} />
+            <ClientStateSync newParams={filters} />
 
             <div className="max-w-7xl mx-auto">
                 <div className="mb-6 px-4 md:px-8">
