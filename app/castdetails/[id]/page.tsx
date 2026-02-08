@@ -3,8 +3,9 @@ import { Movie, CastCredit } from "@/lib/constants";
 import { MovieCard } from "@/components/MovieCard";
 import Image from "next/image";
 import { BackButton } from "@/components/BackButton";
-import { Calendar, MapPin } from "lucide-react";
-import { PersonPhotosModal } from "@/components/PersonPhotosModal";
+import { Calendar, MapPin, Camera } from "lucide-react";
+import Link from "next/link";
+
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -95,8 +96,14 @@ export default async function CastDetailsPage({ params }: PageProps) {
                                     {person.known_for_department}
                                 </div>
 
-                                {/* Photos Modal */}
-                                <PersonPhotosModal photos={person.images?.profiles || []} name={person.name} />
+                                {/* Photos Gallery Link */}
+                                <Link
+                                    href={`/person/${personId}/${person.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}/photos`}
+                                    className="px-4 py-2 bg-black text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors flex items-center gap-2"
+                                >
+                                    <Camera size={14} />
+                                    <span>Gallery</span>
+                                </Link>
                             </div>
                         </div>
 

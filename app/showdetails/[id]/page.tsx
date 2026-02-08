@@ -2,7 +2,7 @@ import { fetchMovieDetails } from "@/lib/tmdb";
 import { RecommendedMovies } from "@/components/RecommendedMovies";
 import { Suspense } from "react";
 import Image from "next/image";
-import { Calendar, Clock, Star, Play } from "lucide-react";
+import { Calendar, Clock, Star, Play, Camera } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
 import { BackButton } from "@/components/BackButton";
@@ -167,15 +167,15 @@ export default async function ShowDetailsPage({ params }: PageProps) {
                             </p>
 
                             {/* Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full sm:w-auto">
+                            <div className="flex flex-wrap items-center gap-3 pt-4 w-full sm:w-auto">
                                 {trailer ? (
                                     <a
                                         href={`https://www.youtube.com/watch?v=${trailer.key}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-3 px-6 py-3.5 bg-black text-white rounded-full font-bold text-lg hover:bg-gray-800 hover:scale-105 transition-all shadow-lg w-full sm:w-auto"
+                                        className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-black rounded-full font-bold text-base hover:bg-gray-200 hover:scale-105 transition-all shadow-lg min-h-[48px]"
                                     >
-                                        <Play fill="currentColor" size={20} />
+                                        <Play fill="currentColor" size={18} />
                                         Watch Trailer
                                     </a>
                                 ) : (
@@ -183,15 +183,24 @@ export default async function ShowDetailsPage({ params }: PageProps) {
                                         href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} ${releaseDate?.split('-')[0] || ''} trailer`)}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-3 px-6 py-3.5 bg-black text-white rounded-full font-bold text-lg hover:bg-gray-800 hover:scale-105 transition-all shadow-lg w-full sm:w-auto"
+                                        className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-black rounded-full font-bold text-base hover:bg-gray-200 hover:scale-105 transition-all shadow-lg min-h-[48px]"
                                     >
-                                        <Play fill="currentColor" size={20} />
+                                        <Play fill="currentColor" size={18} />
                                         Search Trailer
                                     </a>
                                 )}
 
                                 {/* INTERACTION PILLS (Like, Watchlist, Watched) */}
                                 <InteractionButtons movie={movie} />
+
+                                {/* Photos Button */}
+                                <Link
+                                    href={`/tv/${movieId}/${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}/photos`}
+                                    className="flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 border border-gray-200 rounded-full font-medium text-black hover:bg-gray-200 hover:scale-105 transition-all min-h-[48px]"
+                                >
+                                    <Camera size={18} className="" />
+                                    <span>Photos</span>
+                                </Link>
 
                                 {/* OTT Pill (Moved inside buttons container) */}
                                 {(() => {
@@ -206,14 +215,14 @@ export default async function ShowDetailsPage({ params }: PageProps) {
                                             href={watchLink}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-center justify-center gap-4 px-6 py-3.5 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md hover:scale-105 transition-all group w-full sm:w-auto"
+                                            className="flex items-center justify-center gap-3 px-5 py-2 bg-gray-100 border border-gray-200 rounded-full hover:bg-gray-200 hover:scale-105 transition-all group min-h-[48px]"
                                             title="Watch Options"
                                         >
-                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Stream on</span>
-                                            <div className="h-6 w-px bg-gray-200" />
-                                            <div className="flex -space-x-4 group-hover:space-x-1 transition-all">
-                                                {streamers.slice(0, 4).map((p: any) => (
-                                                    <div key={p.provider_id} className="relative w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-sm">
+                                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Stream</span>
+                                            <div className="h-4 w-px bg-gray-300" />
+                                            <div className="flex -space-x-3 group-hover:space-x-1 transition-all">
+                                                {streamers.slice(0, 3).map((p: any) => (
+                                                    <div key={p.provider_id} className="relative w-7 h-7 rounded-full border border-gray-300 overflow-hidden shadow-sm">
                                                         <Image
                                                             src={`https://image.tmdb.org/t/p/original${p.logo_path}`}
                                                             fill
@@ -222,9 +231,9 @@ export default async function ShowDetailsPage({ params }: PageProps) {
                                                         />
                                                     </div>
                                                 ))}
-                                                {streamers.length > 4 && (
-                                                    <div className="relative w-8 h-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500 z-10">
-                                                        +{streamers.length - 4}
+                                                {streamers.length > 3 && (
+                                                    <div className="relative w-7 h-7 rounded-full border border-gray-300 bg-gray-200 flex items-center justify-center text-[9px] font-bold text-black z-10">
+                                                        +{streamers.length - 3}
                                                     </div>
                                                 )}
                                             </div>

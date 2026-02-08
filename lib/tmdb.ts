@@ -185,19 +185,21 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
 
             while (attempts < maxAttempts) {
                 try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
                     const res = await fetch(fullUrl, {
                         next: { revalidate: 3600 },
+                        signal: controller.signal,
                         headers: {
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                            'Accept': 'application/json',
-                            'Connection': 'close' // Avoid keeping connections open to prevent ECONNRESET in some environments
+                            'Accept': 'application/json'
                         }
                     });
+                    clearTimeout(timeoutId);
 
                     if (!res.ok) {
                         const errorBody = await res.text();
                         console.error(`[TMDB Error] Status: ${res.status} ${res.statusText}`);
-                        // If 4xx error (client side), typical retry won't fix it, break immediately unless it's 429
                         if (res.status >= 400 && res.status < 500 && res.status !== 429) {
                             throw new Error(`Failed to fetch ${endpoint}: ${res.status} ${res.statusText}`);
                         }
@@ -211,13 +213,14 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                     console.error(`[TMDB Fetch Error - Attempt ${attempts}/${maxAttempts}] URL: ${safeUrl}`);
 
                     const err = innerError as any;
-                    console.error(`[TMDB Fetch Error] Cause:`, err.message, err.cause ? `(Cause: ${err.cause})` : '');
+                    console.error(`[TMDB Fetch Error] Cause:`, err.message, err.cause);
 
                     if (attempts >= maxAttempts) {
                         throw innerError;
                     }
-                    // Wait before retry (1s, 2s)
-                    await new Promise(resolve => setTimeout(resolve, attempts * 1000));
+                    // Wait before retry (exponential backoff + jitter)
+                    const backoff = (attempts * 1000) + Math.random() * 500;
+                    await new Promise(resolve => setTimeout(resolve, backoff));
                 }
             }
         };
@@ -437,7 +440,38 @@ export async function fetchTrending(timeWindow: 'day' | 'week' = 'day') {
         const data = await res.json();
         return (data.results as any[]).map(r => normalizeMedia(r, r.media_type));
     } catch (e) {
-        console.warn("Trending Error:", e);
         return [];
+    }
+}
+
+export async function fetchMovieImages(id: number, type: 'movie' | 'tv' = 'movie') {
+    if (!TMDB_API_KEY) return { backdrops: [], posters: [], logos: [] };
+    try {
+        const res = await fetch(`${BASE_URL}/${type}/${id}/images?api_key=${TMDB_API_KEY}&include_image_language=en,null`, { next: { revalidate: 3600 } });
+        if (!res.ok) return { backdrops: [], posters: [], logos: [] };
+        const data = await res.json();
+        return {
+            backdrops: data.backdrops || [],
+            posters: data.posters || [],
+            logos: data.logos || []
+        };
+    } catch (e) {
+        console.warn("Fetch Images Error:", e);
+        return { backdrops: [], posters: [], logos: [] };
+    }
+}
+
+export async function fetchPersonImages(id: number) {
+    if (!TMDB_API_KEY) return { profiles: [] };
+    try {
+        const res = await fetch(`${BASE_URL}/person/${id}/images?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 } });
+        if (!res.ok) return { profiles: [] };
+        const data = await res.json();
+        return {
+            profiles: data.profiles || []
+        };
+    } catch (e) {
+        console.warn("Fetch Person Images Error:", e);
+        return { profiles: [] };
     }
 }
