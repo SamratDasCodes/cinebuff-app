@@ -11,6 +11,7 @@ export function AuthListener() {
     useEffect(() => {
         if (!auth) return;
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            console.log("AuthListener: State Changed. User:", currentUser?.uid);
             // Serializing user object because Redux/Zustand don't like non-serializable data
             // and Firebase User object has methods on it.
             if (currentUser) {
@@ -21,8 +22,10 @@ export function AuthListener() {
                     photoURL: currentUser.photoURL,
                 };
                 setUser(serializedUser);
+                console.log("AuthListener: setUser called with", currentUser.uid);
             } else {
                 setUser(null);
+                console.log("AuthListener: setUser called with null");
             }
         });
 

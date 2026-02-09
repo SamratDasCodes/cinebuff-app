@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   description: "Aesthetic movie discovery platform powered by your mood.",
 };
 
+import { DeviceTracker } from "@/components/DeviceTracker";
 import { CookieConsent } from "@/components/CookieConsent";
 
 export default function RootLayout({
@@ -31,6 +32,7 @@ export default function RootLayout({
         <AuthListener />
         <SyncEngine />
         <ActivityLogger />
+        <DeviceTracker />
         {children}
         <CookieConsent />
       </body>

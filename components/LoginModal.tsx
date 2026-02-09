@@ -53,17 +53,21 @@ export function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
 
             // LINKING: Add this device ID to the user's profile
             if (userUser) {
+                console.log("Login Successful, User:", userUser.uid);
                 try {
                     const userRef = doc(db, "users", userUser.uid);
                     // Fire and forget (don't await to speed up UI)
                     setDoc(userRef, { deviceIds: arrayUnion(deviceId) }, { merge: true });
+                    console.log("Device linked:", deviceId);
                 } catch (e) {
                     console.warn("Device Link failed (permissions?):", e);
                 }
+            } else {
+                console.error("Login returned no user object.");
             }
             onClose();
         } catch (err: any) {
-            console.error("Auth Error:", err);
+            console.error("Auth Error (Full):", err);
             // Simplistic error mapping
             if (err.code === "auth/email-already-in-use") setError("User ID 'taken'. Try another.");
             else if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password") {

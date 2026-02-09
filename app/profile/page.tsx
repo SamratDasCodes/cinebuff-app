@@ -2,19 +2,23 @@
 
 import { useMovieStore } from "@/store/useMovieStore";
 import { BackButton } from "@/components/BackButton";
-import { Settings, Heart, Eye, User, Film, BookOpen, ShieldAlert, Edit2, LogOut, Sparkles } from "lucide-react";
+import { Settings, Heart, Eye, User, Film, BookOpen, ShieldAlert, Edit2, LogOut, Sparkles, Smartphone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchMovieDetails } from "@/lib/tmdb";
 import { Movie } from "@/lib/constants";
-import { MovieGrid } from "@/components/MovieGrid"; // Import Grid
+import { MovieGrid } from "@/components/MovieGrid";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
-import { useRouter } from "next/navigation"; // Import router
+import { DeviceCard } from "@/components/DeviceCard";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db, auth } from "@/lib/firebase";
+import { getDeviceInfo } from "@/lib/deviceUtils";
 
 export default function ProfilePage() {
-    const router = useRouter(); // Initialize router
+    const router = useRouter();
     const {
         userId,
         userName,
@@ -32,6 +36,48 @@ export default function ProfilePage() {
         defaultLanguages,
         setDefaultLanguages
     } = useMovieStore();
+
+    // Device Management State
+    const [devices, setDevices] = useState<any[]>([]);
+    const [currentDeviceId, setCurrentDeviceId] = useState<string>("");
+
+    useEffect(() => {
+        // Get current device ID for highlighting
+        const info = getDeviceInfo();
+        setCurrentDeviceId(info.deviceId);
+
+        // Listen for Auth State Changes (Handles page refresh async init)
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is authenticated, now subscribe to devices
+                const q = query(
+                    collection(db, "users", user.uid, "devices"),
+                    orderBy("lastActive", "desc")
+                );
+
+                const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+                    const deviceList = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    setDevices(deviceList);
+                }, (error) => {
+                    console.error("Error fetching devices:", error);
+                    // If permission error, it means rules aren't updated
+                    if (error.code === 'permission-denied') {
+                        console.warn("Please check Firestore Security Rules.");
+                    }
+                });
+
+                // Store unsubscribe function to clean up when auth user changes (rare in session, but good practice)
+                return () => unsubscribeSnapshot();
+            } else {
+                setDevices([]);
+            }
+        });
+
+        return () => unsubscribeAuth();
+    }, []); // Run once on mount, let onAuthStateChanged handle the rest
 
     // Local state for fetched movies (limited preview)
     const [likedPreviews, setLikedPreviews] = useState<Movie[]>([]);
@@ -104,7 +150,7 @@ export default function ProfilePage() {
         loadRecommendations();
 
         return () => { isMounted = false; };
-    }, [likedMovies, watchedMovies, watchlistMovies]);
+    }, [likedMovies, watchedMovies, watchlistMovies, dislikedMovies]);
 
     // Library View State
     const [libraryMode, setLibraryMode] = useState<'favorites' | 'watchlist' | 'watched' | 'recommended' | 'settings'>('favorites');
@@ -195,12 +241,51 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-
-
                 {/* Content Area */}
                 <div>
                     {libraryMode === 'settings' ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+                            {/* REGISTERED DEVICES - NEW SECTION */}
+                            <div className="md:col-span-2">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-400">
+                                    <Smartphone size={20} /> Registered Devices
+                                </h2>
+                                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                                    <div className="space-y-4">
+                                        {userId.startsWith('guest_') ? (
+                                            <div className="text-center py-6">
+                                                <p className="text-gray-500 text-sm mb-4">
+                                                    Sign in to view and manage your active devices.
+                                                </p>
+                                                <Link href="/login" className="px-6 py-2 bg-black text-white rounded-full text-sm font-bold shadow-lg hover:scale-105 transition-transform">
+                                                    Sign In / Register
+                                                </Link>
+                                            </div>
+                                        ) : devices.length === 0 ? (
+                                            <p className="text-gray-500 text-sm">No devices detected yet.</p>
+                                        ) : (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {devices.map((device) => (
+                                                    <DeviceCard
+                                                        key={device.id}
+                                                        id={device.id}
+                                                        data={device}
+                                                        isCurrent={device.id === currentDeviceId}
+                                                    />
+                                                ))}
+                                            </div>
+                                        )}
+                                        {!userId.startsWith('guest_') && (
+                                            <p className="text-[10px] text-gray-400 mt-4 border-t pt-4">
+                                                These are the devices that have logged into your account.
+                                                Removing a device will log it out immediately.
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* General Settings */}
                             <div>
                                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-400">
