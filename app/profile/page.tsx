@@ -414,7 +414,10 @@ export default function ProfilePage() {
                         onClick={async () => {
                             const { signOut } = await import('firebase/auth');
                             const { auth } = await import('@/lib/firebase');
-                            if (auth) await signOut(auth);
+                            if (auth) {
+                                await signOut(auth);
+                                window.location.href = "/home";
+                            }
                         }}
                         className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition-colors"
                     >
