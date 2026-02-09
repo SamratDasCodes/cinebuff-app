@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 import { DeviceCard } from "@/components/DeviceCard";
+import { User as FirebaseUser } from "firebase/auth";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import { getDeviceInfo } from "@/lib/deviceUtils";
@@ -47,7 +48,7 @@ export default function ProfilePage() {
         setCurrentDeviceId(info.deviceId);
 
         // Listen for Auth State Changes (Handles page refresh async init)
-        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+        const unsubscribeAuth = auth.onAuthStateChanged((user: FirebaseUser | null) => {
             if (user) {
                 // User is authenticated, now subscribe to devices
                 const q = query(
