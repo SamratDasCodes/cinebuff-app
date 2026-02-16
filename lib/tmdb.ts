@@ -22,7 +22,7 @@ export async function searchKeywords(query: string) {
 export async function fetchKeywordDetails(id: number) {
     if (!TMDB_API_KEY) return null;
     try {
-        const res = await fetch(`${BASE_URL}/keyword/${id}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 * 24 } });
+        const res = await fetch(`${BASE_URL}/keyword/${id}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 86400 } });
         if (!res.ok) return null;
         const data = await res.json();
         return data as { id: number, name: string };
@@ -188,8 +188,9 @@ export async function fetchMovies({ moods, languages, userKeywords, year, query,
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
+                    // ... inside fetchMovies
                     const res = await fetch(fullUrl, {
-                        next: { revalidate: 3600 },
+                        next: { revalidate: 86400 }, // 24 hours
                         signal: controller.signal,
                         headers: {
                             'Accept': 'application/json'
@@ -280,7 +281,7 @@ export async function fetchMovieDetails(id: number, forceType?: 'movie' | 'tv') 
         const url = `${BASE_URL}/${type}/${id}?api_key=${TMDB_API_KEY}&append_to_response=${appends}`;
 
         try {
-            const res = await fetch(url, { next: { revalidate: 3600 } });
+            const res = await fetch(url, { next: { revalidate: 86400 } });
             if (!res.ok) {
                 // If forced, we truly failed. If smart, we just warn and return null to try next.
                 // console.warn(`[TMDB] ${type} fetch failed for ID ${id}: Status ${res.status}`);
@@ -375,7 +376,7 @@ export async function fetchMovieRecommendations(id: number, page: number = 1, me
             if (res.status === 404) {
                 console.warn(`Recommendations not found for ${id} (${mediaType}), trying similar...`);
                 const similarUrl = `${BASE_URL}/${mediaType}/${id}/similar?api_key=${TMDB_API_KEY}&page=${page}`;
-                const similarRes = await fetch(similarUrl, { next: { revalidate: 3600 } });
+                const similarRes = await fetch(similarUrl, { next: { revalidate: 86400 } });
                 if (!similarRes.ok) return [];
                 const similarData = await similarRes.json();
                 return (similarData.results as any[]).map(r => normalizeMedia(r, mediaType));
@@ -396,7 +397,7 @@ export async function fetchMovieRecommendations(id: number, page: number = 1, me
 export async function fetchPersonDetails(id: number) {
     if (!TMDB_API_KEY || isNaN(id)) return null;
     try {
-        const res = await fetch(`${BASE_URL}/person/${id}?api_key=${TMDB_API_KEY}&append_to_response=images`, { next: { revalidate: 3600 } });
+        const res = await fetch(`${BASE_URL}/person/${id}?api_key=${TMDB_API_KEY}&append_to_response=images`, { next: { revalidate: 86400 } });
         if (!res.ok) return null;
         return await res.json() as Person;
     } catch (e) {
@@ -408,7 +409,7 @@ export async function fetchPersonDetails(id: number) {
 export async function fetchPersonMovieCredits(id: number) {
     if (!TMDB_API_KEY || isNaN(id)) return [];
     try {
-        const res = await fetch(`${BASE_URL}/person/${id}/movie_credits?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 } });
+        const res = await fetch(`${BASE_URL}/person/${id}/movie_credits?api_key=${TMDB_API_KEY}`, { next: { revalidate: 86400 } });
         if (!res.ok) return [];
         const data = await res.json();
         const cast = data.cast as CastCredit[];
@@ -423,7 +424,7 @@ export async function fetchPersonMovieCredits(id: number) {
 export async function fetchTvSeason(tvId: number, seasonNumber: number) {
     if (!TMDB_API_KEY) return null;
     try {
-        const res = await fetch(`${BASE_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 } });
+        const res = await fetch(`${BASE_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 86400 } });
         if (!res.ok) return null;
         return await res.json();
     } catch (e) {
@@ -435,7 +436,7 @@ export async function fetchTvSeason(tvId: number, seasonNumber: number) {
 export async function fetchTrending(timeWindow: 'day' | 'week' = 'day') {
     if (!TMDB_API_KEY) return [];
     try {
-        const res = await fetch(`${BASE_URL}/trending/all/${timeWindow}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 * 4 } });
+        const res = await fetch(`${BASE_URL}/trending/all/${timeWindow}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 86400 } });
         if (!res.ok) return [];
         const data = await res.json();
         return (data.results as any[]).map(r => normalizeMedia(r, r.media_type));
@@ -447,7 +448,7 @@ export async function fetchTrending(timeWindow: 'day' | 'week' = 'day') {
 export async function fetchMovieImages(id: number, type: 'movie' | 'tv' = 'movie') {
     if (!TMDB_API_KEY) return { backdrops: [], posters: [], logos: [] };
     try {
-        const res = await fetch(`${BASE_URL}/${type}/${id}/images?api_key=${TMDB_API_KEY}&include_image_language=en,null`, { next: { revalidate: 3600 } });
+        const res = await fetch(`${BASE_URL}/${type}/${id}/images?api_key=${TMDB_API_KEY}&include_image_language=en,null`, { next: { revalidate: 86400 } });
         if (!res.ok) return { backdrops: [], posters: [], logos: [] };
         const data = await res.json();
         return {
@@ -464,7 +465,7 @@ export async function fetchMovieImages(id: number, type: 'movie' | 'tv' = 'movie
 export async function fetchPersonImages(id: number) {
     if (!TMDB_API_KEY) return { profiles: [] };
     try {
-        const res = await fetch(`${BASE_URL}/person/${id}/images?api_key=${TMDB_API_KEY}`, { next: { revalidate: 3600 } });
+        const res = await fetch(`${BASE_URL}/person/${id}/images?api_key=${TMDB_API_KEY}`, { next: { revalidate: 86400 } });
         if (!res.ok) return { profiles: [] };
         const data = await res.json();
         return {

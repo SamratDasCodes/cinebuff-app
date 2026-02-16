@@ -10,6 +10,7 @@ import { MicroButton } from "./ui/MicroButton";
 import { useMovieStore } from "@/store/useMovieStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface MovieCardProps {
     movie: Movie;
@@ -31,24 +32,30 @@ export const MovieCard = memo(function MovieCard({ movie, onClick }: MovieCardPr
 
     const toggleBlur = (e: React.MouseEvent) => {
         e.stopPropagation();
+        e.preventDefault();
         setBlurred(!blurred);
     };
 
     const router = useRouter();
 
-    const handleNavigation = () => {
+    const getMovieUrl = () => {
+        // Robust check: Trust media_type first, fallback to existence of 'name' (TV specific)
+        const isTv = movie.media_type === 'tv' || !!movie.name;
+        const route = isTv ? 'showdetails' : 'moviedetails';
+        return `/${route}/${movie.id}`;
+    };
+
+    const handleNavigation = (e?: React.MouseEvent) => {
         if (onClick) {
+            e?.preventDefault(); // Prevent Link navigation if custom handler exists
             onClick();
-        } else {
-            // Robust check: Trust media_type first, fallback to existence of 'name' (TV specific)
-            const isTv = movie.media_type === 'tv' || !!movie.name;
-            const route = isTv ? 'showdetails' : 'moviedetails';
-            router.push(`/${route}/${movie.id}`);
         }
+        // If no onClick, let Link handle it
     };
 
     const handleTrailerClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
+        e.preventDefault();
         setLoadingTrailer(true);
         try {
             // Fetch details to get the trailer key
@@ -70,9 +77,9 @@ export const MovieCard = memo(function MovieCard({ movie, onClick }: MovieCardPr
 
     const imageUrl = `https://image.tmdb.org/t/p/w342${movie.poster_path}`;
 
-    return (
+    const CardContent = (
         <GlassCard
-            className="relative aspect-[2/3] overflow-hidden group cursor-pointer"
+            className="relative aspect-[2/3] overflow-hidden group cursor-pointer h-full w-full"
             hoverEffect={true}
             onClick={handleNavigation}
             onMouseEnter={() => setIsHovered(true)}
@@ -154,7 +161,8 @@ export const MovieCard = memo(function MovieCard({ movie, onClick }: MovieCardPr
                                 className="gap-2"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleNavigation();
+                                    // Let Link handle it if present, otherwise handleNavigation
+                                    if (onClick) handleNavigation(e);
                                 }}
                             >
                                 <Info size={12} /> Info
@@ -173,5 +181,16 @@ export const MovieCard = memo(function MovieCard({ movie, onClick }: MovieCardPr
                 )}
             </AnimatePresence>
         </GlassCard >
+    );
+
+    // If custom onClick is provided, don't wrap in Link (e.g. for modal selection)
+    if (onClick) {
+        return CardContent;
+    }
+
+    return (
+        <Link href={getMovieUrl()} className="block h-full w-full" prefetch={true}>
+            {CardContent}
+        </Link>
     );
 });

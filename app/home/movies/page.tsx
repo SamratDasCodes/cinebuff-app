@@ -6,7 +6,7 @@ import { ClientStateSync } from "@/components/ClientStateSync"; // We need this 
 // We should create a helper component for that.
 
 import { ResultCount } from "@/components/ResultCount";
-
+import { StorePagination } from "@/components/StorePagination";
 import { cookies } from "next/headers"; // Import cookies
 
 export default async function MoviesPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
@@ -48,6 +48,8 @@ export default async function MoviesPage({ searchParams }: { searchParams: Promi
                             Movies
                         </h1>
                         <ResultCount initialValue={totalResults} />
+                        <div className="flex-1" />
+                        <StorePagination initialTotalResults={totalResults} />
                     </div>
                     <p className="text-gray-400 text-sm mt-1">Discover cinematic masterpieces</p>
                 </div>

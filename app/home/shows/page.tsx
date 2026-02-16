@@ -4,7 +4,7 @@ import { parseSearchParams } from "@/lib/urlUtils";
 import { ClientStateSync } from "@/components/ClientStateSync";
 
 import { ResultCount } from "@/components/ResultCount";
-
+import { StorePagination } from "@/components/StorePagination";
 import { cookies } from "next/headers";
 
 export default async function ShowsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
@@ -43,6 +43,8 @@ export default async function ShowsPage({ searchParams }: { searchParams: Promis
                             TV Shows
                         </h1>
                         <ResultCount initialValue={totalResults} />
+                        <div className="flex-1" />
+                        <StorePagination initialTotalResults={totalResults} />
                     </div>
                     <p className="text-gray-400 text-sm mt-1">Binge-worthy series and episodes</p>
                 </div>

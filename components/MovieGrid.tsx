@@ -4,6 +4,7 @@ import { useMovieStore } from "@/store/useMovieStore";
 import { MovieCard } from "./MovieCard";
 import { useEffect, useRef, useCallback } from "react";
 import { fetchMovies, fetchMovieDetails } from "@/lib/tmdb";
+import { Pagination } from "./Pagination";
 
 function MovieSkeleton() {
     return (
@@ -37,13 +38,13 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
         lastParams, setLastParams
     } = useMovieStore();
 
-    const observerTarget = useRef<HTMLDivElement>(null);
-    const isLoadingRef = useRef(isLoading);
-    const pageRef = useRef(page);
+    // const observerTarget = useRef<HTMLDivElement>(null); // Removed
+    // const isLoadingRef = useRef(isLoading); // Removed
+    // const pageRef = useRef(page); // Removed
 
-    // Keep refs synced
-    useEffect(() => { isLoadingRef.current = isLoading; }, [isLoading]);
-    useEffect(() => { pageRef.current = page; }, [page]);
+    // Keep refs synced -> Removed
+    // useEffect(() => { isLoadingRef.current = isLoading; }, [isLoading]);
+    // useEffect(() => { pageRef.current = page; }, [page]);
 
     // Reset page on filter change
     useEffect(() => {
@@ -70,7 +71,7 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
         if (effectiveMode !== 'discover') {
             const fetchLibrary = async () => {
                 setIsLoading(true);
-                setMovies([]); // Clear discover movies to avoid confusion
+                // setMovies([]); // Don't clear immediately to prevent flicker, maybe?
 
                 const targetIds = effectiveMode === 'watchlist' ? watchlistMovies :
                     effectiveMode === 'favorites' ? likedMovies :
@@ -86,13 +87,18 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
                 }
 
                 try {
-                    // Batch fetch details. Limit to 50 for now to avoid abuse.
-                    // In real app, we'd have a backend endpoint for this.
-                    const promises = idsToFetch.slice(0, 50).map(id => fetchMovieDetails(id).catch(() => null));
+                    // Manual Pagination for Library? 
+                    // For now, let's just slice based on page.
+                    const ITEMS_PER_PAGE = 20;
+                    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+                    const endIndex = startIndex + ITEMS_PER_PAGE;
+                    const pageIds = idsToFetch.slice(startIndex, endIndex);
+
+                    setTotalResults(idsToFetch.length);
+
+                    const promises = pageIds.map(id => fetchMovieDetails(id).catch(() => null));
                     const results = await Promise.all(promises);
 
-                    // Filter text content for keywords if needed? 
-                    // For now just show all in list.
                     const validMovies = results.filter(m => m !== null) as Movie[];
 
                     if (!isCancelled) {
@@ -112,21 +118,21 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
         // DISCOVER MODE LOGIC
         const fetchData = async () => {
             // SSR HYBRID STRATEGY: 
-            // If page is 1, we rely on the Server Component to pass 'initialMovies'.
-            // When filters change -> URL changes -> Server Re-renders -> new initialMovies passed.
-            // Client fetch is ONLY for Pagination (Page > 1).
+            // If page is 1 AND we have initialMovies passed from server (and no active client filters),
+            // we might want to skip fetch. But complex to track "active client filters" vs server params.
+            // Simpler: Just fetch if not initial load or if filters changed.
 
-            if (page === 1) {
-                // Do not fetch. The sync effect below handles initial data.
-                // Just clear loading state if it was somehow stuck.
-                setIsLoading(false);
-                return;
+            if (page === 1 && initialMovies && initialMovies.length > 0 && !isLoading) {
+                // Rely on the Smart Hydration effect below to set data ? 
+                // Actually, if we just mounted, Smart Hydration runs. 
+                // If we change filters, page resets to 1, Smart Hydration might NOT match new params...
+                // So we SHOULD fetch.
             }
 
             setIsLoading(true);
 
             try {
-                console.log(`Fetching page ${page}...`);
+                // console.log(`Fetching page ${page}...`);
 
                 const keywordIds = selectedKeywords.map(k => k.id.toString());
                 const { results: fetchedMovies, totalResults } = await fetchMovies({
@@ -145,8 +151,8 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
                 });
 
                 if (!isCancelled) {
-                    // Only append for Page > 1. 
-                    addMovies(fetchedMovies);
+                    setMovies(fetchedMovies); // REPLACE, don't append
+                    setTotalResults(totalResults);
                 }
             } catch (error) {
                 if (!isCancelled) console.error("Failed to load movies", error);
@@ -160,7 +166,7 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
         return () => {
             isCancelled = true;
         };
-    }, [page, selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery, selectedRuntime, minRating, selectedWatchProviders, sortBy, watchedMovies, includeAdult, setMovies, addMovies, setIsLoading, mediaMode, watchlistMovies, likedMovies, overrideMode]);
+    }, [page, selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery, selectedRuntime, minRating, selectedWatchProviders, sortBy, watchedMovies, includeAdult, setMovies, setTotalResults, setIsLoading, mediaMode, watchlistMovies, likedMovies, overrideMode, initialMovies, customMovies]);
 
     // KEY COMPONENT: Sync Initial Data & Smart Hydration
     useEffect(() => {
@@ -169,7 +175,7 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
             const currentParams = {
                 moods: selectedMoods,
                 languages: selectedLanguages,
-                keywords: selectedKeywords.map(k => k.id).sort(), // Sort for stability
+                keywords: selectedKeywords.map(k => k.id).sort(),
                 year: selectedYear,
                 query: searchQuery,
                 runtime: selectedRuntime,
@@ -182,20 +188,22 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
             const currentHash = JSON.stringify(currentParams);
 
             if (currentHash === lastParams && movies.length > 0) {
-                // Cache Hit! We have data for this view.
-                // Restore loading state to false and keep existing movies/page
+                // Cache Hit! - But wait, if we are on Page 2, we should probably stay there or reset?
+                // The store persists 'page'.
                 setIsLoading(false);
-                // console.log("Smart Hydration: Restored cached movies", movies.length);
                 return;
             }
 
             // Cache Miss or New Filter (Reset)
-            // console.log("Smart Hydration: Cache miss, applying initial data");
             setMovies(initialMovies);
             setTotalResults(initialTotalResults || 0);
-            setPage(1); // Ensure we are on page 1
+
+            // Only reset page if it's a fresh navigation/filter change, not just a hydration
+            // Actually, if initialMovies are passed, it usually means Page 1 from server.
+            setPage(1);
+
             setIsLoading(false);
-            setLastParams(currentHash); // Update cache hash
+            setLastParams(currentHash);
         }
     }, [initialMovies, initialTotalResults, setMovies, setTotalResults, setPage, setIsLoading,
         selectedMoods, selectedLanguages, selectedKeywords, selectedYear, searchQuery,
@@ -203,88 +211,46 @@ export function MovieGrid({ initialMovies, initialTotalResults, overrideMode, cu
         lastParams, setLastParams, movies.length]);
 
 
-    // Stable Intersection Observer
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                const target = entries[0];
-                if (target.isIntersecting) {
-                    // Check refs to avoid closure staleness
-                    const isDiscover = (overrideMode || 'discover') === 'discover';
-                    if (!isLoadingRef.current && isDiscover) {
-                        console.log("Observer fired! Incrementing page from", pageRef.current);
-                        setPage(pageRef.current + 1);
-                    }
-                }
-            },
-            { threshold: 0.1, rootMargin: '1000px' }
-        );
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
-        const currentTarget = observerTarget.current;
-        if (currentTarget) {
-            observer.observe(currentTarget);
-        }
-
-        return () => {
-            if (currentTarget) observer.unobserve(currentTarget);
-        };
-    }, [setPage]); // Minimal dependencies
-
-    // Disable infinite scroll for library views (until we implement pagination for library)
-    useEffect(() => {
-        if ((overrideMode || 'discover') !== 'discover' && observerTarget.current) {
-            // observer.unobserve(observerTarget.current); 
-            // Actually, simply hiding the sentinel or not incrementing page is enough.
-            // Our intersection observer logic handles page increment.
-            // We just need to ensure `setPage` doesn't trigger a 'discover' fetch if we are in 'library' mode.
-            // But wait, the main useEffect handles `viewFilter !== discover` branch first.
-            // So if `page` increments, the main effect runs, sees 'library', and re-fetches library?
-            // Re-fetching library on scroll is redundant.
-            // We should just return if viewFilter is not discover in the Observer callback.
-        }
-    }, [overrideMode]);
-
-    // const handleCardClick = (id: number) => {
-    //    const movie = movies.find(m => m.id === id);
-    //    if (movie) setActiveMovie(movie);
-    // };
+    const totalPages = Math.min(500, Math.ceil(totalResults / 20)); // TMDB limit 500 pages
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 px-4 md:px-8 pb-20">
-            {isLoading && page === 1 ? (
-                Array.from({ length: 15 }).map((_, i) => <MovieSkeleton key={i} />)
-            ) : (
-                <>
-                    {movies
-                        .filter(movie => !hideWatched || !watchedMovies.includes(movie.id))
-                        .map((movie) => (
-                            <MovieCard
-                                key={movie.id}
-                                movie={movie}
-                            // onClick={() => handleCardClick(movie.id)} <--- Removed to enable internal Link/Navigation
-                            />
-                        ))}
+        <div className="flex flex-col pb-20">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 px-4 md:px-8">
+                {isLoading ? (
+                    Array.from({ length: 20 }).map((_, i) => <MovieSkeleton key={i} />)
+                ) : (
+                    <>
+                        {movies
+                            .filter(movie => !hideWatched || !watchedMovies.includes(movie.id))
+                            .map((movie) => (
+                                <MovieCard
+                                    key={movie.id}
+                                    movie={movie}
+                                />
+                            ))}
 
-                    {!isLoading && movies.filter(movie => !hideWatched || !watchedMovies.includes(movie.id)).length === 0 && (
-                        <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
-                            <h3 className="text-xl font-medium text-black mb-2">
-                                {hideWatched ? "All results hidden (Watched)" : "No vibe match found"}
-                            </h3>
-                        </div>
-                    )}
-                </>
-            )}
-
-            {/* Always rendered sentinel */}
-            <div ref={observerTarget} className="col-span-full h-20 w-full flex justify-center items-center opacity-0">
-                Loading...
+                        {!isLoading && movies.length === 0 && (
+                            <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
+                                <h3 className="text-xl font-medium text-black mb-2">
+                                    {hideWatched ? "All results hidden (Watched)" : "No vibe match found"}
+                                </h3>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
 
-            {/* Loading spinner for subsequent pages */}
-            {isLoading && page > 1 && (
-                <div className="col-span-full py-4 flex justify-center">
-                    <div className="w-6 h-6 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
-                </div>
+            {!isLoading && totalPages > 1 && (
+                <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
             )}
         </div>
     );

@@ -4,6 +4,7 @@ import { MoodFilterTray } from "@/components/MoodFilterTray";
 import { MovieModal } from "@/components/MovieModal";
 import { PersonModal } from "@/components/PersonModal";
 import { SyncStatus } from "@/components/SyncStatus";
+import { ScrollButtons } from "@/components/ScrollButtons";
 
 export default function HomeLayout({
     children,
@@ -18,6 +19,7 @@ export default function HomeLayout({
                 <MovieModal />
                 <PersonModal />
                 <SyncStatus />
+                <ScrollButtons />
 
                 <MoodFilterTray />
 
