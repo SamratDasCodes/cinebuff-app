@@ -43,13 +43,17 @@ export default async function MoviesPage({ searchParams }: { searchParams: Promi
 
             <div className="max-w-7xl mx-auto">
                 <div className="mb-6 px-4 md:px-8">
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-200 to-indigo-400">
-                            Movies
-                        </h1>
-                        <ResultCount initialValue={totalResults} />
-                        <div className="flex-1" />
-                        <StorePagination initialTotalResults={totalResults} />
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                        <div className="flex items-center justify-center md:justify-start gap-4 w-full md:w-auto">
+                            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-200 to-indigo-400">
+                                Movies
+                            </h1>
+                            <ResultCount initialValue={totalResults} />
+                        </div>
+                        <div className="flex-1 hidden md:block" />
+                        <div className="w-full md:w-auto flex justify-center md:justify-end">
+                            <StorePagination initialTotalResults={totalResults} />
+                        </div>
                     </div>
                     <p className="text-gray-400 text-sm mt-1">Discover cinematic masterpieces</p>
                 </div>

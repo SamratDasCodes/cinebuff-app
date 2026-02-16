@@ -20,7 +20,7 @@ export function StorePagination({ initialTotalResults = 0 }: { initialTotalResul
     if (totalPages <= 1) return null;
 
     return (
-        <div className="scale-75 origin-left lg:scale-90 flex items-center">
+        <div className="scale-75 origin-center md:origin-right lg:scale-90 flex items-center justify-center md:justify-end">
             <Pagination
                 currentPage={page}
                 totalPages={totalPages}

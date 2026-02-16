@@ -36,20 +36,12 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         }
 
         for (let i = startPage; i <= endPage; i++) {
-            // Mobile Logic: Show only current page and immediate neighbors (1 window size)
-            // Desktop Logic: Show 5 pages (current +/- 2)
-
-            // Logic: Is this page visible on mobile?
-            // Visible if: i is current page, or i is current-1, or i is current+1.
-            const isVisibleOnMobile = (i === currentPage || i === currentPage - 1 || i === currentPage + 1);
-
             pages.push(
                 <button
                     key={i}
                     onClick={() => onPageChange(i)}
                     className={`
                         w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all
-                        ${!isVisibleOnMobile ? "hidden md:flex" : "flex"} 
                         ${currentPage === i
                             ? "bg-black text-white shadow-md scale-110"
                             : "hover:bg-black/5 text-gray-500 hover:text-black"
@@ -79,7 +71,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
     };
 
     return (
-        <div className="flex items-center justify-center gap-2 mt-12 mb-8">
+        <div className="flex items-center justify-center gap-2 mt-2 mb-4 md:mt-12 md:mb-8">
             <button
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
