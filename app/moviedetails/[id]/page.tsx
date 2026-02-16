@@ -1,5 +1,6 @@
-import { fetchMovieDetails } from "@/lib/tmdb"; // Removed fetchMovieRecommendations
+import { fetchMovieDetails, fetchCollection } from "@/lib/tmdb"; // Removed fetchMovieRecommendations
 import { RecommendedMovies } from "@/components/RecommendedMovies"; // New component
+import { MoviesCarousel } from "@/components/MoviesCarousel"; // Import Carousel for Collection
 import { InteractionButtons } from "@/components/InteractionButtons";
 import { Suspense } from "react";
 import Image from "next/image";
@@ -61,6 +62,12 @@ export default async function MovieDetailsPage({ params }: PageProps) {
 
     // Director
     const director = movie.credits?.crew?.find((c: any) => c.job === "Director")?.name;
+
+    // Fetch Collection if exists
+    let collectionData = null;
+    if (movie.belongs_to_collection) {
+        collectionData = await fetchCollection(movie.belongs_to_collection.id);
+    }
 
     return (
 
@@ -322,6 +329,16 @@ export default async function MovieDetailsPage({ params }: PageProps) {
                     </div>
 
                 </div>
+
+                {/* Collection Carousel */}
+                {collectionData && collectionData.parts && collectionData.parts.length > 0 && (
+                    <section>
+                        <MoviesCarousel
+                            title={`Part of the ${collectionData.name}`}
+                            movies={collectionData.parts}
+                        />
+                    </section>
+                )}
 
                 {/* Recommendations Carousel (Suspense) */}
                 <section>

@@ -476,3 +476,27 @@ export async function fetchPersonImages(id: number) {
         return { profiles: [] };
     }
 }
+
+export async function fetchCollection(collectionId: number) {
+    if (!TMDB_API_KEY || isNaN(collectionId)) return null;
+    try {
+        const res = await fetch(`${BASE_URL}/collection/${collectionId}?api_key=${TMDB_API_KEY}`, { next: { revalidate: 86400 } });
+        if (!res.ok) return null;
+        const data = await res.json();
+        const parts = (data.parts as any[]).map(p => normalizeMedia(p, 'movie'));
+        // Sort by release date
+        parts.sort((a, b) => new Date(a.release_date || 0).getTime() - new Date(b.release_date || 0).getTime());
+
+        return {
+            id: data.id,
+            name: data.name,
+            overview: data.overview,
+            poster_path: data.poster_path,
+            backdrop_path: data.backdrop_path,
+            parts: parts
+        };
+    } catch (e) {
+        console.warn("Fetch Collection Error:", e);
+        return null;
+    }
+}
