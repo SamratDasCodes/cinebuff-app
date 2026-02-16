@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { useMovieStore } from "@/store/useMovieStore";
-import { searchMulti, MultiSearchResult, fetchTrending, fetchMovieRecommendations } from "@/lib/tmdb";
+import { searchMulti, MultiSearchResult, fetchTrending, fetchMovieRecommendations, searchKeywords } from "@/lib/tmdb";
 import { parseSearchIntent, SearchIntent } from "@/lib/searchLogic";
 import { OmniSearchTile } from "./OmniSearchTile";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,6 +40,7 @@ export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onCl
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [correctedQuery, setCorrectedQuery] = useState("");
 
     const debouncedInput = useDebounce(input, 300);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -71,6 +72,8 @@ export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onCl
 
     // Perform Search Logic
     useEffect(() => {
+        let isCancelled = false;
+
         if (!debouncedInput || debouncedInput.trim().length === 0) {
             setResults([]);
             setIntent(null);
@@ -89,6 +92,7 @@ export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onCl
                 if (detectedIntent.type === 'similar' && detectedIntent.query) {
                     // 1. Find the target entity (Movie/TV)
                     const targets = await searchMulti(detectedIntent.query, includeAdult);
+                    if (isCancelled) return;
 
                     if (targets.length > 0) {
                         const bestMatch = targets[0]; // Assume first result is what user meant
@@ -97,6 +101,7 @@ export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onCl
                         if (validMedia) {
                             // 2. Fetch Recommendations
                             const recs = await fetchMovieRecommendations(bestMatch.id, 1, bestMatch.media_type as 'movie' | 'tv');
+                            if (isCancelled) return;
                             // Normalize to MultiSearchResult kind of structure if needed, luckily types overlap mostly
                             // We might need to inject media_type since recommendations might not have it in raw fetch?
                             // fetchMovieRecommendations does normalizeMedia which adds media_type.
@@ -119,30 +124,246 @@ export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onCl
 
                 // NORMAL SEARCH
                 const data = await searchMulti(debouncedInput, includeAdult);
-                const processed = data.map(item => {
-                    let score = 0;
-                    if (item.media_type === 'movie') score += 10;
-                    if (item.media_type === 'person') score += 15;
+                if (isCancelled) return;
 
-                    const text = item.title || item.name || "";
-                    if (text.toLowerCase().startsWith(debouncedInput.toLowerCase())) score += 10;
-                    if (text.toLowerCase() === debouncedInput.toLowerCase()) score += 20;
+                let resultsData = data;
+                let correctedQuery = "";
 
-                    if (watchedMovies.includes(item.id)) score -= 20;
+                // SMART RETRY LOGIC (Aggressive Fallback)
+                if (data.length === 0) {
+                    // Method 1: Split CamelCase/Symbols (Fastest)
+                    let cleanQuery = debouncedInput
+                        .replace(/([a-z])([A-Z])/g, '$1 $2')
+                        .replace(/[_-]/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
 
-                    return { ...item, score };
-                }).sort((a, b) => b.score - a.score);
+                    // Method 2: Keyword Search (Slower but Smarter) - e.g. "harrypotter" -> "Harry Potter"
+                    if (cleanQuery === debouncedInput.trim()) {
+                        // Only try keyword search if simple cleaning didn't change anything
+                        // console.log(`[Smart Retry] Attempting Keyword Search for: "${debouncedInput}"`);
+                        const keywords = await searchKeywords(debouncedInput);
+                        if (isCancelled) return;
+                        if (keywords.length > 0) {
+                            // Use the top keyword as the "clean" query
+                            cleanQuery = keywords[0].name;
+                        }
+                    }
 
-                setResults(processed);
+                    // Method 3: Particle Split (Heuristic for "fastandfurious" -> "fast and furious")
+                    // Checks for common English particles and splits around them. O(1) API call.
+                    if (cleanQuery === debouncedInput.trim() && data.length === 0) {
+                        const particles = ["and", "the", "of", "in", "vs", "to", "at", "on", "by"];
+                        let particleQuery = debouncedInput;
+                        let hasReplacements = false;
+
+                        particles.forEach(p => {
+                            const regex = new RegExp(p, "gi");
+                            if (particleQuery.match(regex)) {
+                                // Replace particle with spaces around it
+                                particleQuery = particleQuery.replace(regex, ` ${p} `);
+                                hasReplacements = true;
+                            }
+                        });
+
+                        if (hasReplacements) {
+                            // Clean up multiple spaces
+                            particleQuery = particleQuery.replace(/\s+/g, ' ').trim();
+
+                            // Only search if it actually changed and grew (added spaces)
+                            if (particleQuery !== debouncedInput && particleQuery.length > debouncedInput.length) {
+                                // console.log(`[Smart Retry] Attempting Particle Split: "${particleQuery}"`);
+                                const particleData = await searchMulti(particleQuery, includeAdult);
+                                if (isCancelled) return;
+
+                                if (particleData.length > 0) {
+                                    resultsData = particleData;
+                                    correctedQuery = particleQuery;
+                                    cleanQuery = particleQuery;
+                                    console.log(`[Smart Retry] Successful Particle Split: "${particleQuery}"`);
+                                }
+                            }
+                        }
+                    }
+
+                    // Method 4: Space Shifter (Heuristic for "Lord ofth e rings" -> "Lord of the rings")
+                    // Iterates through spaces and tries shifting them left or right.
+                    if (cleanQuery === debouncedInput.trim() && data.length === 0) {
+                        const chars = debouncedInput.split('');
+                        const spaceIndices = chars.map((c, i) => c === ' ' ? i : -1).filter(i => i !== -1);
+
+                        // Limit to first few spaces to avoid perf hit on long queries
+                        for (const idx of spaceIndices.slice(0, 5)) {
+                            if (isCancelled) break;
+
+                            // Shift Left 1: ...[A][ ][B][C][D]... -> ...[A][B][ ][C][D]...
+                            // Actually, just simple swaps or moves.
+                            // Case 1: "ofth e" -> "of the". Space at 4 moved to 2.
+                            // That's a shift left by 2.
+
+                            // Try Shift Left 1
+                            if (idx > 1) {
+                                const arr = debouncedInput.split('');
+                                // Remove space at idx
+                                arr.splice(idx, 1);
+                                // Insert space at idx - 1
+                                arr.splice(idx - 1, 0, ' ');
+                                const shiftLeft1 = arr.join('');
+
+                                const shiftData = await searchMulti(shiftLeft1, includeAdult);
+                                if (shiftData.length > 0) {
+                                    resultsData = shiftData;
+                                    correctedQuery = shiftLeft1;
+                                    cleanQuery = shiftLeft1;
+                                    console.log(`[Smart Retry] Successful Space Shift (L1): "${shiftLeft1}"`);
+                                    break;
+                                }
+                            }
+
+                            // Try Shift Left 2
+                            if (idx > 2) {
+                                const arr = debouncedInput.split('');
+                                arr.splice(idx, 1);
+                                arr.splice(idx - 2, 0, ' ');
+                                const shiftLeft2 = arr.join('');
+
+                                const shiftData2 = await searchMulti(shiftLeft2, includeAdult);
+                                if (shiftData2.length > 0) {
+                                    resultsData = shiftData2;
+                                    correctedQuery = shiftLeft2;
+                                    cleanQuery = shiftLeft2;
+                                    console.log(`[Smart Retry] Successful Space Shift (L2): "${shiftLeft2}"`);
+                                    break;
+                                }
+                            }
+
+                            // Try Shift Right 1
+                            if (idx < debouncedInput.length - 2) {
+                                const arr = debouncedInput.split('');
+                                arr.splice(idx, 1);
+                                arr.splice(idx + 1, 0, ' ');
+                                const shiftRight1 = arr.join('');
+
+                                const shiftDataR = await searchMulti(shiftRight1, includeAdult);
+                                if (shiftDataR.length > 0) {
+                                    resultsData = shiftDataR;
+                                    correctedQuery = shiftRight1;
+                                    cleanQuery = shiftRight1;
+                                    console.log(`[Smart Retry] Successful Space Shift (R1): "${shiftRight1}"`);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // Method 5: Strip & Split (Heuristic for "Lordo fthe rings" -> "Lord of the rings")
+                    // 1. Strip all spaces. 2. Re-inject spaces around safe particles.
+                    if (cleanQuery === debouncedInput.trim() && data.length === 0) {
+                        const stripped = debouncedInput.replace(/\s+/g, '');
+                        const safeParticles = ["and", "the", "of", "vs"]; // minimal list to avoid "r in gs"
+                        let resegmented = stripped;
+                        let hasReplacements = false;
+
+                        safeParticles.forEach(p => {
+                            const regex = new RegExp(p, "gi");
+                            if (resegmented.match(regex)) {
+                                resegmented = resegmented.replace(regex, ` ${p} `);
+                                hasReplacements = true;
+                            }
+                        });
+
+                        if (hasReplacements) {
+                            resegmented = resegmented.replace(/\s+/g, ' ').trim();
+                            if (resegmented !== stripped && resegmented !== debouncedInput) {
+                                // console.log(`[Smart Retry] Attempting Strip & Split: "${resegmented}"`);
+                                const resegData = await searchMulti(resegmented, includeAdult);
+                                if (resegData.length > 0) {
+                                    resultsData = resegData;
+                                    correctedQuery = resegmented;
+                                    cleanQuery = resegmented;
+                                    console.log(`[Smart Retry] Successful Strip & Split: "${resegmented}"`);
+                                }
+                            }
+                        }
+                    }
+
+                    // Method 6: Flexible Split (Middle-Out Heuristic)
+                    // "fastand" (7) -> Try 3 ("fas tand"), 4 ("fast and")...
+                    if (cleanQuery === debouncedInput.trim() && data.length === 0) {
+                        const len = debouncedInput.length;
+                        if (len > 3) {
+                            // Generate split points starting from the middle (most likely typo location)
+                            const mid = Math.floor(len / 2);
+                            const splitPoints = [mid];
+                            let offset = 1;
+                            while (mid - offset > 0 || mid + offset < len) {
+                                if (mid + offset < len) splitPoints.push(mid + offset);
+                                if (mid - offset > 0) splitPoints.push(mid - offset);
+                                offset++;
+                            }
+
+                            for (const i of splitPoints) {
+                                if (isCancelled) break;
+                                const splitQuery = debouncedInput.slice(0, i) + " " + debouncedInput.slice(i);
+                                // console.log(`[Smart Retry] Attempting Split: "${splitQuery}"`); 
+                                const splitData = await searchMulti(splitQuery, includeAdult);
+
+                                if (splitData.length > 0) {
+                                    resultsData = splitData;
+                                    correctedQuery = splitQuery;
+                                    cleanQuery = splitQuery;
+                                    console.log(`[Smart Retry] Successful Split: "${splitQuery}"`);
+                                    break; // Stop after first successful split
+                                }
+                            }
+                        }
+                    }
+
+                    if (cleanQuery !== debouncedInput.trim() && cleanQuery.toLowerCase() !== debouncedInput.trim().toLowerCase()) {
+                        console.log(`[Smart Retry] Trying: "${cleanQuery}"`);
+                        if (correctedQuery !== cleanQuery) { // Avoid re-fetching if we already found it via split
+                            const retryData = await searchMulti(cleanQuery, includeAdult);
+                            if (isCancelled) return;
+                            if (retryData.length > 0) {
+                                resultsData = retryData;
+                                correctedQuery = cleanQuery;
+                            }
+                        }
+                    }
+                }
+
+                if (!isCancelled) {
+                    const processed = resultsData.map(item => {
+                        let score = 0;
+                        if (item.media_type === 'movie') score += 10;
+                        if (item.media_type === 'person') score += 15;
+
+                        const text = item.title || item.name || "";
+                        if (text.toLowerCase().startsWith(debouncedInput.toLowerCase())) score += 10;
+                        if (text.toLowerCase() === debouncedInput.toLowerCase()) score += 20;
+
+                        if (watchedMovies.includes(item.id)) score -= 20;
+
+                        return { ...item, score };
+                    }).sort((a, b) => b.score - a.score);
+
+                    setResults(processed);
+                    setCorrectedQuery(correctedQuery); // Store the corrected query for UI
+                }
             } catch (error) {
                 console.error("Search Failed", error);
-                setResults([]);
+                if (!isCancelled) {
+                    setResults([]);
+                    setCorrectedQuery("");
+                }
             } finally {
-                setIsLoading(false);
+                if (!isCancelled) setIsLoading(false);
             }
         };
 
         performSearch();
+
+        return () => { isCancelled = true; };
 
     }, [debouncedInput, watchedMovies, includeAdult]);
 
@@ -319,6 +540,21 @@ export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onCl
                                             {intent.type === 'similar' ? '✨ Recommendation Mode' : '🔎 Smart Filter'}
                                             <span className="opacity-75 font-normal text-white">
                                                 {intent.type === 'similar' ? `Finding movies like "${intent.query}"` : `Filtering: ${intent.query}`}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* SMART RETRY FEEDBACK */}
+                                {correctedQuery && (
+                                    <div className="max-w-7xl mx-auto mt-2">
+                                        <div className="inline-flex items-center gap-2 bg-yellow-500/10 text-yellow-600 text-xs font-bold px-3 py-1 rounded-full border border-yellow-500/20">
+                                            <span>Showing results for</span>
+                                            <span className="text-black font-extrabold underline decoration-yellow-500/50 underline-offset-2">
+                                                "{correctedQuery}"
+                                            </span>
+                                            <span className="opacity-50 font-normal ml-1">
+                                                (instead of "{input}")
                                             </span>
                                         </div>
                                     </div>
