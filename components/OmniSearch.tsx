@@ -505,7 +505,7 @@ export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onCl
                             className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-lg flex flex-col"
                         >
                             {/* HEADER SECTION */}
-                            <div className="flex-shrink-0 border-b border-black/5 bg-white/50 p-4 md:p-6 shadow-sm">
+                            <div className="flex-shrink-0 border-b border-black/5 bg-white/50 p-3 md:p-6 shadow-sm">
                                 <div className="max-w-7xl mx-auto w-full flex items-center gap-4">
                                     <Search className="w-6 h-6 text-indigo-600" />
                                     <input
@@ -518,14 +518,25 @@ export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onCl
                                         placeholder="Type to search..."
                                         className="
                                             flex-1 bg-transparent border-none outline-none 
-                                            text-2xl md:text-4xl font-bold text-black placeholder:text-gray-400
+                                            text-xl md:text-4xl font-bold text-black placeholder:text-gray-400
                                         "
                                     />
-                                    <div className="hidden md:flex items-center gap-4">
-                                        {isLoading && <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />}
+                                    <div className="flex items-center gap-2 md:gap-4">
+                                        {isLoading && <Loader2 className="w-5 h-5 md:w-6 md:h-6 text-indigo-600 animate-spin" />}
+
+                                        {/* Mobile Close Button */}
                                         <button
                                             onClick={handleClose}
-                                            className="p-2 rounded-full hover:bg-black/5 text-gray-400 hover:text-black transition-colors"
+                                            className="md:hidden p-2 -mr-2 text-gray-400 hover:text-black"
+                                        >
+                                            <span className="sr-only">Close</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                                        </button>
+
+                                        {/* Desktop ESC Hint */}
+                                        <button
+                                            onClick={handleClose}
+                                            className="hidden md:block p-2 rounded-full hover:bg-black/5 text-gray-400 hover:text-black transition-colors"
                                         >
                                             <span className="sr-only">Close</span>
                                             <span className="text-sm font-medium tracking-widest uppercase">Esc</span>
@@ -562,7 +573,7 @@ export function OmniSearch({ manualOpen, onClose }: { manualOpen?: boolean; onCl
                             </div>
 
                             {/* RESULTS GRID SCROLLABLE AREA */}
-                            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8">
+                            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 md:p-8">
                                 <div className="max-w-7xl mx-auto">
                                     {showZeroState && (
                                         <div className="space-y-8">
